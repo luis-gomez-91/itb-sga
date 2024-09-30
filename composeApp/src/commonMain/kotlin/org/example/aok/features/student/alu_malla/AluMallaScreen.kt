@@ -2,8 +2,6 @@ package org.example.aok.features.student.alu_malla
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,38 +11,26 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.GroupWork
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Pending
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.ShowChart
 import androidx.compose.material.icons.filled.Stairs
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Work
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.rounded.Warning
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
@@ -67,12 +53,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.example.aok.core.MainViewModel
 import org.example.aok.core.formatoText
-import org.example.aok.core.logInfo
 import org.example.aok.data.network.AluMalla
 import org.example.aok.data.network.AluMallaAsignatura
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
-import org.example.aok.features.student.alu_finanzas.CardAluFinanza
 import org.example.aok.ui.components.MyAssistChip
 import org.example.aok.ui.components.MyCard
 import org.example.aok.ui.components.MyCircularProgressIndicator
@@ -146,8 +130,6 @@ fun Screen(
                 .fillMaxSize()
                 .background(color = MaterialTheme.colorScheme.surface)
         ) {
-            var isRefreshing by remember { mutableStateOf(false) }
-
             if (mallaFiltrada.isNotEmpty()) {
                 LaunchedEffect(selectedTabIndex) {
                     pagerState.animateScrollToPage(selectedTabIndex)
@@ -187,7 +169,6 @@ fun ScrollableTabRowNivelesMalla(
     selectedTabIndex: Int,
     onTabSelected: (Int) -> Unit
 ) {
-
 
     val nivelIconos = listOf(
         Icons.Filled.MenuBook,
@@ -286,10 +267,9 @@ fun AsignaturaItem(
             estado = "REPROBADO"
         )
         else -> CardStyle(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-            color = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            color = MaterialTheme.colorScheme.onSurface,
             icono = Icons.Filled.Pending,
-//            icono = Icons.Filled.AccessTime,
             estado = "PENDIENTE"
         )
     }

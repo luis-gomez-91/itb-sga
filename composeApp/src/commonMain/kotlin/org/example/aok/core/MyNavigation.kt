@@ -16,8 +16,14 @@ import org.example.aok.features.student.alu_cronograma.AluCronogramaScreen
 import org.example.aok.features.student.alu_cronograma.AluCronogramaViewModel
 import org.example.aok.features.student.alu_finanzas.AluFinannzasScreen
 import org.example.aok.features.student.alu_finanzas.AluFinanzasViewModel
+import org.example.aok.features.student.alu_horario.AluHorarioScreen
+import org.example.aok.features.student.alu_horario.AluHorarioViewModel
 import org.example.aok.features.student.alu_malla.AluMallaScreen
 import org.example.aok.features.student.alu_malla.AluMallaViewModel
+import org.example.aok.features.student.alu_materias.AluMateriasScreen
+import org.example.aok.features.student.alu_materias.AluMateriasViewModel
+import org.example.aok.features.student.pago_online.PagoOnlineScreen
+import org.example.aok.features.student.pago_online.PagoOnlineViewModel
 
 @Composable
 fun MyNavigation(
@@ -28,7 +34,10 @@ fun MyNavigation(
     accountViewModel: AccountViewModel,
     aluFinanzasViewModel: AluFinanzasViewModel,
     aluCronogramaViewModel: AluCronogramaViewModel,
-    aluMallaViewModel: AluMallaViewModel
+    aluMallaViewModel: AluMallaViewModel,
+    aluHorarioViewModel: AluHorarioViewModel,
+    pagoOnlineViewModel: PagoOnlineViewModel,
+    aluMateriasViewModel: AluMateriasViewModel
 ) {
     val navController = rememberNavController()
     NavHost(
@@ -42,5 +51,8 @@ fun MyNavigation(
         composable("alu_finanzas") { AluFinannzasScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluFinanzasViewModel) }
         composable("alu_cronograma") { AluCronogramaScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluCronogramaViewModel) }
         composable("alu_malla") { AluMallaScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluMallaViewModel) }
+        composable("alu_horarios") { AluHorarioScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluHorarioViewModel) }
+        composable("online") { PagoOnlineScreen(navController, mainViewModel, homeViewModel, loginViewModel, pagoOnlineViewModel) }
+        composable("alu_materias") { AluMateriasScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluMateriasViewModel) }
     }
 }

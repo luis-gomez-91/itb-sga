@@ -22,15 +22,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIos
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.ArrowForwardIos
-import androidx.compose.material.icons.filled.ArrowLeft
-import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Login
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -247,14 +242,14 @@ fun cardInscripcion(
                 Row {
                     MyAssistChip(
                         label = "Cédula: ${inscripcion.identificacion}",
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                        labelColor = MaterialTheme.colorScheme.tertiary,
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        labelColor = MaterialTheme.colorScheme.secondary,
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     MyAssistChip(
                         label = inscripcion.username,
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                        labelColor = MaterialTheme.colorScheme.tertiary,
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        labelColor = MaterialTheme.colorScheme.secondary,
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     IconButton(

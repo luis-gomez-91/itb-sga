@@ -14,8 +14,10 @@ import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.features.student.alu_cronograma.AluCronogramaViewModel
 import org.example.aok.features.student.alu_finanzas.AluFinanzasViewModel
+import org.example.aok.features.student.alu_horario.AluHorarioViewModel
 import org.example.aok.features.student.alu_malla.AluMallaViewModel
-
+import org.example.aok.features.student.alu_materias.AluMateriasViewModel
+import org.example.aok.features.student.pago_online.PagoOnlineViewModel
 
 @Composable
 fun App() {
@@ -27,6 +29,9 @@ fun App() {
     val aluFinanzasViewModel = remember { AluFinanzasViewModel() }
     val aluCronogramaViewModel = remember { AluCronogramaViewModel() }
     val aluMallaViewModel = remember { AluMallaViewModel() }
+    val aluHorarioViewModel = remember { AluHorarioViewModel() }
+    val pagoOnlineViewModel = remember { PagoOnlineViewModel() }
+    val aluMateriasViewModel = remember { AluMateriasViewModel() }
 
     AppTheme {
         Surface(
@@ -41,7 +46,10 @@ fun App() {
                 accountViewModel = accountViewModel,
                 aluFinanzasViewModel = aluFinanzasViewModel,
                 aluCronogramaViewModel = aluCronogramaViewModel,
-                aluMallaViewModel = aluMallaViewModel
+                aluMallaViewModel = aluMallaViewModel,
+                aluHorarioViewModel = aluHorarioViewModel,
+                pagoOnlineViewModel = pagoOnlineViewModel,
+                aluMateriasViewModel = aluMateriasViewModel
             )
         }
     }

@@ -34,3 +34,18 @@ sealed class AluMallaResult {
     data class Success(val aluMalla: List<AluMalla>) : AluMallaResult()
     data class Failure(val error: Error) : AluMallaResult()
 }
+
+sealed class AluHorarioResult {
+    data class Success(val aluHorario: List<AluHorario>) : AluHorarioResult()
+    data class Failure(val error: Error) : AluHorarioResult()
+}
+
+sealed class PagoOnlineResult {
+    data class Success(val pagoOnline: PagoOnline) : PagoOnlineResult()
+    data class Failure(val error: Error) : PagoOnlineResult()
+}
+
+sealed class AluMateriasResult {
+    data class Success(val aluMateria: List<AluMateria>) : AluMateriasResult()
+    data class Failure(val error: Error) : AluMateriasResult()
+}
