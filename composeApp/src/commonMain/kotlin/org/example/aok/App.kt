@@ -17,6 +17,7 @@ import org.example.aok.features.student.alu_finanzas.AluFinanzasViewModel
 import org.example.aok.features.student.alu_horario.AluHorarioViewModel
 import org.example.aok.features.student.alu_malla.AluMallaViewModel
 import org.example.aok.features.student.alu_materias.AluMateriasViewModel
+import org.example.aok.features.student.facturacion_electronica.AluFacturacionViewModel
 import org.example.aok.features.student.pago_online.PagoOnlineViewModel
 
 @Composable
@@ -32,6 +33,7 @@ fun App() {
     val aluHorarioViewModel = remember { AluHorarioViewModel() }
     val pagoOnlineViewModel = remember { PagoOnlineViewModel() }
     val aluMateriasViewModel = remember { AluMateriasViewModel() }
+    val aluFacturacionViewModel = remember { AluFacturacionViewModel() }
 
     AppTheme {
         Surface(
@@ -49,7 +51,8 @@ fun App() {
                 aluMallaViewModel = aluMallaViewModel,
                 aluHorarioViewModel = aluHorarioViewModel,
                 pagoOnlineViewModel = pagoOnlineViewModel,
-                aluMateriasViewModel = aluMateriasViewModel
+                aluMateriasViewModel = aluMateriasViewModel,
+                aluFacturacionViewModel = aluFacturacionViewModel
             )
         }
     }
