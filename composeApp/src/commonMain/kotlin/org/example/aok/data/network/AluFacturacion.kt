@@ -11,13 +11,3 @@ data class AluFacturacion(
     val tipo: String,
     val xml: String
 )
-
-data class AluFacturacionXML(
-    val result: String,
-    val reportfile: String
-)
-
-data class AluFacturacionRIDE(
-    val result: String,
-    val reportfile: String
-)

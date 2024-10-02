@@ -6,7 +6,6 @@ import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import org.example.aok.data.network.AluFacturacion
 import org.example.aok.data.network.AluFacturacionResult
-import org.example.aok.data.network.AluFacturacionXML
 import org.example.aok.data.network.Error
 
 class AluFacturacionService(
@@ -29,14 +28,28 @@ class AluFacturacionService(
         }
     }
 
-    suspend fun downloadXML(ruta: String): AluFacturacionXML {
-        return try {
-            val response = client.get("https://sga.itb.edu.ec$ruta")
-            response.body<AluFacturacionXML>()
-        } catch (e: Exception) {
-            throw Exception("Error al descargar XML: ${e.message}")
-        }
-    }
+//    suspend fun fetchRIDE(ruta: String): RIDEResult {
+//
+//        return try {
+//            val response = client.get("https://sga.itb.edu.ec$ruta")
+//
+//            if (response.status == HttpStatusCode.OK) {
+//                logInfo("alu_facturacion", "OKAS")
+//                logInfo("alu_facturacion", "${response}")
+//                val report = response.body<Report>()
+//                logInfo("alu_facturacion", "REPORT: ${report}")
+//
+//                RIDEResult.Success(report)
+//            } else {
+//                val error = response.body<Error>()
+//                RIDEResult.Failure(error)
+//            }
+//        } catch (e: Exception) {
+//            val error = Error("Error inesperado: ${e.message}")
+//            RIDEResult.Failure(error)
+//        }
+//
+//    }
 
 
 }

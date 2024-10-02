@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
 import org.example.aok.core.MainViewModel
 import org.example.aok.core.MyNavigation
+import org.example.aok.core.PDFOpener
 import org.example.aok.features.admin.inscripciones.InscripcionesViewModel
 import org.example.aok.features.common.account.AccountViewModel
 import org.example.aok.features.common.home.HomeViewModel
@@ -21,10 +22,12 @@ import org.example.aok.features.student.facturacion_electronica.AluFacturacionVi
 import org.example.aok.features.student.pago_online.PagoOnlineViewModel
 
 @Composable
-fun App() {
+fun App(
+    homeViewModel : HomeViewModel
+) {
     val mainViewModel = remember { MainViewModel() }
     val loginViewModel = remember { LoginViewModel() }
-    val homeViewModel = remember { HomeViewModel() }
+//    val homeViewModel = remember { HomeViewModel() }
     val accountViewModel = remember { AccountViewModel() }
     val inscripcionesViewModel = remember { InscripcionesViewModel() }
     val aluFinanzasViewModel = remember { AluFinanzasViewModel() }

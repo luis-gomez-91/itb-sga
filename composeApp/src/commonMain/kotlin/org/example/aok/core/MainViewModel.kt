@@ -4,14 +4,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import org.example.aok.data.network.DatosFacturacion
+import org.example.aok.data.network.PagoOnlineForm
 
 class MainViewModel: ViewModel() {
-//    var showBottomSheet by mutableStateOf(false)
-//    var showNavigationDrawer by mutableStateOf(false)
 
-    private val _onSearch = MutableStateFlow<Boolean>(false)
-    val onSearch: StateFlow<Boolean> = _onSearch
+    private val _isLoading = MutableStateFlow<Boolean>(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _error = MutableStateFlow<String>("")
+    val error: StateFlow<String> = _error
+
+
 
 }

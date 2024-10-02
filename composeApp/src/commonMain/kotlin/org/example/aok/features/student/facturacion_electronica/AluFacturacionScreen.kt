@@ -99,7 +99,8 @@ fun Screen(
                 items(dataFiltada) { facturacion ->
                     CardItem(
                         data = facturacion,
-                        aluFacturacionViewModel = aluFacturacionViewModel
+                        aluFacturacionViewModel = aluFacturacionViewModel,
+                        homeViewModel = homeViewModel
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
@@ -111,7 +112,8 @@ fun Screen(
 @Composable
 fun CardItem(
     data: AluFacturacion,
-    aluFacturacionViewModel: AluFacturacionViewModel
+    aluFacturacionViewModel: AluFacturacionViewModel,
+    homeViewModel: HomeViewModel
 ) {
     MyCard (
         modifier = Modifier.padding(bottom = 4.dp),
@@ -163,18 +165,21 @@ fun CardItem(
                     enabled = true,
                     icon = Icons.Filled.Download,
                     onClickAction = {
-                        aluFacturacionViewModel.downloadRIDE(data.xml)
+                        homeViewModel.openPDF("https://sga.itb.edu.ec/media//documentos/userreports/lagomez11/factura_sri20241001_130714.pdf")
                     },
                     buttonColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     textColor = MaterialTheme.colorScheme.onPrimary
                 )
                 Spacer(modifier = Modifier.width(4.dp))
+
+
+
                 MyFilledTonalButton(
                     text = "RIDE",
                     enabled = true,
                     icon = Icons.Filled.Download,
                     onClickAction = {
-
+                        aluFacturacionViewModel.downloadRIDE("factura_sri", homeViewModel)
                     },
                     buttonColor = MaterialTheme.colorScheme.tertiaryContainer,
                     textColor = MaterialTheme.colorScheme.tertiary

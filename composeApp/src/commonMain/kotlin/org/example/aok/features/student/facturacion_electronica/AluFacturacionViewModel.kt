@@ -5,27 +5,30 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonPrimitive
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
 import org.example.aok.data.network.AluFacturacion
+import org.example.aok.data.network.Report
 import org.example.aok.data.network.AluFacturacionResult
-import org.example.aok.data.network.AluFacturacionXML
+import org.example.aok.data.network.ReportForm
+import org.example.aok.features.common.home.HomeViewModel
 
-class AluFacturacionViewModel : ViewModel() {
+class AluFacturacionViewModel() : ViewModel() {
     private val client = createHttpClient()
     private val service = AluFacturacionService(client)
 
     private val _data = MutableStateFlow<List<AluFacturacion>>(emptyList())
     val data: StateFlow<List<AluFacturacion>> = _data
 
-    private val _error = MutableStateFlow<String?>(null) // Iniciando como null
+    private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
     private val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _XML = MutableStateFlow<AluFacturacionXML?>(null)
-    val XML: StateFlow<AluFacturacionXML?> = _XML
+    private val _RIDE = MutableStateFlow<Report?>(null)
+    val RIDE: StateFlow<Report?> = _RIDE
 
 
     fun onloadAluFacturacion(id: Int) {
@@ -38,7 +41,7 @@ class AluFacturacionViewModel : ViewModel() {
                 when (result) {
                     is AluFacturacionResult.Success -> {
                         _data.value = result.aluFacturacion
-                        _error.value = null // Limpiar errores en caso de éxito
+                        _error.value = null
                     }
                     is AluFacturacionResult.Failure -> {
                         _error.value = result.error.error ?: "Ocurrió un error desconocido"
@@ -52,13 +55,24 @@ class AluFacturacionViewModel : ViewModel() {
         }
     }
 
-    fun downloadRIDE(url: String) {
+    fun downloadRIDE(reportName: String, homeViewModel: HomeViewModel) {
+        _isLoading.value = true
         viewModelScope.launch {
             try {
-                _XML.value = service.downloadXML(url)
-                logInfo("alu_facturacion", "$_XML.value")
+                val form = ReportForm(
+                    reportName = reportName,
+                    params = listOf(
+                        mapOf(
+                            "factura" to JsonPrimitive(1009991)
+                        )
+                    )
+                )
+                homeViewModel.onloadReport(form)
             } catch (e: Exception) {
-                _error.value = "Error al descargar y guardar el archivo: ${e.message}"
+                logInfo("alu_facturacion", "Error: ${e.message}")
+                _error.value = "Error al descargar y abrir el archivo: ${e.message}"
+            } finally {
+                _isLoading.value = false
             }
         }
     }
