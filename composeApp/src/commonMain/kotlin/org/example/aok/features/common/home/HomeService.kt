@@ -7,6 +7,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
@@ -49,6 +50,7 @@ class HomeService(
             if (response.status == HttpStatusCode.OK) {
                 val data = response.body<Report>()
                 ReportResult.Success(data)
+
             } else {
                 val error = response.body<Error>()
                 ReportResult.Failure(error)
@@ -56,6 +58,7 @@ class HomeService(
         } catch (e: Exception) {
             val error = Error("Error inesperado: ${e.message}")
             ReportResult.Failure(error)
+        } finally {
         }
     }
 }

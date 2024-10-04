@@ -27,30 +27,5 @@ class AluFacturacionService(
             AluFacturacionResult.Failure(error)
         }
     }
-
-//    suspend fun fetchRIDE(ruta: String): RIDEResult {
-//
-//        return try {
-//            val response = client.get("https://sga.itb.edu.ec$ruta")
-//
-//            if (response.status == HttpStatusCode.OK) {
-//                logInfo("alu_facturacion", "OKAS")
-//                logInfo("alu_facturacion", "${response}")
-//                val report = response.body<Report>()
-//                logInfo("alu_facturacion", "REPORT: ${report}")
-//
-//                RIDEResult.Success(report)
-//            } else {
-//                val error = response.body<Error>()
-//                RIDEResult.Failure(error)
-//            }
-//        } catch (e: Exception) {
-//            val error = Error("Error inesperado: ${e.message}")
-//            RIDEResult.Failure(error)
-//        }
-//
-//    }
-
-
 }
 

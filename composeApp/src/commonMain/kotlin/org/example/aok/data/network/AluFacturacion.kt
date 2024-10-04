@@ -9,5 +9,6 @@ data class AluFacturacion(
     val numeroAutorizacion: String,
     val ride: String,
     val tipo: String,
-    val xml: String
+    val xml: String,
+    val id: Int
 )

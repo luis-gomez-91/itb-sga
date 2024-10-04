@@ -24,15 +24,12 @@ class AluFacturacionViewModel() : ViewModel() {
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
-    private val _isLoading = MutableStateFlow<Boolean>(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
-
     private val _RIDE = MutableStateFlow<Report?>(null)
     val RIDE: StateFlow<Report?> = _RIDE
 
 
-    fun onloadAluFacturacion(id: Int) {
-        _isLoading.value = true
+    fun onloadAluFacturacion(id: Int, homeViewModel: HomeViewModel) {
+        homeViewModel.changeLoading()
         viewModelScope.launch {
             try {
                 val result = service.fetchAluFacturacion(id)
@@ -50,21 +47,19 @@ class AluFacturacionViewModel() : ViewModel() {
             } catch (e: Exception) {
                 _error.value = "Error al cargar los datos: ${e.message}"
             } finally {
-                _isLoading.value = false
+                homeViewModel.changeLoading()
             }
         }
     }
 
-    fun downloadRIDE(reportName: String, homeViewModel: HomeViewModel) {
-        _isLoading.value = true
+    fun downloadRIDE(reportName: String, id: Int, homeViewModel: HomeViewModel) {
+        homeViewModel.changeLoading()
         viewModelScope.launch {
             try {
                 val form = ReportForm(
-                    reportName = reportName,
-                    params = listOf(
-                        mapOf(
-                            "factura" to JsonPrimitive(1009991)
-                        )
+                reportName = reportName,
+                params = mapOf(
+                        "factura" to JsonPrimitive(id)
                     )
                 )
                 homeViewModel.onloadReport(form)
@@ -72,7 +67,7 @@ class AluFacturacionViewModel() : ViewModel() {
                 logInfo("alu_facturacion", "Error: ${e.message}")
                 _error.value = "Error al descargar y abrir el archivo: ${e.message}"
             } finally {
-                _isLoading.value = false
+                homeViewModel.changeLoading()
             }
         }
     }

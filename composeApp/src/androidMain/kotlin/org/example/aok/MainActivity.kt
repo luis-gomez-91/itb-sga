@@ -9,7 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
-import org.example.aok.core.PDFOpenerAndroid
+import org.example.aok.core.URLOpenerAndroid
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.student.facturacion_electronica.AluFacturacionViewModel
 
@@ -27,10 +27,10 @@ class MainActivity : ComponentActivity() {
                 val darkTheme = isSystemInDarkTheme()
                 insetsController.isAppearanceLightStatusBars = !darkTheme
                 insetsController.isAppearanceLightNavigationBars = !darkTheme
-                val pdfOpener = PDFOpenerAndroid(this)
+                val urlOpener = URLOpenerAndroid(this)
 
                 setContent {
-                    val homeViewModel = HomeViewModel(pdfOpener)
+                    val homeViewModel = HomeViewModel(urlOpener)
                     App(homeViewModel)
                 }
 

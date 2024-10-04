@@ -5,18 +5,16 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.example.aok.core.PDFOpener
+import org.example.aok.core.URLOpener
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
-import org.example.aok.data.network.Error
 import org.example.aok.data.network.Home
 import org.example.aok.data.network.HomeResult
-import org.example.aok.data.network.PagoOnlineForm
 import org.example.aok.data.network.Report
 import org.example.aok.data.network.ReportForm
 import org.example.aok.data.network.ReportResult
 
-class HomeViewModel(private val pdfOpener: PDFOpener) : ViewModel() {
+class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
     val client = createHttpClient()
     val service = HomeService(client)
 
@@ -34,6 +32,10 @@ class HomeViewModel(private val pdfOpener: PDFOpener) : ViewModel() {
 
     private val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading: StateFlow<Boolean> = _isLoading
+
+    fun changeLoading() {
+        _isLoading.value = !_isLoading.value
+    }
 
     private val _report = MutableStateFlow<Report?>(null)
     val report: StateFlow<Report?> = _report
@@ -80,20 +82,19 @@ class HomeViewModel(private val pdfOpener: PDFOpener) : ViewModel() {
             _isLoading.value = true
             try {
                 val result = service.fetchReport(form)
-                logInfo("report", "$result")
-
                 when (result) {
                     is ReportResult.Success -> {
                         _report.value = result.report
                         _error.value = null
+                        val url = "https://sga.itb.edu.ec${_report.value!!.url}"
+                        openURL(url)
                     }
                     is ReportResult.Failure -> {
                         _error.value = result.error.error?:"Error inesperado"
                     }
                 }
-//                openPDF(result.url)
-
             } catch (e: Exception) {
+                logInfo("report", "$e")
                 _error.value = "Error: ${e.message}"
             } finally {
                 _isLoading.value = false
@@ -101,14 +102,12 @@ class HomeViewModel(private val pdfOpener: PDFOpener) : ViewModel() {
         }
     }
 
-    fun openPDF(url: String) {
-        logInfo("alu_facturacion", "${url}")
-//        url = "https://sga.itb.edu.ec/media//documentos/userreports/lagomez11/factura_sri20241001_130714.pdf"
+    fun openURL(url: String) {
         viewModelScope.launch {
             try {
-                pdfOpener.openPDF(url)
+                pdfOpener.openURL(url)
             } catch (e: Exception) {
-                logInfo("alu_facturacion", "ERROR POSI: ${e}")
+                logInfo("alu_facturacion", "ERROR: ${e}")
             }
         }
     }

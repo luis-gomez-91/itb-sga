@@ -66,14 +66,15 @@ fun Screen(
     aluFacturacionViewModel: AluFacturacionViewModel
 ) {
     val data by aluFacturacionViewModel.data.collectAsState(emptyList())
-    val isLoading by aluFacturacionViewModel.isLoading.collectAsState(false)
+    val isLoading by homeViewModel.isLoading.collectAsState(false)
     val searchQuery by homeViewModel.searchQuery.collectAsState("")
 
     LaunchedEffect(Unit) {
         homeViewModel.clearSearchQuery()
         homeViewModel.homeData.value!!.persona.idInscripcion?.let {
             aluFacturacionViewModel.onloadAluFacturacion(
-                it
+                it,
+                homeViewModel
             )
         }
     }
@@ -165,21 +166,20 @@ fun CardItem(
                     enabled = true,
                     icon = Icons.Filled.Download,
                     onClickAction = {
-                        homeViewModel.openPDF("https://sga.itb.edu.ec/media//documentos/userreports/lagomez11/factura_sri20241001_130714.pdf")
+//                        homeViewModel.openPDF("https://sga.itb.edu.ec/media//documentos/userreports/lagomez11/factura_sri20241001_130714.pdf")
+                        homeViewModel.openURL("https://sga.itb.edu.ec/${data.xml}")
                     },
                     buttonColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     textColor = MaterialTheme.colorScheme.onPrimary
                 )
                 Spacer(modifier = Modifier.width(4.dp))
 
-
-
                 MyFilledTonalButton(
                     text = "RIDE",
                     enabled = true,
                     icon = Icons.Filled.Download,
                     onClickAction = {
-                        aluFacturacionViewModel.downloadRIDE("factura_sri", homeViewModel)
+                        aluFacturacionViewModel.downloadRIDE("factura_sri", data.id, homeViewModel)
                     },
                     buttonColor = MaterialTheme.colorScheme.tertiaryContainer,
                     textColor = MaterialTheme.colorScheme.tertiary
