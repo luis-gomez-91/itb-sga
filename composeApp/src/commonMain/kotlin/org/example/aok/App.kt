@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
 import org.example.aok.core.MainViewModel
 import org.example.aok.core.MyNavigation
-import org.example.aok.core.PDFOpener
 import org.example.aok.features.admin.inscripciones.InscripcionesViewModel
 import org.example.aok.features.common.account.AccountViewModel
 import org.example.aok.features.common.home.HomeViewModel
@@ -18,6 +17,7 @@ import org.example.aok.features.student.alu_finanzas.AluFinanzasViewModel
 import org.example.aok.features.student.alu_horario.AluHorarioViewModel
 import org.example.aok.features.student.alu_malla.AluMallaViewModel
 import org.example.aok.features.student.alu_materias.AluMateriasViewModel
+import org.example.aok.features.student.alu_notas.AluNotasViewModel
 import org.example.aok.features.student.facturacion_electronica.AluFacturacionViewModel
 import org.example.aok.features.student.pago_online.PagoOnlineViewModel
 
@@ -37,6 +37,7 @@ fun App(
     val pagoOnlineViewModel = remember { PagoOnlineViewModel() }
     val aluMateriasViewModel = remember { AluMateriasViewModel() }
     val aluFacturacionViewModel = remember { AluFacturacionViewModel() }
+    val aluNotasViewModel = remember { AluNotasViewModel() }
 
     AppTheme {
         Surface(
@@ -55,7 +56,8 @@ fun App(
                 aluHorarioViewModel = aluHorarioViewModel,
                 pagoOnlineViewModel = pagoOnlineViewModel,
                 aluMateriasViewModel = aluMateriasViewModel,
-                aluFacturacionViewModel = aluFacturacionViewModel
+                aluFacturacionViewModel = aluFacturacionViewModel,
+                aluNotasViewModel = aluNotasViewModel
             )
         }
     }

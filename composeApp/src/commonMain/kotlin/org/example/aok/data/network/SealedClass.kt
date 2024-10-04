@@ -55,6 +55,11 @@ sealed class AluFacturacionResult {
     data class Failure(val error: Error) : AluFacturacionResult()
 }
 
+sealed class AluNotasResult {
+    data class Success(val aluNotas: List<AluNotas>) : AluNotasResult()
+    data class Failure(val error: Error) : AluNotasResult()
+}
+
 sealed class ReportResult {
     data class Success(val report: Report) : ReportResult()
     data class Failure(val error: Error) : ReportResult()

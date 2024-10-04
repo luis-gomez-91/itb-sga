@@ -22,6 +22,8 @@ import org.example.aok.features.student.alu_malla.AluMallaScreen
 import org.example.aok.features.student.alu_malla.AluMallaViewModel
 import org.example.aok.features.student.alu_materias.AluMateriasScreen
 import org.example.aok.features.student.alu_materias.AluMateriasViewModel
+import org.example.aok.features.student.alu_notas.AluNotasScreen
+import org.example.aok.features.student.alu_notas.AluNotasViewModel
 import org.example.aok.features.student.facturacion_electronica.AluFacturacionScreen
 import org.example.aok.features.student.facturacion_electronica.AluFacturacionViewModel
 import org.example.aok.features.student.pago_online.PagoOnlineScreen
@@ -40,7 +42,8 @@ fun MyNavigation(
     aluHorarioViewModel: AluHorarioViewModel,
     pagoOnlineViewModel: PagoOnlineViewModel,
     aluMateriasViewModel: AluMateriasViewModel,
-    aluFacturacionViewModel: AluFacturacionViewModel
+    aluFacturacionViewModel: AluFacturacionViewModel,
+    aluNotasViewModel: AluNotasViewModel
 ) {
     val navController = rememberNavController()
     NavHost(
@@ -58,5 +61,6 @@ fun MyNavigation(
         composable("online") { PagoOnlineScreen(navController, mainViewModel, homeViewModel, loginViewModel, pagoOnlineViewModel) }
         composable("alu_materias") { AluMateriasScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluMateriasViewModel) }
         composable("alu_facturacion_electronica") { AluFacturacionScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluFacturacionViewModel) }
+        composable("alu_notas") { AluNotasScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluNotasViewModel) }
     }
 }
