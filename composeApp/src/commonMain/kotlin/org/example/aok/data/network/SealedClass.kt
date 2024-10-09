@@ -56,7 +56,7 @@ sealed class AluFacturacionResult {
 }
 
 sealed class AluNotasResult {
-    data class Success(val aluNotas: List<AluNotas>) : AluNotasResult()
+    data class Success(val tipoAsignaturaNota: TipoAsignaturaNota) : AluNotasResult()
     data class Failure(val error: Error) : AluNotasResult()
 }
 

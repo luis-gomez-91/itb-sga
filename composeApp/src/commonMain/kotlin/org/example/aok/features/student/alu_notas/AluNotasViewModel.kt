@@ -9,21 +9,25 @@ import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
 import org.example.aok.data.network.AluNotas
 import org.example.aok.data.network.AluNotasResult
+import org.example.aok.data.network.Home
+import org.example.aok.data.network.OtraNotaAsignatura
+import org.example.aok.data.network.TipoAsignaturaNota
 
 class AluNotasViewModel: ViewModel() {
     val client = createHttpClient()
     val service = AluNotasService(client)
 
-    private val _data = MutableStateFlow<List<AluNotas>>(emptyList())
-    val data: StateFlow<List<AluNotas>> = _data
+    private val _data = MutableStateFlow<TipoAsignaturaNota?>(null)
+    val data: StateFlow<TipoAsignaturaNota?> = _data
 
-    private val _error = MutableStateFlow<String>("")
+
+    private val _error = MutableStateFlow<String?>("")
     val error: StateFlow<String?> = _error
 
     private val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    fun onloadAluCronograma(id: Int) {
+    fun onloadAluNotaAsignatura(id: Int) {
         _isLoading.value = true
         viewModelScope.launch {
             try {
@@ -32,7 +36,7 @@ class AluNotasViewModel: ViewModel() {
 
                 when (result) {
                     is AluNotasResult.Success -> {
-                        _data.value = result.aluNotas
+                        _data.value = result.tipoAsignaturaNota
                         _error.value = ""
                     }
                     is AluNotasResult.Failure -> {
