@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
@@ -268,9 +269,10 @@ fun AluNotaItem(
                     )
 
                     MyAssistChip(
-                        label = "${data.nota} nota",
+                        label = data.nota.toString(),
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        labelColor = MaterialTheme.colorScheme.secondary
+                        labelColor = MaterialTheme.colorScheme.secondary,
+                        icon = Icons.Filled.Assignment
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -280,6 +282,14 @@ fun AluNotaItem(
                         label = data.estado,
                         containerColor = estadoColor.containerColor,
                         labelColor = estadoColor.color
+                    )
+
+                    // Icono para expandir/colapsar
+                    Icon(
+                        imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        contentDescription = if (expanded) "Colapsar" else "Expandir",
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier
                     )
                 }
 
@@ -397,6 +407,13 @@ fun OtraNotaItem(
                         label = data.estado,
                         containerColor = estadoColor.containerColor,
                         labelColor = estadoColor.color
+                    )
+
+                    // Icono para expandir/colapsar
+                    Icon(
+                        imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        contentDescription = if (expanded) "Colapsar" else "Expandir",
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
 
