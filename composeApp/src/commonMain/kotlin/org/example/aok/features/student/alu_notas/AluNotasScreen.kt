@@ -89,10 +89,15 @@ fun Screen(
     val asignaturas = data?.asignaturas
     val otraNotas = data?.otrasnotas
 
-    val dataFiltrada = if (searchQuery.isNotEmpty()) {
+    val asignaturaFiltrada = if (searchQuery.isNotEmpty()) {
         asignaturas?.filter { it.asignatura.contains(searchQuery, ignoreCase = true) }
     } else {
-        data
+        asignaturas
+    }
+    val otraNotaFiltrada = if (searchQuery.isNotEmpty()) {
+        otraNotas?.filter { it.nombre.contains(searchQuery, ignoreCase = true) }
+    } else {
+        otraNotas
     }
 
     LaunchedEffect(Unit) {
@@ -100,7 +105,7 @@ fun Screen(
         aluNotasViewModel.onloadAluNotaAsignatura(homeViewModel.homeData.value!!.persona.idInscripcion!!)
     }
 
-    TipoItem(asignaturas, otraNotas)
+    TipoItem(asignaturaFiltrada, otraNotaFiltrada)
 }
 
 
