@@ -60,6 +60,11 @@ kotlin {
 
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
+            implementation("com.mohamedrejeb.calf:calf-file-picker:0.5.3")
+            implementation("com.mohamedrejeb.calf:calf-file-picker-coil:0.5.1")
+            implementation("io.coil-kt.coil3:coil-compose:3.0.0-alpha8")
+
+
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)

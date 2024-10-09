@@ -50,7 +50,7 @@ fun MyNavigation(
         navController = navController,
         startDestination = "login"
     ) {
-        composable("login") { LoginScreen(navController, loginViewModel) }
+        composable("login") { LoginScreen(navController, loginViewModel, homeViewModel) }
         composable("home") { HomeScreen(navController, mainViewModel, homeViewModel, loginViewModel) }
         composable("inscripciones") { InscripcionesScreen(navController, mainViewModel, homeViewModel, loginViewModel, inscripcionesViewModel) }
         composable("account") { AccountScreen(navController, mainViewModel, homeViewModel, loginViewModel, accountViewModel) }

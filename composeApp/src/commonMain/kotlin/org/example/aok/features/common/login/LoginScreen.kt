@@ -43,6 +43,7 @@ import aok.composeapp.generated.resources.instagram
 import aok.composeapp.generated.resources.logo
 import aok.composeapp.generated.resources.logo_dark
 import aok.composeapp.generated.resources.tiktok
+import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.ui.components.MyAlert
 import org.example.aok.ui.components.MyCircularProgressIndicator
 
@@ -51,7 +52,8 @@ import org.example.aok.ui.components.MyCircularProgressIndicator
 @Composable
 fun LoginScreen(
     navController: NavHostController,
-    loginViewModel: LoginViewModel
+    loginViewModel: LoginViewModel,
+    homeViewModel: HomeViewModel
 ) {
     val username by loginViewModel.username.collectAsState()
     val password by loginViewModel.password.collectAsState()
@@ -168,7 +170,10 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                RedesSociales()
+                RedesSociales(
+                    modifier = Modifier,
+                    homeViewModel = homeViewModel
+                )
             }
         }
 
@@ -203,12 +208,17 @@ fun PasswordIcon(
 }
 
 @Composable
-fun RedesSociales(modifier: Modifier = Modifier) {
+fun RedesSociales(
+    modifier: Modifier = Modifier,
+    homeViewModel: HomeViewModel
+) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
-        IconButton(onClick = { }) {
+        IconButton(onClick = {
+            homeViewModel.openURL(url = "https://www.instagram.com/itb_ec")
+        }) {
             Image(
                 painter = painterResource(Res.drawable.instagram),
                 contentDescription = "Instagram",
@@ -216,9 +226,7 @@ fun RedesSociales(modifier: Modifier = Modifier) {
             )
         }
         IconButton(onClick = {
-            val facebookUrl = "https://www.facebook.com/itb.edu.ec/?locale=es_LA"
-//            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(facebookUrl))
-//            context.startActivity(intent)
+            homeViewModel.openURL(url = "https://www.facebook.com/itb.edu.ec")
         }) {
             Image(
                 painter = painterResource(Res.drawable.facebook),
@@ -226,7 +234,9 @@ fun RedesSociales(modifier: Modifier = Modifier) {
                 modifier = Modifier.size(120.dp)
             )
         }
-        IconButton(onClick = { }) {
+        IconButton(onClick = {
+            homeViewModel.openURL(url = "https://www.tiktok.com/@itb_ec?lang=es")
+        }) {
             Image(
                 painter = painterResource(Res.drawable.tiktok),
                 contentDescription = "Tik Tok",

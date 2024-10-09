@@ -1,8 +1,10 @@
 package org.example.aok.ui.components.dashboard
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +17,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LockReset
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Person
@@ -35,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -45,7 +50,12 @@ import aok.composeapp.generated.resources.logo
 import aok.composeapp.generated.resources.logo_dark
 import aok.composeapp.generated.resources.tiktok
 import coil3.compose.AsyncImage
+import coil3.compose.LocalPlatformContext
+import com.mohamedrejeb.calf.picker.FilePickerFileType
+import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
+import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
 import kotlinx.coroutines.launch
+import org.example.aok.data.domain.DrawerItem
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.features.common.login.RedesSociales
@@ -64,9 +74,9 @@ fun MyDrawerContent(
 //    val persona = homeDataState.value?.persona
 //
     val items = listOf(
-        ItemsDrawer("Perfil", Icons.Filled.Person, "account"),
-        ItemsDrawer("Logout", Icons.Filled.Logout, "logout"),
-        ItemsDrawer("Cambiar contraseña", Icons.Filled.LockReset, "")
+        DrawerItem("Perfil", Icons.Filled.Person, "account"),
+        DrawerItem("Logout", Icons.Filled.Logout, "logout"),
+        DrawerItem("Cambiar contraseña", Icons.Filled.LockReset, "")
     )
 
     val imageLogo =
@@ -77,6 +87,16 @@ fun MyDrawerContent(
         }
 
 //    val defaultPainter: Painter = painterResource(id = R.drawable.logo)
+
+    val scopee = rememberCoroutineScope()
+    val context = LocalPlatformContext.current
+    val pickerLauncher = rememberFilePickerLauncher(
+        type = FilePickerFileType.Image,
+        selectionMode = FilePickerSelectionMode.Single,
+        onResult = { file ->
+
+        }
+    )
 
     ModalDrawerSheet(
 
@@ -92,65 +112,83 @@ fun MyDrawerContent(
             ) {
                 Row(
                     modifier = Modifier
-//                    .background(
-//                        brush = Brush.verticalGradient(
-//                            colors = listOf(
-//                                MaterialTheme.colorScheme.tertiaryContainer,
-//                                Color.Transparent
-//                            )
-//                        )
-//                    )
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(top = 48.dp, bottom = 16.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Image(
-                        painter = painterResource(imageLogo),
-                        contentDescription = "logo",
-                        modifier = Modifier.fillMaxWidth(0.8f)
-                    )
+//                    Image(
+//                        painter = painterResource(imageLogo),
+//                        contentDescription = "logo",
+//                        modifier = Modifier.fillMaxWidth(0.8f)
+//                    )
+
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.6f) // Ajusta el tamaño del box para la imagen y el icono
+                    ) {
+                        AsyncImage(
+                            model = loginViewModel.userData.value!!.photo,
+                            contentDescription = "Foto perfil",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
+                                .clip(CircleShape)
+                        )
+
+                        IconButton(
+                            onClick = {
+                                pickerLauncher.launch()
+                            },
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(4.dp)
+                                .size(48.dp)
+                                .background(color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f), shape = CircleShape)
+                                .clip(CircleShape)
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                imageVector = Icons.Filled.Camera,
+                                contentDescription = "Actualizar foto",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
                 }
 
                 Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
                     text = "Sistema de Gestión Académica",
                     fontWeight = FontWeight.ExtraBold,
-                    fontSize = 16.sp,
+                    fontSize = 20.sp,
                     color = MaterialTheme.colorScheme.primary
                 )
+                Spacer(modifier = Modifier.height(8.dp))
 
-//                Text(
-//                    text = homeViewModel.homeData.value?.persona?.nombre ?: "",
-//                    fontWeight = FontWeight.Bold,
-//                    fontSize = 16.sp,
-//                    color = MaterialTheme.colorScheme.secondary
-//                )
-//                Text(
-//                    text = homeViewModel.homeData.value?.persona?.identificacion ?: "",
-//                    fontWeight = FontWeight.Bold,
-//                    fontSize = 12.sp,
-//                    color = MaterialTheme.colorScheme.secondary
-//                )
-//
-//                Row {
-//                    MyAssistChip(
-//                        label = homeViewModel.homeData.value?.persona?.emailinst ?: "",
-//                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-//                        labelColor = MaterialTheme.colorScheme.tertiary,
-//                    )
-//                    Spacer(modifier = Modifier.width(4.dp))
-//                    MyAssistChip(
-//                        label = homeViewModel.homeData.value?.persona?.usuario ?: "",
-//                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-//                        labelColor = MaterialTheme.colorScheme.tertiary,
-//                    )
-//                }
+                Text(
+                    text = homeViewModel.homeData.value?.persona?.nombre ?: "",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = "(${homeViewModel.homeData.value?.persona?.identificacion})" ?: "",
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
                 Divider()
                 Spacer(modifier = Modifier.height(8.dp))
+
                 items.forEach { item ->
                     NavigationDrawerItem(
-                        label = { Text(text = item.label, fontSize = 12.sp) },
+                        label = { Text(text = item.label, fontSize = 16.sp) },
                         selected = false,
                         onClick = {
                             scope.launch {
@@ -165,8 +203,8 @@ fun MyDrawerContent(
                         icon = {
                             Icon(
                                 imageVector = item.icon,
-                                contentDescription = "",
-                                modifier = Modifier.size(20.dp),
+                                contentDescription = item.label,
+                                modifier = Modifier.size(24.dp),
                                 tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
@@ -174,14 +212,10 @@ fun MyDrawerContent(
                 }
             }
 
-            RedesSociales()
+            RedesSociales(
+                modifier = Modifier,
+                homeViewModel = homeViewModel
+            )
         }
     }
 }
-
-
-data class ItemsDrawer(
-    val label: String,
-    val icon: ImageVector,
-    val navigate: String,
-)
