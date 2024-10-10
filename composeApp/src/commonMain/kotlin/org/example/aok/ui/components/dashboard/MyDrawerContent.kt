@@ -14,15 +14,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LockPerson
 import androidx.compose.material.icons.filled.LockReset
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Person2
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
@@ -32,7 +31,11 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,13 +47,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import aok.composeapp.generated.resources.Res
-import aok.composeapp.generated.resources.facebook
-import aok.composeapp.generated.resources.instagram
 import aok.composeapp.generated.resources.logo
 import aok.composeapp.generated.resources.logo_dark
-import aok.composeapp.generated.resources.tiktok
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
+import com.mohamedrejeb.calf.io.KmpFile
+import com.mohamedrejeb.calf.io.getPath
+import com.mohamedrejeb.calf.io.readByteArray
 import com.mohamedrejeb.calf.picker.FilePickerFileType
 import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
 import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
@@ -75,8 +78,8 @@ fun MyDrawerContent(
 //
     val items = listOf(
         DrawerItem("Perfil", Icons.Filled.Person, "account"),
-        DrawerItem("Logout", Icons.Filled.Logout, "logout"),
-        DrawerItem("Cambiar contraseña", Icons.Filled.LockReset, "")
+        DrawerItem("Cambiar contraseña", Icons.Filled.LockPerson, ""),
+        DrawerItem("Cerrar sesión", Icons.Filled.Logout, "logout")
     )
 
     val imageLogo =
@@ -90,11 +93,22 @@ fun MyDrawerContent(
 
     val scopee = rememberCoroutineScope()
     val context = LocalPlatformContext.current
+    var byteArray by remember { mutableStateOf(ByteArray(0)) }
+    var platformSpecificFilePath by remember { mutableStateOf("") }
+    var platformSpecificFile by remember { mutableStateOf<KmpFile?>(null) }
+
+
     val pickerLauncher = rememberFilePickerLauncher(
         type = FilePickerFileType.Image,
-        selectionMode = FilePickerSelectionMode.Single,
-        onResult = { file ->
-
+        selectionMode = FilePickerSelectionMode.Multiple,
+        onResult = { files ->
+            scopee.launch {
+                files.firstOrNull()?.let {
+//                    byteArray = it.readByteArray(contextt)
+                    platformSpecificFile = it
+//                    platformSpecificFilePath = it.getPath(context) ?: ""
+                }
+            }
         }
     )
 
@@ -104,16 +118,33 @@ fun MyDrawerContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 32.dp),
+                .padding(top = 40.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    text = "Sistema de Gestión Académica",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 20.sp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    text = "INSTITUTO TECNOLÓGICO BOLIVARIANO DE TECNOLOGÍA",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 10.sp,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 48.dp, bottom = 16.dp),
+                        .padding(vertical = 16.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -126,7 +157,7 @@ fun MyDrawerContent(
 
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(0.6f) // Ajusta el tamaño del box para la imagen y el icono
+                            .fillMaxWidth(0.5f)
                     ) {
                         AsyncImage(
                             model = loginViewModel.userData.value!!.photo,
@@ -144,30 +175,19 @@ fun MyDrawerContent(
                             },
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
-                                .padding(4.dp)
                                 .size(48.dp)
-                                .background(color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f), shape = CircleShape)
+                                .background(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f), shape = CircleShape)
                                 .clip(CircleShape)
                         ) {
                             Icon(
-                                modifier = Modifier.size(24.dp),
+                                modifier = Modifier.size(40.dp).padding(4.dp),
                                 imageVector = Icons.Filled.Camera,
                                 contentDescription = "Actualizar foto",
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.surface
                             )
                         }
                     }
                 }
-
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    text = "Sistema de Gestión Académica",
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 20.sp,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     text = homeViewModel.homeData.value?.persona?.nombre ?: "",
@@ -197,7 +217,7 @@ fun MyDrawerContent(
                             if (item.label == "Logout") {
 //                                loginViewModel.logout(navHostController, context)
                             } else {
-//                                navHostController.navigate(item.navigate)
+                                navHostController.navigate(item.navigate)
                             }
                         },
                         icon = {
