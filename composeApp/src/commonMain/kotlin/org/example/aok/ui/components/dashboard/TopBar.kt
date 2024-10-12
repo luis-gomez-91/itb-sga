@@ -108,6 +108,7 @@ fun MyTopBar(
 
                             keyboardActions = KeyboardActions(
                                 onSearch = {
+                                    homeViewModel.actualPageRestart()
                                     homeViewModel.onSearchQueryChanged(searchQuery)
                                     focusRequester.freeFocus()
                                 }

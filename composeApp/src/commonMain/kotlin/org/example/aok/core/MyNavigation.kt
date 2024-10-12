@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import org.example.aok.features.admin.docentes.DocentesScreen
+import org.example.aok.features.admin.docentes.DocentesViewModel
 import org.example.aok.features.admin.inscripciones.InscripcionesScreen
 import org.example.aok.features.admin.inscripciones.InscripcionesViewModel
 import org.example.aok.features.common.account.AccountScreen
@@ -43,7 +45,8 @@ fun MyNavigation(
     pagoOnlineViewModel: PagoOnlineViewModel,
     aluMateriasViewModel: AluMateriasViewModel,
     aluFacturacionViewModel: AluFacturacionViewModel,
-    aluNotasViewModel: AluNotasViewModel
+    aluNotasViewModel: AluNotasViewModel,
+    docentesViewModel: DocentesViewModel
 ) {
     val navController = rememberNavController()
     NavHost(
@@ -62,5 +65,6 @@ fun MyNavigation(
         composable("alu_materias") { AluMateriasScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluMateriasViewModel) }
         composable("alu_facturacion_electronica") { AluFacturacionScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluFacturacionViewModel) }
         composable("alu_notas") { AluNotasScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluNotasViewModel) }
+        composable("docentes") { DocentesScreen(navController, mainViewModel, homeViewModel, loginViewModel, docentesViewModel) }
     }
 }

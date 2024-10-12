@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
 import org.example.aok.core.MainViewModel
 import org.example.aok.core.MyNavigation
+import org.example.aok.features.admin.docentes.DocentesViewModel
 import org.example.aok.features.admin.inscripciones.InscripcionesViewModel
 import org.example.aok.features.common.account.AccountViewModel
 import org.example.aok.features.common.home.HomeViewModel
@@ -38,6 +39,7 @@ fun App(
     val aluMateriasViewModel = remember { AluMateriasViewModel() }
     val aluFacturacionViewModel = remember { AluFacturacionViewModel() }
     val aluNotasViewModel = remember { AluNotasViewModel() }
+    val docentesViewModel = remember { DocentesViewModel() }
 
     AppTheme {
         Surface(
@@ -57,7 +59,8 @@ fun App(
                 pagoOnlineViewModel = pagoOnlineViewModel,
                 aluMateriasViewModel = aluMateriasViewModel,
                 aluFacturacionViewModel = aluFacturacionViewModel,
-                aluNotasViewModel = aluNotasViewModel
+                aluNotasViewModel = aluNotasViewModel,
+                docentesViewModel = docentesViewModel
             )
         }
     }

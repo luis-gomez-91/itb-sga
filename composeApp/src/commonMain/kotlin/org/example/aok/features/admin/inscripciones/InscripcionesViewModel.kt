@@ -9,6 +9,7 @@ import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
 import org.example.aok.data.network.InscripcionResult
 import org.example.aok.data.network.Inscripciones
+import org.example.aok.features.common.home.HomeViewModel
 
 class InscripcionesViewModel: ViewModel() {
     val client = createHttpClient()
@@ -20,21 +21,15 @@ class InscripcionesViewModel: ViewModel() {
     private val _error = MutableStateFlow<String>("")
     val error: StateFlow<String?> = _error
 
-    private val _isLoading = MutableStateFlow<Boolean>(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
+//    private val _isLoading = MutableStateFlow<Boolean>(false)
+//    val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _pagingRange = MutableStateFlow<Int>(20)
-    val pagingRange: StateFlow<Int> = _pagingRange
-
-    fun onloadInscripciones(
-        search: String,
-        desde: Int = 1,
-        hasta: Int = _pagingRange.value
-    ) {
-        _isLoading.value = true
+    fun onloadInscripciones(search: String, page: Int, homeViewModel: HomeViewModel) {
+//        _isLoading.value = true
+        homeViewModel.changeLoading()
         viewModelScope.launch {
             try {
-                val result = inscripcionesService.fetchInscripciones(search, desde, hasta)
+                val result = inscripcionesService.fetchInscripciones(search, page)
                 logInfo("inscripciones", "$result")
 
                 when (result) {
@@ -50,7 +45,8 @@ class InscripcionesViewModel: ViewModel() {
             } catch (e: Exception) {
                 _error.value = "Error loading data: ${e.message}"
             } finally {
-                _isLoading.value = false
+//                _isLoading.value = false
+                homeViewModel.changeLoading()
             }
         }
     }

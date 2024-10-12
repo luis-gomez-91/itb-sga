@@ -3,7 +3,7 @@ package org.example.aok.data.network
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Paging(
-    val firstPage: Int,
-    val lastPage: Int
+data class Docentes(
+    val paging: Paging,
+    val profesores: List<Docente>
 )

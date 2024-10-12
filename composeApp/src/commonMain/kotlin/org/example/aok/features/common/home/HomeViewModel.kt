@@ -24,34 +24,6 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
-    private val _searchQuery = MutableStateFlow<String>("")
-    val searchQuery: StateFlow<String> get() = _searchQuery
-
-    private val _fastSearch = MutableStateFlow<Boolean>(true)
-    val fastSearch: StateFlow<Boolean> get() = _fastSearch
-
-    private val _isLoading = MutableStateFlow<Boolean>(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
-
-    fun changeLoading() {
-        _isLoading.value = !_isLoading.value
-    }
-
-    private val _report = MutableStateFlow<Report?>(null)
-    val report: StateFlow<Report?> = _report
-
-    fun onSearchQueryChanged(newQuery: String) {
-        _searchQuery.value = newQuery
-    }
-
-    fun changeFastSearch(estado: Boolean) {
-        _fastSearch.value = estado
-    }
-
-    fun clearSearchQuery() {
-        _searchQuery.value = ""
-    }
-
     fun onloadHome(id: Int) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -76,6 +48,37 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
             }
         }
     }
+
+//  ----------------------------------------------------------  LOADING ---------------------------------------------------------
+    private val _isLoading = MutableStateFlow<Boolean>(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    fun changeLoading() {
+        _isLoading.value = !_isLoading.value
+    }
+
+//  ----------------------------------------------------------  BUSQUEDA ---------------------------------------------------------
+    private val _searchQuery = MutableStateFlow<String>("")
+    val searchQuery: StateFlow<String> get() = _searchQuery
+
+    private val _fastSearch = MutableStateFlow<Boolean>(true)
+    val fastSearch: StateFlow<Boolean> get() = _fastSearch
+
+    fun onSearchQueryChanged(newQuery: String) {
+        _searchQuery.value = newQuery
+    }
+
+    fun changeFastSearch(estado: Boolean) {
+        _fastSearch.value = estado
+    }
+
+    fun clearSearchQuery() {
+        _searchQuery.value = ""
+    }
+
+//  ----------------------------------------------------------  REPORTES ---------------------------------------------------------
+    private val _report = MutableStateFlow<Report?>(null)
+    val report: StateFlow<Report?> = _report
 
     fun onloadReport(form: ReportForm) {
         viewModelScope.launch {
@@ -110,6 +113,23 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
                 logInfo("alu_facturacion", "ERROR: ${e}")
             }
         }
+    }
+
+
+//  ----------------------------------------------------------  PAGINADO ---------------------------------------------------------
+    private val _actualPage = MutableStateFlow<Int>(1)
+    val actualPage: StateFlow<Int> = _actualPage
+
+    fun pageMore() {
+        _actualPage.value += 1
+    }
+
+    fun pageLess() {
+        _actualPage.value -= 1
+    }
+
+    fun actualPageRestart() {
+        _actualPage.value = 1
     }
 }
 

@@ -15,6 +15,11 @@ sealed class InscripcionResult {
     data class Failure(val error: Error) : InscripcionResult()
 }
 
+sealed class DocentesResult {
+    data class Success(val docentes: Docentes) : DocentesResult()
+    data class Failure(val error: Error) : DocentesResult()
+}
+
 sealed class AccountResult {
     data class Success(val account: Account) : AccountResult()
     data class Failure(val error: Error) : AccountResult()

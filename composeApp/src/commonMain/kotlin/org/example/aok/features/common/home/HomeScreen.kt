@@ -191,7 +191,7 @@ fun panelModulos(
         modifier = modifier
     ) {
         items(modulosFiltrados) { modulo ->
-            cardModulo(modulo = modulo, navController = navController)
+            cardModulo(modulo = modulo, navController = navController, homeViewModel = homeViewModel)
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
@@ -201,7 +201,8 @@ fun panelModulos(
 @Composable
 fun cardModulo(
     modulo: Modulo,
-    navController: NavHostController
+    navController: NavHostController,
+    homeViewModel: HomeViewModel
 ) {
     Card (
         modifier = Modifier.fillMaxWidth(),
@@ -209,7 +210,10 @@ fun cardModulo(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
             contentColor = MaterialTheme.colorScheme.primary
         ),
-        onClick = { navController.navigate(modulo.url) }
+        onClick = {
+            navController.navigate(modulo.url)
+            homeViewModel.clearSearchQuery()
+        }
     ) {
         Row(
             modifier = Modifier

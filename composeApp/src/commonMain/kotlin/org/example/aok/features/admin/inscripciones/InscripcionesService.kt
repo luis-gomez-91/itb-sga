@@ -12,9 +12,9 @@ import org.example.aok.data.network.Inscripciones
 class InscripcionesService(
     private val client: HttpClient
 ) {
-    suspend fun fetchInscripciones(search: String, from: Int, to: Int): InscripcionResult {
+    suspend fun fetchInscripciones(search: String, page: Int): InscripcionResult {
         return try {
-            val response = client.get("https://sga.itb.edu.ec/api_rest?action=inscripcion&search=$search&desde=${from}&hasta=${to}")
+            val response = client.get("https://sga.itb.edu.ec/api_rest?action=inscripcion&search=$search&page=${page}")
 
             if (response.status == HttpStatusCode.OK) {
                 val inscripciones = response.body<Inscripciones>()
