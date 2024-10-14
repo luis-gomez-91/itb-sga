@@ -7,7 +7,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,10 +29,16 @@ import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Login
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Notes
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,6 +54,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import org.example.aok.core.MainViewModel
@@ -92,15 +103,12 @@ fun Screen(
     val data by docentesViewModel.data.collectAsState()
     val isLoading by homeViewModel.isLoading.collectAsState(false)
     val query by homeViewModel.searchQuery.collectAsState("")
+    val actualPage by homeViewModel.actualPage.collectAsState(1)
 
-    if (query.isNotBlank()) {
-        docentesViewModel.onloadDocentes(query)
-    }
     homeViewModel.changeFastSearch(false)
-    LaunchedEffect(Unit) {
-        homeViewModel.clearSearchQuery()
-        homeViewModel.changeFastSearch(false)
-        docentesViewModel.onloadDocentes("")
+
+    LaunchedEffect(query) {
+        docentesViewModel.onloadDocentes(query, actualPage, homeViewModel)
     }
 
     if (isLoading) {
@@ -126,7 +134,6 @@ fun Screen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }
-
                 }
             }
             Row (
@@ -134,33 +141,48 @@ fun Screen(
                     .fillMaxWidth()
                     .padding(4.dp)
                     .background(color = MaterialTheme.colorScheme.surfaceContainer),
-                horizontalArrangement = Arrangement.SpaceAround
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
             ){
                 IconButton(
                     onClick = {
+                        homeViewModel.pageLess()
                         docentesViewModel.onloadDocentes(
-                            search = ""
+                            query,
+                            actualPage,
+                            homeViewModel
                         )
-                    }
+                    },
+                    enabled = actualPage > 1  && !isLoading
                 ) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBackIos,
                         contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onSurface
+                        tint = if (actualPage > 1  && !isLoading) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outlineVariant
                     )
                 }
 
+                Text(
+                    text = "${actualPage}/${data?.paging?.lastPage?: 0}",
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 20.sp
+                )
+
                 IconButton(
                     onClick = {
+                        homeViewModel.pageMore()
                         docentesViewModel.onloadDocentes(
-                            search = ""
+                            query,
+                            actualPage,
+                            homeViewModel
                         )
-                    }
+                    },
+                    enabled = actualPage < (data?.paging?.lastPage ?: Int.MAX_VALUE) && !isLoading
                 ) {
                     Icon(
                         imageVector = Icons.Filled.ArrowForwardIos,
                         contentDescription = "Next",
-                        tint = MaterialTheme.colorScheme.onSurface
+                        tint = if (actualPage < (data?.paging?.lastPage ?: Int.MAX_VALUE)  && !isLoading) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outlineVariant
                     )
                 }
             }
@@ -177,89 +199,107 @@ fun DocenteItem(
     navController: NavHostController
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var showActions by remember { mutableStateOf(false) }
 
-    Row (
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 4.dp)
-            .background(color = MaterialTheme.colorScheme.surface),
-        verticalAlignment = Alignment.Top,
-    ){
-        AsyncImage(
-            model = docente.foto,
-            contentDescription = "Foto",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .height(64.dp)
-                .aspectRatio(1/1f)
-                .aspectRatio(1f)
-                .clip(CircleShape)
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                    shape = CircleShape
-                )
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-
-
+            .background(color = MaterialTheme.colorScheme.surface)
+    ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 4.dp)
+                .background(color = MaterialTheme.colorScheme.surface),
+            verticalAlignment = Alignment.Top,
         ) {
-            Column {
-                Text(
-                    text = docente.nombre,
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                )
+            AsyncImage(
+                model = docente.foto,
+                contentDescription = "Foto",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .height(64.dp)
+                    .aspectRatio(1 / 1f)
+                    .aspectRatio(1f)
+                    .clip(CircleShape)
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = CircleShape
+                    )
+            )
+            Spacer(modifier = Modifier.width(16.dp))
 
-                Row {
-                    MyAssistChip(
-                        label = "Cédula: ${docente.identificacion}",
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        labelColor = MaterialTheme.colorScheme.secondary,
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = docente.nombre,
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    MyAssistChip(
-                        label = docente.username,
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        labelColor = MaterialTheme.colorScheme.secondary,
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    IconButton(
-                        onClick = {
-                            loginViewModel.changeLogin(docente.idPersona, docente.nombre)
-                            homeViewModel.clearSearchQuery()
-                            navController.navigate("home")
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Login,
-                            contentDescription = "Login",
-                            tint = MaterialTheme.colorScheme.primary
+
+                    Row {
+                        MyAssistChip(
+                            label = "Cédula: ${docente.identificacion}",
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            labelColor = MaterialTheme.colorScheme.secondary,
                         )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        MyAssistChip(
+                            label = docente.username,
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            labelColor = MaterialTheme.colorScheme.secondary,
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+
+                        Column {
+                            IconButton(
+                                onClick = {
+                                    showActions = !showActions
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.MoreVert,
+                                    contentDescription = "More Information",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+
+                            Box {
+                                if (showActions) {
+                                    DropdownDocente(
+                                        loginViewModel = loginViewModel,
+                                        homeViewModel = homeViewModel,
+                                        navController = navController,
+                                        docente = docente,
+                                        onDismissRequest = { showActions = false }
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
 
-                DetalleDocente(docente, expanded)
-            }
-
-            IconButton(
-                onClick = { expanded = !expanded }
-            ) {
-                Icon(
-                    imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = "More options",
-                    tint = MaterialTheme.colorScheme.secondary
-                )
+                IconButton(
+                    onClick = { expanded = !expanded }
+                ) {
+                    Icon(
+                        imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        contentDescription = "More options",
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                }
             }
         }
-
-
+        Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f), thickness = 1.dp)
     }
-    Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f), thickness = 1.dp)
+    DetalleDocente(docente, expanded)
 }
 
 @Composable
@@ -273,7 +313,7 @@ fun DetalleDocente(
         exit = fadeOut() + shrinkVertically()
     ) {
         MyCard (
-            modifier = Modifier.padding(bottom = 4.dp),
+            modifier = Modifier.padding(horizontal = 16.dp),
             onClick = { }
         ) {
             Column {
@@ -287,6 +327,86 @@ fun DetalleDocente(
                     fontSize = 8.sp,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun DropdownDocente(
+    loginViewModel: LoginViewModel,
+    homeViewModel: HomeViewModel,
+    navController: NavHostController,
+    docente: Docente,
+    onDismissRequest: () -> Unit
+) {
+    Popup (
+        alignment = Alignment.TopStart,
+        properties = PopupProperties(),
+        onDismissRequest = onDismissRequest
+    ){
+        Card(
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
+        ) {
+            Surface(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(vertical = 8.dp, horizontal = 16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.background(MaterialTheme.colorScheme.background)
+                ) {
+                    Row(
+                        modifier = Modifier.clickable {
+                            loginViewModel.changeLogin(docente.idPersona, docente.nombre)
+                            homeViewModel.clearSearchQuery()
+                            navController.navigate("home")
+                        }
+                    ){
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            imageVector = Icons.Filled.Login,
+                            contentDescription = "Login",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            text = "Login",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    Row {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            imageVector = Icons.Filled.School,
+                            contentDescription = "Clases",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = "Clases",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    Row {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            imageVector = Icons.Filled.Notes,
+                            contentDescription = "Calificaciones",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = "Calificaciones",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                }
             }
         }
     }

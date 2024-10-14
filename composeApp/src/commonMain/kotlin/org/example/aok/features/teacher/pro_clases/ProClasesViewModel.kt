@@ -1,4 +1,4 @@
-package org.example.aok.features.admin.inscripciones
+package org.example.aok.features.teacher.pro_clases
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,36 +7,40 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
-import org.example.aok.data.network.InscripcionResult
-import org.example.aok.data.network.Inscripciones
+import org.example.aok.data.network.ProClases
+import org.example.aok.data.network.ProClasesResult
 import org.example.aok.features.common.home.HomeViewModel
 
-class InscripcionesViewModel: ViewModel() {
+class ProClasesViewModel: ViewModel() {
     val client = createHttpClient()
-    val inscripcionesService = InscripcionesService(client)
+    val service = ProClasesService(client)
 
-    private val _data = MutableStateFlow<Inscripciones?>(null)
-    val data: StateFlow<Inscripciones?> = _data
+    private val _data = MutableStateFlow<ProClases?>(null)
+    val data: StateFlow<ProClases?> = _data
 
     private val _error = MutableStateFlow<String>("")
     val error: StateFlow<String?> = _error
 
-    fun onloadInscripciones(search: String, page: Int, homeViewModel: HomeViewModel) {
+    fun onloadProClases(search: String, page: Int, homeViewModel: HomeViewModel) {
         homeViewModel.changeLoading()
         viewModelScope.launch {
             try {
-                val result = inscripcionesService.fetchInscripciones(search, page)
-                logInfo("inscripciones", "$result")
+                val result = homeViewModel.homeData.value?.persona?.idDocente?.let {
+                    service.fetchProClases(search, 2,
+                        it
+                    )
+                }
+                logInfo("pro_clases", "$result")
 
                 when (result) {
-                    is InscripcionResult.Success -> {
-                        _data.value = result.inscripciones
-//                        _data.value!!.paging.next = _data.value!!.paging.next.from + _pagingRange.value
+                    is ProClasesResult.Success -> {
+                        _data.value = result.proClases
                         _error.value = ""
                     }
-                    is InscripcionResult.Failure -> {
+                    is ProClasesResult.Failure -> {
                         _error.value = result.error.error ?: "An unknown error occurred"
                     }
+                    else -> {}
                 }
             } catch (e: Exception) {
                 _error.value = "Error loading data: ${e.message}"

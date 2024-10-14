@@ -155,12 +155,12 @@ fun Screen(
                         homeViewModel
                     )
                 },
-                enabled = actualPage > 1
+                enabled = actualPage > 1  && !isLoading
             ) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBackIos,
                     contentDescription = "Back",
-                    tint = if (actualPage > 1) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outlineVariant
+                    tint = if (actualPage > 1  && !isLoading) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outlineVariant
                 )
             }
 
@@ -179,12 +179,12 @@ fun Screen(
                         homeViewModel
                     )
                 },
-                enabled = actualPage < (data?.paging?.lastPage ?: Int.MAX_VALUE)
+                enabled = actualPage < (data?.paging?.lastPage ?: Int.MAX_VALUE) && !isLoading
             ) {
                 Icon(
                     imageVector = Icons.Filled.ArrowForwardIos,
                     contentDescription = "Next",
-                    tint = if (actualPage < (data?.paging?.lastPage ?: Int.MAX_VALUE)) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outlineVariant
+                    tint = if (actualPage < (data?.paging?.lastPage ?: Int.MAX_VALUE)  && !isLoading) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outlineVariant
                 )
             }
         }
@@ -289,7 +289,6 @@ fun cardInscripcion(
                         }
 
                     }
-//                    detalleInscripcion(inscripcion, expanded)
                 }
 
                 IconButton(

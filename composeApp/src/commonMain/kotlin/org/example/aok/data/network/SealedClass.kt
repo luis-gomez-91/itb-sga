@@ -69,3 +69,8 @@ sealed class ReportResult {
     data class Success(val report: Report) : ReportResult()
     data class Failure(val error: Error) : ReportResult()
 }
+
+sealed class ProClasesResult {
+    data class Success(val proClases: ProClases) : ProClasesResult()
+    data class Failure(val error: Error) : ProClasesResult()
+}

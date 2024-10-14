@@ -10,6 +10,7 @@ import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
 import org.example.aok.data.network.Home
 import org.example.aok.data.network.HomeResult
+import org.example.aok.data.network.Periodo
 import org.example.aok.data.network.Report
 import org.example.aok.data.network.ReportForm
 import org.example.aok.data.network.ReportResult
@@ -35,14 +36,15 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
                     is HomeResult.Success -> {
                         _homeData.value = result.home
                         _error.value = null
+                        _periodoSelect.value = result.home.periodos[0]
                     }
                     is HomeResult.Failure -> {
-                        _error.value = result.error.error?:"Error inesperado"
+                        _error.value = result.error.error
                     }
                 }
 
             } catch (e: Exception) {
-                _error.value = "${e}"?:"Error inesperado"
+                _error.value = "${e}"
             } finally {
                 _isLoading.value = false
             }
@@ -131,6 +133,22 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
     fun actualPageRestart() {
         _actualPage.value = 1
     }
+
+    //  --------------------------------------------------- BOTTOM SHEET PERIODOS ---------------------------------------------------
+    private val _showBottomSheet = MutableStateFlow<Boolean>(false)
+    val showBottomSheet: StateFlow<Boolean> = _showBottomSheet
+
+    private val _periodoSelect = MutableStateFlow<Periodo?>(null)
+    val periodoSelect: StateFlow<Periodo?> = _periodoSelect
+
+    fun changeBottomSheet() {
+        _showBottomSheet.value = !_showBottomSheet.value
+    }
+
+    fun changePeriodoSelect(periodo: Periodo) {
+        _periodoSelect.value = periodo
+    }
 }
+
 
 

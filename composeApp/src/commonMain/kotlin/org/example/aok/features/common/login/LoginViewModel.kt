@@ -10,6 +10,7 @@ import org.example.aok.data.network.Login
 import org.example.aok.data.network.LoginResult
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
+import org.example.aok.features.common.home.HomeViewModel
 
 class LoginViewModel : ViewModel() {
     val client = createHttpClient()
@@ -83,6 +84,22 @@ class LoginViewModel : ViewModel() {
                 _error.value = "Login failed: ${e.message}"
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+
+    fun onLogout(navController: NavHostController) {
+        viewModelScope.launch {
+            _username.value = ""
+            _password.value = ""
+            _userData.value = null
+            _error.value = null
+
+            _isLoading.value = false
+            _verPassword.value = false
+
+            navController.navigate("login") {
+                popUpTo("home") { inclusive = true }  // Clear the back stack
             }
         }
     }

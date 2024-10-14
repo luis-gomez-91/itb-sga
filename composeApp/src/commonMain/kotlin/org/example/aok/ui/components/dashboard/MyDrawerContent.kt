@@ -160,7 +160,8 @@ fun MyDrawerContent(
                             .fillMaxWidth(0.5f)
                     ) {
                         AsyncImage(
-                            model = loginViewModel.userData.value!!.photo,
+//                            model = loginViewModel.userData.value!!.photo,
+                            model = homeViewModel.homeData.value?.persona?.foto,
                             contentDescription = "Foto perfil",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
@@ -215,7 +216,7 @@ fun MyDrawerContent(
                                 drawerState.close()
                             }
                             if (item.label == "Logout") {
-//                                loginViewModel.logout(navHostController, context)
+                                loginViewModel.onLogout(navHostController)
                             } else {
                                 navHostController.navigate(item.navigate)
                             }

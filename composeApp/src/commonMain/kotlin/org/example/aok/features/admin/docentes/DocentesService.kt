@@ -11,9 +11,9 @@ import org.example.aok.data.network.Error
 class DocentesService(
     private val client: HttpClient
 ) {
-    suspend fun fetchDocentes(search: String, from: Int, to: Int): DocentesResult {
+    suspend fun fetchDocentes(search: String): DocentesResult {
         return try {
-            val response = client.get("https://sga.itb.edu.ec/api_rest?action=docentes&search=$search&desde=${from}&hasta=${to}")
+            val response = client.get("https://sga.itb.edu.ec/api_rest?action=docentes&search=$search")
 
             if (response.status == HttpStatusCode.OK) {
                 val data = response.body<Docentes>()

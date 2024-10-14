@@ -9,6 +9,7 @@ import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
 import org.example.aok.data.network.Docentes
 import org.example.aok.data.network.DocentesResult
+import org.example.aok.features.common.home.HomeViewModel
 
 class DocentesViewModel: ViewModel() {
     val client = createHttpClient()
@@ -20,21 +21,11 @@ class DocentesViewModel: ViewModel() {
     private val _error = MutableStateFlow<String>("")
     val error: StateFlow<String?> = _error
 
-    private val _isLoading = MutableStateFlow<Boolean>(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
-
-    private val _pagingRange = MutableStateFlow<Int>(20)
-    val pagingRange: StateFlow<Int> = _pagingRange
-
-    fun onloadDocentes(
-        search: String,
-        desde: Int = 1,
-        hasta: Int = _pagingRange.value
-    ) {
-        _isLoading.value = true
+    fun onloadDocentes(search: String, page: Int, homeViewModel: HomeViewModel) {
+        homeViewModel.changeLoading()
         viewModelScope.launch {
             try {
-                val result = service.fetchDocentes(search, desde, hasta)
+                val result = service.fetchDocentes(search)
                 logInfo("docentes", "$result")
 
                 when (result) {
@@ -46,11 +37,12 @@ class DocentesViewModel: ViewModel() {
                     is DocentesResult.Failure -> {
                         _error.value = result.error.error ?: "An unknown error occurred"
                     }
+                    else -> {}
                 }
             } catch (e: Exception) {
                 _error.value = "Error loading data: ${e.message}"
             } finally {
-                _isLoading.value = false
+                homeViewModel.changeLoading()
             }
         }
     }

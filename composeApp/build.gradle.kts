@@ -120,6 +120,7 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.core)
     implementation(libs.places)
+    implementation(libs.protolite.well.known.types)
 
 }
 

@@ -71,7 +71,9 @@ fun MyBottomBar(
                 BottomBarItem(
                     icon = Icons.Filled.ViewList,
                     label = "Periodos",
-                    onClick = {  }
+                    onClick = {
+                        homeViewModel.changeBottomSheet()
+                    }
                 )
                 BottomBarItem(
                     icon = Icons.Filled.Person,
@@ -80,57 +82,6 @@ fun MyBottomBar(
                         navController.navigate("account")
                     }
                 )
-            }
-
-            if (false) {
-//            ModalBottomSheet(
-//                onDismissRequest = { mainViewModel.showBottomSheet = false }
-//            ) {
-//                ContentBottomSheet(navController, homeViewModel, perfilViewModel)
-//            }
-                ModalNavigationDrawer(
-                    drawerContent = {
-                        ModalNavigationDrawer(
-                            drawerContent = {
-                                ModalDrawerSheet {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(150.dp)
-                                            .background(MaterialTheme.colorScheme.primaryContainer)
-                                    ) {
-                                        Text(text = "Header", modifier = Modifier.padding(16.dp))
-                                    }
-                                    Divider()
-                                    NavigationDrawerItem(
-                                        label = { Text(text = "Mi perfil") },
-                                        selected = false,
-                                        icon = { Icon(imageVector = Icons.Filled.Person, contentDescription = "Perfil", tint = MaterialTheme.colorScheme.tertiaryContainer) },
-                                        onClick = { /* Handle profile click */ }
-                                    )
-                                }
-                            },
-//                        onDismissRequest = { mainViewModel.showNavigationDrawer = false }
-                        ) {
-                            // Your main content here
-                            Box(modifier = Modifier.fillMaxSize()) {
-                                Text(text = "Main Content")
-                            }
-                        }
-                    },
-//                onDismissRequest = { showNavigationDrawer = false }
-                ) {
-                    // Your main content here
-                }
-            }
-
-//        Opciones de icono Periodos
-            if (false) {
-                ModalBottomSheet(
-                    onDismissRequest = {  }
-                ) {
-                    PeriodosContentSheet(homeViewModel)
-                }
             }
         }
     }
@@ -166,39 +117,4 @@ fun BottomBarItem(
         )
     }
 }
-
-@Composable
-fun PeriodosContentSheet(homeViewModel: HomeViewModel) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-    ) {
-//        homeViewModel.homeData.value?.let { data ->
-//            items(data.periodos) { periodo ->
-//                PeriodoItem(periodo)
-//            }
-//        }
-
-    }
-}
-
-//@Composable
-//fun PeriodoItem(periodo: Periodo) {
-//    TextButton(
-//        modifier = Modifier
-//            .padding(vertical = 4.dp, horizontal = 4.dp)
-//            .fillMaxWidth(),
-//        onClick = {},
-//        colors = ButtonDefaults.textButtonColors(
-//            containerColor = MaterialTheme.colorScheme.surface
-//        )
-//    ) {
-//        Text(
-//            text = periodo.nombre,
-//            fontSize = 12.sp,
-//            color = MaterialTheme.colorScheme.onSurface
-//        )
-//    }
-//}
 
