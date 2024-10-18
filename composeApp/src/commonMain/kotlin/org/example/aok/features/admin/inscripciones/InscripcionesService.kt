@@ -5,7 +5,6 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import org.example.aok.data.network.Error
-import org.example.aok.data.network.Inscripcion
 import org.example.aok.data.network.InscripcionResult
 import org.example.aok.data.network.Inscripciones
 
@@ -24,7 +23,7 @@ class InscripcionesService(
                 InscripcionResult.Failure(error)
             }
         } catch (e: Exception) {
-            val error = Error("Error inesperado: ${e.message}")
+            val error = Error("Error", "Error inesperado: ${e.message}")
             InscripcionResult.Failure(error)
         }
     }

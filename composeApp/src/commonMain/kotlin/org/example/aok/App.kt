@@ -22,6 +22,7 @@ import org.example.aok.features.student.alu_notas.AluNotasViewModel
 import org.example.aok.features.student.facturacion_electronica.AluFacturacionViewModel
 import org.example.aok.features.student.pago_online.PagoOnlineViewModel
 import org.example.aok.features.teacher.pro_clases.ProClasesViewModel
+import org.example.aok.features.teacher.pro_horarios.ProHorariosViewModel
 
 @Composable
 fun App(
@@ -42,6 +43,7 @@ fun App(
     val aluNotasViewModel = remember { AluNotasViewModel() }
     val docentesViewModel = remember { DocentesViewModel() }
     val proClasesViewModel = remember { ProClasesViewModel() }
+    val proHorariosViewModel = remember { ProHorariosViewModel() }
 
     AppTheme {
         Surface(
@@ -63,7 +65,8 @@ fun App(
                 aluFacturacionViewModel = aluFacturacionViewModel,
                 aluNotasViewModel = aluNotasViewModel,
                 docentesViewModel = docentesViewModel,
-                proClasesViewModel = proClasesViewModel
+                proClasesViewModel = proClasesViewModel,
+                proHorariosViewModel = proHorariosViewModel
             )
         }
     }

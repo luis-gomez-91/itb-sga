@@ -32,6 +32,8 @@ import org.example.aok.features.student.pago_online.PagoOnlineScreen
 import org.example.aok.features.student.pago_online.PagoOnlineViewModel
 import org.example.aok.features.teacher.pro_clases.ProClasesScreen
 import org.example.aok.features.teacher.pro_clases.ProClasesViewModel
+import org.example.aok.features.teacher.pro_horarios.ProHorariosScreen
+import org.example.aok.features.teacher.pro_horarios.ProHorariosViewModel
 
 @Composable
 fun MyNavigation(
@@ -49,7 +51,8 @@ fun MyNavigation(
     aluFacturacionViewModel: AluFacturacionViewModel,
     aluNotasViewModel: AluNotasViewModel,
     docentesViewModel: DocentesViewModel,
-    proClasesViewModel: ProClasesViewModel
+    proClasesViewModel: ProClasesViewModel,
+    proHorariosViewModel: ProHorariosViewModel
 ) {
     val navController = rememberNavController()
     NavHost(
@@ -70,5 +73,6 @@ fun MyNavigation(
         composable("alu_notas") { AluNotasScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluNotasViewModel) }
         composable("docentes") { DocentesScreen(navController, mainViewModel, homeViewModel, loginViewModel, docentesViewModel) }
         composable("pro_clases") { ProClasesScreen(navController, mainViewModel, homeViewModel, loginViewModel, proClasesViewModel) }
+        composable("pro_horarios") { ProHorariosScreen(navController, mainViewModel, homeViewModel, loginViewModel, proHorariosViewModel) }
     }
 }

@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.GroupWork
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,8 +46,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.example.aok.core.MainViewModel
 import org.example.aok.core.formatoText
+import org.example.aok.core.parseTime
 import org.example.aok.data.network.ClaseX
 import org.example.aok.data.network.Paging
 import org.example.aok.features.common.home.HomeViewModel
@@ -246,29 +251,41 @@ fun ClaseItem(
                 }
             }
 
-            Row {
-                MyAssistChip(
-                    label = clase.fecha,
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    labelColor = MaterialTheme.colorScheme.primary,
-                    icon = Icons.Filled.DateRange
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row {
+                    MyAssistChip(
+                        label = clase.fecha,
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        labelColor = MaterialTheme.colorScheme.primary,
+                        icon = Icons.Filled.DateRange
+                    )
 
-                Spacer(modifier = Modifier.width(4.dp))
-                MyAssistChip(
-                    label = clase.grupo,
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    labelColor = MaterialTheme.colorScheme.primary,
-                    icon = Icons.Filled.GroupWork
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                MyAssistChip(
-                    label = if (clase.abierta) "Abierta" else "Cerrada",
-                    containerColor = if (clase.abierta) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.errorContainer,
-                    labelColor = if (clase.abierta) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.error,
-                    icon = if (clase.abierta) Icons.Filled.Check else Icons.Filled.Cancel
-                )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    MyAssistChip(
+                        label = clase.grupo,
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        labelColor = MaterialTheme.colorScheme.primary,
+                        icon = Icons.Filled.GroupWork
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    MyAssistChip(
+                        label = if (clase.abierta) "Abierta" else "Cerrada",
+                        containerColor = if (clase.abierta) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.errorContainer,
+                        labelColor = if (clase.abierta) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.error,
+                        icon = if (clase.abierta) Icons.Filled.Check else Icons.Filled.Cancel
+                    )
+                }
+                IconButton(onClick = {  }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Acciones"
+                    )
+                }
             }
+
 
             AnimatedVisibility(
                 visible = expanded,

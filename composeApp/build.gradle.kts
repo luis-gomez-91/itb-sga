@@ -121,6 +121,7 @@ dependencies {
     implementation(libs.androidx.core)
     implementation(libs.places)
     implementation(libs.protolite.well.known.types)
+    implementation(libs.androidx.core.i18n)
 
 }
 

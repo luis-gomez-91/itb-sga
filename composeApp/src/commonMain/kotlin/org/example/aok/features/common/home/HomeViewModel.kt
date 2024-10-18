@@ -14,6 +14,7 @@ import org.example.aok.data.network.Periodo
 import org.example.aok.data.network.Report
 import org.example.aok.data.network.ReportForm
 import org.example.aok.data.network.ReportResult
+import org.example.aok.data.network.Error
 
 class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
     val client = createHttpClient()
@@ -21,9 +22,6 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
 
     private val _homeData = MutableStateFlow<Home?>(null)
     val homeData: StateFlow<Home?> = _homeData
-
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error
 
     fun onloadHome(id: Int) {
         viewModelScope.launch {
@@ -35,20 +33,40 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
                 when (result) {
                     is HomeResult.Success -> {
                         _homeData.value = result.home
-                        _error.value = null
-                        _periodoSelect.value = result.home.periodos[0]
+                        clearError()
+                        if (_periodoSelect.value == null) {
+                            _periodoSelect.value = result.home.periodos[0]
+                        }
                     }
                     is HomeResult.Failure -> {
-                        _error.value = result.error.error
+                        _error.value = result.error
+                        _error.value!!.title = "Error al cargar datos"
                     }
+                    else -> {}
                 }
 
             } catch (e: Exception) {
-                _error.value = "${e}"
+                addError(title = "Error", text = "${e.message}")
             } finally {
                 _isLoading.value = false
             }
         }
+    }
+
+//  -----------------------------------------------------------  ERROR ---------------------------------------------------------
+    private val _error = MutableStateFlow<Error?>(null)
+    val error: StateFlow<Error?> = _error
+
+    fun clearError() {
+        _error.value = null
+    }
+
+    fun addError(title: String, text: String) {
+        val newError = Error(
+            title = title,
+            error = text
+        )
+        _error.value = newError
     }
 
 //  ----------------------------------------------------------  LOADING ---------------------------------------------------------
@@ -95,12 +113,15 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
                         openURL(url)
                     }
                     is ReportResult.Failure -> {
-                        _error.value = result.error.error?:"Error inesperado"
+                        _error.value = result.error
+                        _error.value!!.title = "Error al generar reporte"
                     }
+
+                    else -> {}
                 }
             } catch (e: Exception) {
                 logInfo("report", "$e")
-                _error.value = "Error: ${e.message}"
+                addError(title = "Error", text = "${e.message}")
             } finally {
                 _isLoading.value = false
             }

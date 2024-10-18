@@ -23,7 +23,7 @@ private val client: HttpClient
                 LoginResult.Failure(error)
             }
         } catch (e: Exception) {
-            val error = Error("Error inesperado: ${e.message}")
+            val error = Error("Error", "Error inesperado: ${e.message}")
             LoginResult.Failure(error)
         }
     }

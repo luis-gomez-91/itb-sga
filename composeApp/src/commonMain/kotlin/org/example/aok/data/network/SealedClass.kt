@@ -74,3 +74,8 @@ sealed class ProClasesResult {
     data class Success(val proClases: ProClases) : ProClasesResult()
     data class Failure(val error: Error) : ProClasesResult()
 }
+
+sealed class ProHorariosResult {
+    data class Success(val proHorarios: List<ProHorario>) : ProHorariosResult()
+    data class Failure(val error: Error) : ProHorariosResult()
+}

@@ -189,7 +189,7 @@ fun CardAluFinanza(
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Text(text = formatoText("Abodo: ", "$${rubro.pagado}"),
+                Text(text = formatoText("Abono: ", "$${rubro.pagado}"),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )

@@ -23,7 +23,7 @@ class AluFacturacionService(
                 AluFacturacionResult.Failure(error)
             }
         } catch (e: Exception) {
-            val error = Error("Error inesperado: ${e.message}")
+            val error = Error("Error", "Error inesperado: ${e.message}")
             AluFacturacionResult.Failure(error)
         }
     }

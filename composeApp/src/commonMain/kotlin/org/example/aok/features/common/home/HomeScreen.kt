@@ -87,6 +87,7 @@ fun Screen(
 ) {
     val homeData by homeViewModel.homeData.collectAsState()
     val isLoading by homeViewModel.isLoading.collectAsState(false)
+    homeViewModel.actualPageRestart()
 
     Column(
         modifier = Modifier.fillMaxWidth(),

@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.example.aok.core.MainViewModel
 import org.example.aok.data.network.Periodo
-import org.example.aok.features.admin.docentes.DocenteItem
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
 
@@ -88,7 +87,7 @@ fun DashBoardScreen(
                 ) {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
-                        text = "Periodos Académicos",
+                        text = "Períodos Académicos",
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center,
@@ -117,25 +116,35 @@ fun PeriodoItem(
     periodo: Periodo,
     homeViewModel: HomeViewModel
 ) {
-    val periodoSelect by homeViewModel.periodoSelect.collectAsState(0)
-    TextButton(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp)
-            .background(color = if(periodoSelect == periodo) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent),
-        onClick = {
-            homeViewModel.changePeriodoSelect(periodo)
-        }
-    ) {
-        Text(
+    val periodoSelect by homeViewModel.periodoSelect.collectAsState(null)
+    val data by homeViewModel.homeData.collectAsState(null)
+    data?.let {
+
+        TextButton(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp),
-            text = periodo.nombre,
-            fontWeight = FontWeight.Normal,
-            fontSize = 14.sp,
-            textAlign = TextAlign.Center,
-            color = if(periodoSelect == periodo) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outline
-        )
+                .padding(horizontal = 8.dp)
+                .background(
+                    color = if (periodoSelect!!.id == periodo.id)
+                        MaterialTheme.colorScheme.secondaryContainer
+                    else Color.Transparent
+                ),
+            onClick = {
+                homeViewModel.changePeriodoSelect(periodo)
+            }
+        ) {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                text = periodo.nombre,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center,
+                color = if (periodoSelect!!.id == periodo.id)
+                    MaterialTheme.colorScheme.secondary
+                else MaterialTheme.colorScheme.outline
+            )
+        }
     }
 }

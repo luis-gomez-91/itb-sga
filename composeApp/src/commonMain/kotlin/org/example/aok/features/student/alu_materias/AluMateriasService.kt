@@ -31,7 +31,7 @@ class AluMateriasService(
                 AluMateriasResult.Failure(error)
             }
         } catch (e: Exception) {
-            val error = Error("Error inesperado: ${e.message}")
+            val error = Error("Error", "Error inesperado: ${e.message}")
             AluMateriasResult.Failure(error)
         }
     }

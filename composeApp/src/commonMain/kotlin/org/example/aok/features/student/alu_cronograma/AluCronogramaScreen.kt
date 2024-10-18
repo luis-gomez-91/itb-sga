@@ -116,10 +116,10 @@ fun AluCronogramaItem(
         modifier = Modifier.padding(bottom = 4.dp),
         onClick = { },
         colors = CardDefaults.cardColors(
-            containerColor = if (!expanded) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.surfaceContainerLow,
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
             contentColor = MaterialTheme.colorScheme.primary
         ),
-        borderColor = if (!expanded) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.surfaceContainer,
+        borderColor = MaterialTheme.colorScheme.surfaceContainer,
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()

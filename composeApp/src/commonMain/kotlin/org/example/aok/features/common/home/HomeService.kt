@@ -35,7 +35,7 @@ class HomeService(
                 HomeResult.Failure(error)
             }
         } catch (e: Exception) {
-            val error = Error("Error inesperado: ${e.message}")
+            val error = Error("Error", "Error inesperado: ${e.message}")
             HomeResult.Failure(error)
         }
     }
@@ -56,7 +56,7 @@ class HomeService(
                 ReportResult.Failure(error)
             }
         } catch (e: Exception) {
-            val error = Error("Error inesperado: ${e.message}")
+            val error = Error("Error", "Error inesperado: ${e.message}")
             ReportResult.Failure(error)
         } finally {
         }
