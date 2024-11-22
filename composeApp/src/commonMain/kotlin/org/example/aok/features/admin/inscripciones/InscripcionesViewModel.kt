@@ -22,7 +22,7 @@ class InscripcionesViewModel: ViewModel() {
     val error: StateFlow<String?> = _error
 
     fun onloadInscripciones(search: String, page: Int, homeViewModel: HomeViewModel) {
-        homeViewModel.changeLoading()
+        homeViewModel.changeLoading(true)
         viewModelScope.launch {
             try {
                 val result = inscripcionesService.fetchInscripciones(search, page)
@@ -41,7 +41,7 @@ class InscripcionesViewModel: ViewModel() {
             } catch (e: Exception) {
                 _error.value = "Error loading data: ${e.message}"
             } finally {
-                homeViewModel.changeLoading()
+                homeViewModel.changeLoading(false)
             }
         }
     }

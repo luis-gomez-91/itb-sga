@@ -22,7 +22,7 @@ class DocentesViewModel: ViewModel() {
     val error: StateFlow<String?> = _error
 
     fun onloadDocentes(search: String, page: Int, homeViewModel: HomeViewModel) {
-        homeViewModel.changeLoading()
+        homeViewModel.changeLoading(true)
         viewModelScope.launch {
             try {
                 val result = service.fetchDocentes(search)
@@ -42,7 +42,7 @@ class DocentesViewModel: ViewModel() {
             } catch (e: Exception) {
                 _error.value = "Error loading data: ${e.message}"
             } finally {
-                homeViewModel.changeLoading()
+                homeViewModel.changeLoading(false)
             }
         }
     }

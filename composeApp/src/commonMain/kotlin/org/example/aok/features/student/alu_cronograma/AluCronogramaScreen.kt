@@ -9,6 +9,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -96,15 +97,30 @@ fun Screen(
         aluCronogramaViewModel.onloadAluCronograma(homeViewModel.homeData.value!!.persona.idInscripcion!!)
     }
 
-    LazyColumn(modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 8.dp, horizontal = 16.dp)
-    ) {
-        items(dataFiltada) { data ->
-            AluCronogramaItem(data)
-            Spacer(modifier = Modifier.height(8.dp))
+    if (dataFiltada.isEmpty()) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Usted no se encuentra matriculado",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    } else {
+        LazyColumn(modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp, horizontal = 16.dp)
+        ) {
+            items(dataFiltada) { data ->
+                AluCronogramaItem(data)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
     }
+
 }
 
 @Composable

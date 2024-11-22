@@ -62,8 +62,6 @@ import org.example.aok.data.domain.DrawerItem
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.features.common.login.RedesSociales
-import org.example.aok.ui.components.MyAssistChip
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun MyDrawerContent(
@@ -215,7 +213,7 @@ fun MyDrawerContent(
                             scope.launch {
                                 drawerState.close()
                             }
-                            if (item.label == "Logout") {
+                            if (item.label == "Cerrar sesión") {
                                 loginViewModel.onLogout(navHostController)
                             } else {
                                 navHostController.navigate(item.navigate)

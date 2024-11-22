@@ -29,7 +29,7 @@ class AluFacturacionViewModel() : ViewModel() {
 
 
     fun onloadAluFacturacion(id: Int, homeViewModel: HomeViewModel) {
-        homeViewModel.changeLoading()
+        homeViewModel.changeLoading(true)
         viewModelScope.launch {
             try {
                 val result = service.fetchAluFacturacion(id)
@@ -47,13 +47,13 @@ class AluFacturacionViewModel() : ViewModel() {
             } catch (e: Exception) {
                 _error.value = "Error al cargar los datos: ${e.message}"
             } finally {
-                homeViewModel.changeLoading()
+                homeViewModel.changeLoading(false)
             }
         }
     }
 
     fun downloadRIDE(reportName: String, id: Int, homeViewModel: HomeViewModel) {
-        homeViewModel.changeLoading()
+        homeViewModel.changeLoading(true)
         viewModelScope.launch {
             try {
                 val form = ReportForm(
@@ -67,7 +67,7 @@ class AluFacturacionViewModel() : ViewModel() {
                 logInfo("alu_facturacion", "Error: ${e.message}")
                 _error.value = "Error al descargar y abrir el archivo: ${e.message}"
             } finally {
-                homeViewModel.changeLoading()
+                homeViewModel.changeLoading(false)
             }
         }
     }

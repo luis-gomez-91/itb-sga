@@ -12,6 +12,8 @@ import androidx.core.view.WindowCompat
 import org.example.aok.core.URLOpenerAndroid
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.student.facturacion_electronica.AluFacturacionViewModel
+import android.content.Intent
+import android.net.Uri
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,5 +39,9 @@ class MainActivity : ComponentActivity() {
 //                App()
             }
         }
+        // ATTENTION: This was auto-generated to handle app links.
+        val appLinkIntent: Intent = intent
+        val appLinkAction: String? = appLinkIntent.action
+        val appLinkData: Uri? = appLinkIntent.data
     }
 }

@@ -72,7 +72,9 @@ class LoginViewModel : ViewModel() {
                 when (result) {
                     is LoginResult.Success -> {
                         _userData.value = result.login
-                        navController.navigate("home")
+                        navController.navigate("home") {
+                            popUpTo("login") { inclusive = true }
+                        }
                         _error.value = null
                     }
                     is LoginResult.Failure -> {
@@ -92,14 +94,16 @@ class LoginViewModel : ViewModel() {
         viewModelScope.launch {
             _username.value = ""
             _password.value = ""
-            _userData.value = null
-            _error.value = null
+//            _userData.value = null
+//            _error.value = null
 
             _isLoading.value = false
             _verPassword.value = false
 
-            navController.navigate("login") {
-                popUpTo("home") { inclusive = true }  // Clear the back stack
+            navController?.let {
+                it.navigate("login") {
+                    popUpTo("home") { inclusive = true }
+                }
             }
         }
     }

@@ -28,7 +28,7 @@ class ProHorariosViewModel : ViewModel() {
         periodo: Periodo
     ) {
         viewModelScope.launch {
-            homeViewModel.changeLoading()
+            homeViewModel.changeLoading(true)
             try {
                 val result = service.fetchProHorarios(periodo, id)
                 logInfo("pro_horarios", "$result")
@@ -46,7 +46,7 @@ class ProHorariosViewModel : ViewModel() {
             } catch (e: Exception) {
                 _error.value = "Error: ${e.message}"
             } finally {
-                homeViewModel.changeLoading()
+                homeViewModel.changeLoading(false)
             }
         }
     }

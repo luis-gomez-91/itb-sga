@@ -19,6 +19,7 @@ import org.example.aok.features.student.alu_horario.AluHorarioViewModel
 import org.example.aok.features.student.alu_malla.AluMallaViewModel
 import org.example.aok.features.student.alu_materias.AluMateriasViewModel
 import org.example.aok.features.student.alu_notas.AluNotasViewModel
+import org.example.aok.features.student.alu_solicitudes_online.AluSolicitudesViewModel
 import org.example.aok.features.student.facturacion_electronica.AluFacturacionViewModel
 import org.example.aok.features.student.pago_online.PagoOnlineViewModel
 import org.example.aok.features.teacher.pro_clases.ProClasesViewModel
@@ -41,6 +42,7 @@ fun App(
     val aluMateriasViewModel = remember { AluMateriasViewModel() }
     val aluFacturacionViewModel = remember { AluFacturacionViewModel() }
     val aluNotasViewModel = remember { AluNotasViewModel() }
+    val aluSolicitudesViewModel = remember { AluSolicitudesViewModel() }
     val docentesViewModel = remember { DocentesViewModel() }
     val proClasesViewModel = remember { ProClasesViewModel() }
     val proHorariosViewModel = remember { ProHorariosViewModel() }
@@ -66,7 +68,8 @@ fun App(
                 aluNotasViewModel = aluNotasViewModel,
                 docentesViewModel = docentesViewModel,
                 proClasesViewModel = proClasesViewModel,
-                proHorariosViewModel = proHorariosViewModel
+                proHorariosViewModel = proHorariosViewModel,
+                aluSolicitudesViewModel = aluSolicitudesViewModel
             )
         }
     }

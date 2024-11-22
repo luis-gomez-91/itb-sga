@@ -73,8 +73,8 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
     private val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    fun changeLoading() {
-        _isLoading.value = !_isLoading.value
+    fun changeLoading(value: Boolean) {
+        _isLoading.value = value
     }
 
 //  ----------------------------------------------------------  BUSQUEDA ---------------------------------------------------------
