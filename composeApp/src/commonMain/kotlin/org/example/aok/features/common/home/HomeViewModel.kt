@@ -2,6 +2,8 @@ package org.example.aok.features.common.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mohamedrejeb.calf.picker.toImageBitmap
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -15,6 +17,9 @@ import org.example.aok.data.network.Report
 import org.example.aok.data.network.ReportForm
 import org.example.aok.data.network.ReportResult
 import org.example.aok.data.network.Error
+import org.example.aok.data.network.form.UploadPhotoForm
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
     val client = createHttpClient()
@@ -169,6 +174,36 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
     fun changePeriodoSelect(periodo: Periodo) {
         _periodoSelect.value = periodo
     }
+
+    //  --------------------------------------------------- IMAGENES ---------------------------------------------------
+    private val _imageLoading = MutableStateFlow<Boolean>(false)
+    val imageLoading: StateFlow<Boolean> = _imageLoading
+
+    fun changeImageLoading(value: Boolean) {
+        _imageLoading.value = value
+    }
+
+    suspend fun uploadPhoto(file: ByteArray) {
+        try {
+            changeImageLoading(true)
+            val fileAsIntList = file.map { it.toUByte().toInt() }
+            val form = homeData.value?.persona?.idPersona?.let {
+                UploadPhotoForm(
+                    idPersona = it,
+                    file = fileAsIntList,
+                    action = "uploadPhoto"
+                )
+            }
+            val result = form?.let { service.uploadPhoto(it) }
+
+        } catch (e: Exception) {
+            val error = Error("Error", "Error inesperado: ${e.message}")
+            ReportResult.Failure(error)
+        } finally {
+            changeImageLoading(false)
+        }
+    }
+
 }
 
 

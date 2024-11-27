@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
+import org.example.aok.core.SERVER_URL
 import org.example.aok.data.network.Docentes
 import org.example.aok.data.network.DocentesResult
 import org.example.aok.data.network.Error
@@ -13,7 +14,7 @@ class DocentesService(
 ) {
     suspend fun fetchDocentes(search: String): DocentesResult {
         return try {
-            val response = client.get("https://sga.itb.edu.ec/api_rest?action=docentes&search=$search")
+            val response = client.get("${SERVER_URL}api_rest?action=docentes&search=$search")
 
             if (response.status == HttpStatusCode.OK) {
                 val data = response.body<Docentes>()

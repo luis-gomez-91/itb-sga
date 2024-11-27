@@ -166,7 +166,6 @@ fun CardItem(
                     enabled = true,
                     icon = Icons.Filled.Download,
                     onClickAction = {
-//                        homeViewModel.openPDF("https://sga.itb.edu.ec/media//documentos/userreports/lagomez11/factura_sri20241001_130714.pdf")
                         homeViewModel.openURL("https://sga.itb.edu.ec/${data.xml}")
                     },
                     buttonColor = MaterialTheme.colorScheme.onPrimaryContainer,

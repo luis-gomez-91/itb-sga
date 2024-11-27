@@ -5,6 +5,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
+import org.example.aok.core.SERVER_URL
 import org.example.aok.core.logInfo
 import org.example.aok.data.network.Account
 import org.example.aok.data.network.AccountResult
@@ -15,7 +16,7 @@ class AccountService(
 ) {
     suspend fun fetchAccount(id: Int): AccountResult {
         return try {
-            val response = client.get("https://sga.itb.edu.ec/api_rest?action=account&id=$id")
+            val response = client.get("${SERVER_URL}api_rest?action=account&id=$id")
 
             if (response.status == HttpStatusCode.OK) {
 //                logInfo("account", "Response: ${response.bodyAsText()}")

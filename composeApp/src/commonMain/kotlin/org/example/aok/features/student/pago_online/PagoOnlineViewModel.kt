@@ -9,7 +9,7 @@ import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
 import org.example.aok.data.network.DatosFacturacion
 import org.example.aok.data.network.PagoOnline
-import org.example.aok.data.network.PagoOnlineForm
+import org.example.aok.data.network.form.PagoOnlineForm
 import org.example.aok.data.network.PagoOnlineResult
 
 class PagoOnlineViewModel : ViewModel() {

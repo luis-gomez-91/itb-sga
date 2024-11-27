@@ -1,31 +1,31 @@
 package org.example.aok.features.common.home
 
+import aok.composeapp.generated.resources.Res
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.call.receive
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import org.example.aok.core.logInfo
+import org.example.aok.core.SERVER_URL
 import org.example.aok.data.network.Error
 import org.example.aok.data.network.Home
 import org.example.aok.data.network.HomeResult
-import org.example.aok.data.network.PagoOnlineForm
 import org.example.aok.data.network.Report
 import org.example.aok.data.network.ReportForm
 import org.example.aok.data.network.ReportResult
+import org.example.aok.data.network.form.PagoOnlineForm
+import org.example.aok.data.network.form.UploadPhotoForm
 
 class HomeService(
     private val client: HttpClient
 ) {
     suspend fun fetchHome(id: Int): HomeResult {
         return try {
-            val response = client.get("https://sga.itb.edu.ec/api_rest?action=panel&id=$id")
+            val response = client.get("${SERVER_URL}api_rest?action=panel&id=$id")
 
             if (response.status == HttpStatusCode.OK) {
                 val home = response.body<Home>()
@@ -43,7 +43,7 @@ class HomeService(
     suspend fun fetchReport(form: ReportForm): ReportResult {
         return try {
             val response =
-                client.post("https://sga.itb.edu.ec/api_rest?action=runReport") {
+                client.post("${SERVER_URL}api_rest?action=runReport") {
                     contentType(ContentType.Application.Json)
                     setBody(form)
                 }
@@ -61,4 +61,13 @@ class HomeService(
         } finally {
         }
     }
+
+    suspend fun uploadPhoto(form: UploadPhotoForm): HttpResponse {
+        return client.post("${SERVER_URL}api_rest?action=postDispatcher") {
+            contentType(ContentType.Application.Json)
+            setBody(form)
+        }
+    }
+
+
 }

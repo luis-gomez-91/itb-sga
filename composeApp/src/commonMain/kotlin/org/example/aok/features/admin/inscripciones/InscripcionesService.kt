@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
+import org.example.aok.core.SERVER_URL
 import org.example.aok.data.network.Error
 import org.example.aok.data.network.InscripcionResult
 import org.example.aok.data.network.Inscripciones
@@ -13,7 +14,7 @@ class InscripcionesService(
 ) {
     suspend fun fetchInscripciones(search: String, page: Int): InscripcionResult {
         return try {
-            val response = client.get("https://sga.itb.edu.ec/api_rest?action=inscripcion&search=$search&page=${page}")
+            val response = client.get("${SERVER_URL}api_rest?action=inscripcion&search=$search&page=${page}")
 
             if (response.status == HttpStatusCode.OK) {
                 val inscripciones = response.body<Inscripciones>()

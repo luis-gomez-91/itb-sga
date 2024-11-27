@@ -5,6 +5,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
+import org.example.aok.core.SERVER_URL
 import org.example.aok.core.logInfo
 import org.example.aok.data.network.AluCronograma
 import org.example.aok.data.network.AluCronogramaResult
@@ -16,7 +17,7 @@ class AluCronogramaService(
     suspend fun fetchAluCronograma(id: Int): AluCronogramaResult {
         return try {
             logInfo("alu_cronograma", id.toString())
-            val response = client.get("https://sga.itb.edu.ec/api_rest?action=alu_cronograma&id=$id")
+            val response = client.get("${SERVER_URL}api_rest?action=alu_cronograma&id=$id")
 
             if (response.status == HttpStatusCode.OK) {
                 val data = response.body<List<AluCronograma>>()

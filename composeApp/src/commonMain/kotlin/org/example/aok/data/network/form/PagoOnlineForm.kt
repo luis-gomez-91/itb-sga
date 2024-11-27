@@ -1,4 +1,4 @@
-package org.example.aok.data.network
+package org.example.aok.data.network.form
 
 import kotlinx.serialization.Serializable
 

@@ -1,9 +1,12 @@
 package org.example.aok.features.common.login
 
+import aok.composeapp.generated.resources.Res
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
+import org.example.aok.core.SERVER_URL
+import org.example.aok.core.logInfo
 import org.example.aok.data.network.Error
 import org.example.aok.data.network.Login
 import org.example.aok.data.network.LoginResult
@@ -13,7 +16,7 @@ private val client: HttpClient
 ) {
     suspend fun fetchLogin(user: String, password: String): LoginResult {
         return try {
-            val response = client.get("https://sga.itb.edu.ec/api_rest?action=login&username=$user&password=$password")
+            val response = client.get("${SERVER_URL}api_rest?action=login&username=$user&password=$password")
 
             if (response.status == HttpStatusCode.OK) {
                 val login = response.body<Login>()

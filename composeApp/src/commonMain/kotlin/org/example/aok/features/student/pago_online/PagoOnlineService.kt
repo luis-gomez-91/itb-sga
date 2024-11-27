@@ -9,18 +9,19 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import org.example.aok.core.SERVER_URL
 import org.example.aok.data.network.Error
 import org.example.aok.data.network.Home
 import org.example.aok.data.network.HomeResult
 import org.example.aok.data.network.PagoOnline
-import org.example.aok.data.network.PagoOnlineForm
 import org.example.aok.data.network.PagoOnlineResult
+import org.example.aok.data.network.form.PagoOnlineForm
 
 class PagoOnlineRepository(
     private val client: HttpClient
 ) {
     suspend fun sendPagoOnline(pagoOnlieForm: PagoOnlineForm): HttpResponse {
-        return client.post("https://sga.itb.edu.ec/api_rest?action=online/") {
+        return client.post("${SERVER_URL}api_rest?action=online/") {
             contentType(ContentType.Application.Json)
             setBody(pagoOnlieForm)
         }
@@ -32,7 +33,7 @@ class PagoOnlineService(
 ) {
     suspend fun fetchPagoOnline(id: Int): PagoOnlineResult {
         return try {
-            val response = client.get("https://sga.itb.edu.ec/api_rest?action=online&id=$id")
+            val response = client.get("${SERVER_URL}api_rest?action=online&id=$id")
 
             if (response.status == HttpStatusCode.OK) {
                 val pagoOnline = response.body<PagoOnline>()
@@ -48,7 +49,7 @@ class PagoOnlineService(
     }
 
     suspend fun sendPagoOnline(pagoOnlieForm: PagoOnlineForm): HttpResponse {
-        return client.post("https://sga.itb.edu.ec/api_rest?action=facturarPagoOnline") {
+        return client.post("${SERVER_URL}api_rest?action=facturarPagoOnline") {
             contentType(ContentType.Application.Json)
             setBody(pagoOnlieForm)
         }

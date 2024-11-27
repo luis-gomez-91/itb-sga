@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 
 
 @Composable
@@ -27,13 +29,14 @@ fun MyFilledTonalButton(
     onClickAction: () -> Unit, // Acción al hacer clic
     icon: ImageVector? = null,
     buttonColor: Color = MaterialTheme.colorScheme.primaryContainer, // Color del botón opcional
-    textColor: Color = MaterialTheme.colorScheme.primary // Color del texto opcional
+    textColor: Color = MaterialTheme.colorScheme.primary, // Color del texto opcional
+    iconSize: Dp = 16.dp,
+    textSize: TextUnit = 12.sp
 ) {
     FilledTonalButton(
         onClick = onClickAction,
-//        modifier = Modifier.height(48.dp),
         enabled = enabled,
-        shape = RoundedCornerShape(12.dp), // Esquinas redondeadas
+        shape = RoundedCornerShape(8.dp), // Esquinas redondeadas
         colors = ButtonDefaults.filledTonalButtonColors(
             containerColor = buttonColor, // Usar color pasado como parámetro o predeterminado
             contentColor = textColor // Usar color del texto pasado como parámetro o predeterminado
@@ -43,14 +46,14 @@ fun MyFilledTonalButton(
             Icon(
                 imageVector = icon,
                 contentDescription = text, // Descripción del ícono para accesibilidad
-                modifier = Modifier.size(24.dp), // Tamaño del ícono
+                modifier = Modifier.size(iconSize), // Tamaño del ícono
                 tint = textColor // Color del ícono
             )
-            Spacer(modifier = Modifier.width(8.dp)) // Espacio entre ícono y texto
+            Spacer(modifier = Modifier.width(4.dp)) // Espacio entre ícono y texto
         }
         Text(
             text = text,
-            fontSize = 16.sp,
+            fontSize = textSize,
             fontWeight = FontWeight.Bold,
             color = textColor // Aplicar el color del texto
         )

@@ -10,7 +10,10 @@ import org.example.aok.core.logInfo
 import org.example.aok.data.network.AluSolicitud
 import org.example.aok.data.network.AluSolicitudDepartamentos
 import org.example.aok.data.network.AluSolicitudesResult
+import org.example.aok.data.network.DatosFacturacion
 import org.example.aok.data.network.TipoEspecie
+import org.example.aok.data.network.form.PagoOnlineForm
+import org.example.aok.data.network.form.SolicitudEspecieForm
 import org.example.aok.features.common.home.HomeViewModel
 
 class AluSolicitudesViewModel: ViewModel() {
@@ -48,7 +51,7 @@ class AluSolicitudesViewModel: ViewModel() {
         }
     }
 
-//    ADD SOLICITUD
+//    CARGAR FORMULARIO
     private val _departamentos = MutableStateFlow<List<AluSolicitudDepartamentos>>(emptyList())
     val departamentos: StateFlow<List<AluSolicitudDepartamentos>> = _departamentos
 
@@ -78,15 +81,48 @@ class AluSolicitudesViewModel: ViewModel() {
         viewModelScope.launch {
             try {
                 val result = service.fetchTipoEspecies()
-                logInfo("alu_solicitudes", "$result")
                 _departamentos.value = result
-
             } catch (e: Exception) {
                 _error.value = "Error: ${e.message}"
-                logInfo("alu_solicitudes", "${e.message}")
+                logInfo("alu_solicitudes", "ERROR: ${e.message}")
             } finally {
                 homeViewModel.changeLoading(false)
             }
         }
     }
+
+//    ------------------------------ ADD SOLICITUD ----------------------------------------------
+
+    private val _observacion = MutableStateFlow("")
+    val observacion: StateFlow<String> = _observacion
+
+    private val _formLoading = MutableStateFlow<Boolean>(false)
+    val formLoading: StateFlow<Boolean> = _formLoading
+
+    fun onObservacionChanged(obs: String) {
+        _observacion.value = obs
+    }
+
+    fun addSolicitud(idInscripcion: Int, obs: String) {
+        viewModelScope.launch {
+            _formLoading.value = true
+            val form = SolicitudEspecieForm(
+                action = "addSolicitud",
+                idEspecie = _selectedTipoSolicitud.value!!.id,
+                observacion = obs,
+                idInscripcion = idInscripcion
+            )
+            try {
+                val result = service.addSolicitud(form)
+
+            } catch (e: Exception) {
+                logInfo("alu_solicitudes", "${e.message}")
+                _error.value = "Error: ${e.message}"
+            } finally {
+                _formLoading.value = false
+            }
+        }
+    }
+
+
 }

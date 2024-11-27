@@ -5,6 +5,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
+import org.example.aok.core.SERVER_URL
 import org.example.aok.data.network.AluNotasResult
 import org.example.aok.data.network.Error
 import org.example.aok.data.network.TipoAsignaturaNota
@@ -14,7 +15,7 @@ class AluNotasService(
 ) {
     suspend fun fetchAluNota(id: Int): AluNotasResult {
         return try {
-            val response = client.get("https://sga.itb.edu.ec/api_rest?action=alu_notas&id=$id")
+            val response = client.get("${SERVER_URL}api_rest?action=alu_notas&id=$id")
             println(response.bodyAsText())
 
             if (response.status == HttpStatusCode.OK) {

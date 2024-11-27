@@ -18,7 +18,6 @@ import android.net.Uri
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             Surface(color = Color.Transparent) {
                 WindowCompat.setDecorFitsSystemWindows(window, false)

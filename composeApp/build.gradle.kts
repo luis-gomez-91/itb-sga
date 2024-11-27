@@ -38,7 +38,6 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
-
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -63,6 +62,12 @@ kotlin {
             implementation("com.mohamedrejeb.calf:calf-file-picker:0.5.3")
             implementation("com.mohamedrejeb.calf:calf-file-picker-coil:0.5.1")
             implementation("io.coil-kt.coil3:coil-compose:3.0.0-alpha8")
+
+            // peekaboo-ui
+            implementation(libs.peekaboo.ui)
+
+            // peekaboo-image-picker
+            implementation(libs.peekaboo.image.picker)
 
 
         }
@@ -108,6 +113,13 @@ android {
         debugImplementation(compose.uiTooling)
     }
 }
+
+repositories {
+    google()
+    mavenCentral()
+    maven { url = uri("https://jitpack.io") }
+}
+
 dependencies {
     implementation(libs.androidx.foundation.android)
     implementation(libs.androidx.runtime.android)

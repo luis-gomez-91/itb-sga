@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
+import org.example.aok.core.SERVER_URL
 import org.example.aok.data.network.Error
 import org.example.aok.data.network.Periodo
 import org.example.aok.data.network.ProHorario
@@ -14,7 +15,7 @@ class ProHorariosService(
 ) {
     suspend fun fetchProHorarios(periodo: Periodo, id: Int): ProHorariosResult {
         return try {
-            val response = client.get("https://sga.itb.edu.ec/api_rest?action=pro_horarios&id=${id}&periodo=${periodo.id}")
+            val response = client.get("${SERVER_URL}api_rest?action=pro_horarios&id=${id}&periodo=${periodo.id}")
 
             if (response.status == HttpStatusCode.OK) {
                 val data = response.body<List<ProHorario>>()

@@ -17,11 +17,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.LockPerson
-import androidx.compose.material.icons.filled.LockReset
 import androidx.compose.material.icons.filled.Logout
-import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
@@ -31,6 +32,7 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,7 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,19 +51,19 @@ import androidx.navigation.NavHostController
 import aok.composeapp.generated.resources.Res
 import aok.composeapp.generated.resources.logo
 import aok.composeapp.generated.resources.logo_dark
+import aok.composeapp.generated.resources.name
 import coil3.compose.AsyncImage
-import coil3.compose.LocalPlatformContext
-import com.mohamedrejeb.calf.io.KmpFile
-import com.mohamedrejeb.calf.io.getPath
-import com.mohamedrejeb.calf.io.readByteArray
-import com.mohamedrejeb.calf.picker.FilePickerFileType
-import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
-import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
+import com.mohamedrejeb.calf.picker.toImageBitmap
+import com.preat.peekaboo.image.picker.ResizeOptions
+import com.preat.peekaboo.image.picker.SelectionMode
+import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.example.aok.data.domain.DrawerItem
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.features.common.login.RedesSociales
+import org.example.aok.ui.components.MyCircularProgressIndicator
 
 @Composable
 fun MyDrawerContent(
@@ -71,9 +73,7 @@ fun MyDrawerContent(
     loginViewModel: LoginViewModel
 ) {
     val scope = rememberCoroutineScope()
-//    val homeDataState = homeViewModel.homeData.observeAsState()
-//    val persona = homeDataState.value?.persona
-//
+
     val items = listOf(
         DrawerItem("Perfil", Icons.Filled.Person, "account"),
         DrawerItem("Cambiar contraseña", Icons.Filled.LockPerson, ""),
@@ -86,29 +86,6 @@ fun MyDrawerContent(
         } else {
             Res.drawable.logo
         }
-
-//    val defaultPainter: Painter = painterResource(id = R.drawable.logo)
-
-    val scopee = rememberCoroutineScope()
-    val context = LocalPlatformContext.current
-    var byteArray by remember { mutableStateOf(ByteArray(0)) }
-    var platformSpecificFilePath by remember { mutableStateOf("") }
-    var platformSpecificFile by remember { mutableStateOf<KmpFile?>(null) }
-
-
-    val pickerLauncher = rememberFilePickerLauncher(
-        type = FilePickerFileType.Image,
-        selectionMode = FilePickerSelectionMode.Multiple,
-        onResult = { files ->
-            scopee.launch {
-                files.firstOrNull()?.let {
-//                    byteArray = it.readByteArray(contextt)
-                    platformSpecificFile = it
-//                    platformSpecificFilePath = it.getPath(context) ?: ""
-                }
-            }
-        }
-    )
 
     ModalDrawerSheet(
 
@@ -139,54 +116,7 @@ fun MyDrawerContent(
                     color = MaterialTheme.colorScheme.secondary
                 )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-//                    Image(
-//                        painter = painterResource(imageLogo),
-//                        contentDescription = "logo",
-//                        modifier = Modifier.fillMaxWidth(0.8f)
-//                    )
-
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(0.5f)
-                    ) {
-                        AsyncImage(
-//                            model = loginViewModel.userData.value!!.photo,
-                            model = homeViewModel.homeData.value?.persona?.foto,
-                            contentDescription = "Foto perfil",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1f)
-                                .clip(CircleShape)
-                        )
-
-                        IconButton(
-                            onClick = {
-                                pickerLauncher.launch()
-                            },
-                            modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .size(48.dp)
-                                .background(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f), shape = CircleShape)
-                                .clip(CircleShape)
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(40.dp).padding(4.dp),
-                                imageVector = Icons.Filled.Camera,
-                                contentDescription = "Actualizar foto",
-                                tint = MaterialTheme.colorScheme.surface
-                            )
-                        }
-                    }
-                }
+                PhotoProfile(homeViewModel, scope)
 
                 Text(
                     text = homeViewModel.homeData.value?.persona?.nombre ?: "",
@@ -235,6 +165,138 @@ fun MyDrawerContent(
                 modifier = Modifier,
                 homeViewModel = homeViewModel
             )
+        }
+    }
+}
+
+@Composable
+fun PhotoProfile(
+    homeViewModel: HomeViewModel,
+    scope: CoroutineScope
+) {
+    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+    var imageByteArray by remember { mutableStateOf<ByteArray?>(null) }
+    val imageLoading by homeViewModel.imageLoading.collectAsState(false)
+
+    val resizeOptions = ResizeOptions(
+        width = 1200, // Custom width
+        height = 1200, // Custom height
+        resizeThresholdBytes = 2 * 1024 * 1024L, // Custom threshold for 2MB,
+        compressionQuality = 0.5 // Adjust compression quality (0.0 to 1.0)
+    )
+
+    val singleImagePicker = rememberImagePickerLauncher(
+        selectionMode = SelectionMode.Single,
+        scope = scope,
+//        resizeOptions = resizeOptions,
+        onResult = { byteArrays ->
+            byteArrays.firstOrNull()?.let {
+                imageBitmap = it.toImageBitmap()
+                imageByteArray = it
+            }
+        }
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.5f)
+                .aspectRatio(1f)
+        ) {
+            if (imageLoading) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.tertiary,
+                    strokeWidth = 4.dp,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            } else {
+                if (imageBitmap != null) {
+                    Image(
+                        bitmap = imageBitmap!!,
+                        contentDescription = "Foto perfil",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                            .clip(CircleShape)
+                    )
+
+                    IconButton(
+                        onClick = {
+                            scope.launch {
+                                imageByteArray?.let { homeViewModel.uploadPhoto(it) }
+                            }
+                        },
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .size(48.dp)
+                            .background(color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f), shape = CircleShape)
+                            .clip(CircleShape)
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(40.dp).padding(4.dp),
+                            imageVector = Icons.Filled.Save,
+                            contentDescription = "Guardar foto",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+
+                    IconButton(
+                        onClick = {
+                            imageBitmap = null
+                        },
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .size(48.dp)
+                            .background(color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.8f), shape = CircleShape)
+                            .clip(CircleShape)
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(40.dp).padding(4.dp),
+                            imageVector = Icons.Filled.Cancel,
+                            contentDescription = "Guardar foto",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                } else {
+                    AsyncImage(
+                        model = homeViewModel.homeData.value?.persona?.foto,
+                        contentDescription = "Foto perfil",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                            .clip(CircleShape)
+                    )
+
+                    IconButton(
+                        onClick = {
+                            singleImagePicker.launch()
+                        },
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .size(48.dp)
+                            .background(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f), shape = CircleShape)
+                            .clip(CircleShape)
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(40.dp).padding(4.dp),
+                            imageVector = Icons.Filled.Camera,
+                            contentDescription = "Actualizar foto",
+                            tint = MaterialTheme.colorScheme.surface
+                        )
+                    }
+                }
+            }
+
+
+
         }
     }
 }

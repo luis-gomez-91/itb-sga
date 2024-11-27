@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
+import org.example.aok.core.SERVER_URL
 import org.example.aok.data.network.AluFacturacion
 import org.example.aok.data.network.AluFacturacionResult
 import org.example.aok.data.network.Error
@@ -13,7 +14,7 @@ class AluFacturacionService(
 ) {
     suspend fun fetchAluFacturacion(id: Int): AluFacturacionResult {
         return try {
-            val response = client.get("https://sga.itb.edu.ec/api_rest?action=alu_facturacion_electronica&id=$id")
+            val response = client.get("${SERVER_URL}api_rest?action=alu_facturacion_electronica&id=$id")
 
             if (response.status == HttpStatusCode.OK) {
                 val data = response.body<List<AluFacturacion>>()

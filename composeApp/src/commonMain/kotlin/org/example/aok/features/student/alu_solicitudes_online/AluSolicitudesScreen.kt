@@ -6,31 +6,28 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Numbers
-import androidx.compose.material.icons.filled.PostAdd
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Start
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,6 +39,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -51,6 +49,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -66,6 +65,7 @@ import org.example.aok.ui.components.MyAddButton
 import org.example.aok.ui.components.MyAssistChip
 import org.example.aok.ui.components.MyCard
 import org.example.aok.ui.components.MyCircularProgressIndicator
+import org.example.aok.ui.components.MyFilledTonalButton
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 
 @Composable
@@ -91,7 +91,6 @@ fun AluSolicitudesScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Screen(
     homeViewModel: HomeViewModel,
@@ -121,52 +120,45 @@ fun Screen(
     if (isLoading) {
         MyCircularProgressIndicator()
     } else {
-        if (false) {
-            AddSolicitudScreen(
-                aluSolicitudesViewModel = aluSolicitudesViewModel,
-                homeViewModel = homeViewModel
-            )
-        } else {
-            Box(
-                modifier = Modifier.fillMaxSize()
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    if (filterData.isEmpty()) {
-                        Text(
-                            text = "No existen solicitudes generadas",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            items(data) { solicitud ->
-                                CardAluFinanza(
-                                    solicitud = solicitud
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                            }
+                if (filterData.isEmpty()) {
+                    Text(
+                        text = "No existen solicitudes generadas",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(data) { solicitud ->
+                            CardAluFinanza(
+                                solicitud = solicitud
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
                         }
                     }
-                    //            Spacer(modifier = Modifier.height(8.dp))
                 }
-                MyAddButton(
-                    modifier = Modifier.align(Alignment.BottomEnd),
-                    onclick = {
-                        aluSolicitudesViewModel.changeShowForm()
-                    }
-                )
+                //            Spacer(modifier = Modifier.height(8.dp))
             }
-            if (showForm) {
-                addSolicitudForm(aluSolicitudesViewModel, homeViewModel)
-            }
+            MyAddButton(
+                modifier = Modifier.align(Alignment.BottomEnd),
+                onclick = {
+                    aluSolicitudesViewModel.changeShowForm()
+                }
+            )
+        }
+        if (showForm) {
+            FormAddSolicitud(aluSolicitudesViewModel, homeViewModel)
         }
     }
 }
@@ -295,140 +287,3 @@ fun MoreInfo(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun addSolicitudForm(
-    aluSolicitudesViewModel: AluSolicitudesViewModel,
-    homeViewModel: HomeViewModel
-) {
-    var expandedDepartamento by remember { mutableStateOf(false) }
-    var expandedTipoSolicitud by remember { mutableStateOf(false) }
-    val departamentos by aluSolicitudesViewModel.departamentos.collectAsState(emptyList())
-    val selectedDepartamento by aluSolicitudesViewModel.selectedDepartamento.collectAsState(null)
-    val selectedTipoSolicitud by aluSolicitudesViewModel.selectedTipoSolicitud.collectAsState(null)
-
-    LaunchedEffect(departamentos) {
-        if (departamentos.isEmpty()) {
-            aluSolicitudesViewModel.onloadAddForm(homeViewModel)
-        }
-    }
-
-    ModalBottomSheet(
-        onDismissRequest = {
-            aluSolicitudesViewModel.changeShowForm()
-        }
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "Nueva solicitud",
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Spacer(Modifier.height(16.dp))
-
-            ExposedDropdownMenuBox(
-                modifier = Modifier.fillMaxWidth(),
-                expanded = expandedDepartamento,
-                onExpandedChange = { expandedDepartamento = it },
-            ) {
-                TextField(
-                    value = selectedDepartamento?.nombre ?: "",
-                    onValueChange = { },
-                    readOnly = true,
-                    label = { Text(text = "Departamento") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandedDepartamento) },
-                    modifier = Modifier.menuAnchor().fillMaxWidth(),
-                    textStyle = TextStyle(fontSize = 10.sp)
-                )
-
-                ExposedDropdownMenu(
-                    modifier = Modifier.fillMaxWidth(),
-                    expanded = expandedDepartamento,
-                    onDismissRequest = { expandedDepartamento = false }
-                ) {
-                    departamentos.forEach { departamento ->
-                        DropdownMenuItem(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = {
-                                Text(
-                                    departamento.nombre,
-                                    fontSize = 10.sp,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            },
-                            onClick = {
-                                aluSolicitudesViewModel.changeSelectedDepartamento(departamento)
-                                expandedDepartamento = false
-                            }
-                        )
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(8.dp))
-
-            ExposedDropdownMenuBox(
-                modifier = Modifier.fillMaxWidth(),
-                expanded = expandedTipoSolicitud,
-                onExpandedChange = { if (selectedDepartamento != null) expandedTipoSolicitud = it },
-            ) {
-                TextField(
-                    value = selectedDepartamento?.especies?.find { it == selectedTipoSolicitud }?.nombre ?: "",
-                    onValueChange = { },
-                    readOnly = true,
-                    enabled = selectedDepartamento != null,
-                    label = { Text(text = "Tipo solicitud") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandedTipoSolicitud) },
-                    modifier = Modifier.menuAnchor().fillMaxWidth(),
-                    textStyle = TextStyle(fontSize = 10.sp)
-                )
-
-                ExposedDropdownMenu(
-                    modifier = Modifier.fillMaxWidth(),
-                    expanded = expandedTipoSolicitud,
-                    onDismissRequest = { expandedTipoSolicitud = false }
-                ) {
-                    selectedDepartamento?.especies?.forEach { tipoSolicitud ->
-                        DropdownMenuItem(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = {
-                                Text(
-                                    tipoSolicitud.nombre,
-                                    fontSize = 10.sp,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            },
-                            onClick = {
-                                aluSolicitudesViewModel.changeSelectedTipoEspecie(tipoSolicitud)
-                                expandedTipoSolicitud = false
-                            }
-                        )
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(8.dp))
-
-            var text by remember { mutableStateOf("") }
-            TextField(
-                value = text,
-                onValueChange = { text = it },
-                label = { Text("Observaciones") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp),
-                textStyle = TextStyle(fontSize = 14.sp),
-                maxLines = 5,
-                singleLine = false,
-                shape = RoundedCornerShape(8.dp),
-            )
-        }
-    }
-}
