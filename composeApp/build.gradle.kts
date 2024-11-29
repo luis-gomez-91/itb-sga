@@ -38,6 +38,11 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
+
+            // Enables FileKit without Compose dependencies
+            implementation("io.github.vinceglb:filekit-core:0.8.7")
+            // Enables FileKit with Composable utilities
+            implementation("io.github.vinceglb:filekit-compose:0.8.7")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -68,6 +73,11 @@ kotlin {
 
             // peekaboo-image-picker
             implementation(libs.peekaboo.image.picker)
+
+            // Enables FileKit without Compose dependencies
+            implementation("io.github.vinceglb:filekit-core:0.8.7")
+            // Enables FileKit with Composable utilities
+            implementation("io.github.vinceglb:filekit-compose:0.8.7")
 
 
         }
@@ -134,6 +144,11 @@ dependencies {
     implementation(libs.places)
     implementation(libs.protolite.well.known.types)
     implementation(libs.androidx.core.i18n)
+
+    implementation("io.github.vinceglb:filekit-core:0.8.7")
+
+    // Enables FileKit with Composable utilities
+    implementation("io.github.vinceglb:filekit-compose:0.8.7")
 
 }
 

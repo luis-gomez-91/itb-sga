@@ -32,6 +32,7 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,7 +52,6 @@ import androidx.navigation.NavHostController
 import aok.composeapp.generated.resources.Res
 import aok.composeapp.generated.resources.logo
 import aok.composeapp.generated.resources.logo_dark
-import aok.composeapp.generated.resources.name
 import coil3.compose.AsyncImage
 import com.mohamedrejeb.calf.picker.toImageBitmap
 import com.preat.peekaboo.image.picker.ResizeOptions
@@ -59,11 +59,12 @@ import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.example.aok.core.SERVER_URL
+import org.example.aok.core.logInfo
 import org.example.aok.data.domain.DrawerItem
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.features.common.login.RedesSociales
-import org.example.aok.ui.components.MyCircularProgressIndicator
 
 @Composable
 fun MyDrawerContent(
@@ -177,6 +178,15 @@ fun PhotoProfile(
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     var imageByteArray by remember { mutableStateOf<ByteArray?>(null) }
     val imageLoading by homeViewModel.imageLoading.collectAsState(false)
+    val photoUploaded by homeViewModel.photoUploaded.collectAsState()
+
+
+    LaunchedEffect(photoUploaded) {
+        if (photoUploaded) {
+            imageBitmap = null // Limpia la imagen al completarse la subida
+            homeViewModel.resetPhotoUploadedFlag() // Restablece el estado en el ViewModel
+        }
+    }
 
     val resizeOptions = ResizeOptions(
         width = 1200, // Custom width
@@ -188,7 +198,7 @@ fun PhotoProfile(
     val singleImagePicker = rememberImagePickerLauncher(
         selectionMode = SelectionMode.Single,
         scope = scope,
-//        resizeOptions = resizeOptions,
+        resizeOptions = resizeOptions,
         onResult = { byteArrays ->
             byteArrays.firstOrNull()?.let {
                 imageBitmap = it.toImageBitmap()
@@ -231,6 +241,7 @@ fun PhotoProfile(
                         onClick = {
                             scope.launch {
                                 imageByteArray?.let { homeViewModel.uploadPhoto(it) }
+
                             }
                         },
                         modifier = Modifier
@@ -265,8 +276,9 @@ fun PhotoProfile(
                         )
                     }
                 } else {
+                    logInfo("prueba", "${SERVER_URL}${homeViewModel.homeData.value?.persona?.foto}")
                     AsyncImage(
-                        model = homeViewModel.homeData.value?.persona?.foto,
+                        model = "${SERVER_URL}${homeViewModel.homeData.value?.persona?.foto}",
                         contentDescription = "Foto perfil",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier

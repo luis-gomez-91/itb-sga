@@ -51,8 +51,7 @@ import org.example.aok.features.common.home.HomeViewModel
 fun MyTopBar(
     title: String,
     drawerState: DrawerState,
-    homeViewModel: HomeViewModel,
-    mainViewModel: MainViewModel
+    homeViewModel: HomeViewModel
 ) {
     val focusRequester = remember { FocusRequester() }
     var onSearch by remember { mutableStateOf(true) }

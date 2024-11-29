@@ -2,8 +2,6 @@ package org.example.aok.features.common.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mohamedrejeb.calf.picker.toImageBitmap
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -18,8 +16,6 @@ import org.example.aok.data.network.ReportForm
 import org.example.aok.data.network.ReportResult
 import org.example.aok.data.network.Error
 import org.example.aok.data.network.form.UploadPhotoForm
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 
 class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
     val client = createHttpClient()
@@ -183,6 +179,13 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
         _imageLoading.value = value
     }
 
+    private val _photoUploaded = MutableStateFlow(false)
+    val photoUploaded: StateFlow<Boolean> = _photoUploaded
+
+    fun resetPhotoUploadedFlag() {
+        _photoUploaded.value = false
+    }
+
     suspend fun uploadPhoto(file: ByteArray) {
         try {
             changeImageLoading(true)
@@ -195,6 +198,9 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
                 )
             }
             val result = form?.let { service.uploadPhoto(it) }
+            _homeData.value!!.persona.foto = result?.message ?: _homeData.value!!.persona.foto
+            logInfo("prueba", "${result}")
+            _photoUploaded.value = true
 
         } catch (e: Exception) {
             val error = Error("Error", "Error inesperado: ${e.message}")

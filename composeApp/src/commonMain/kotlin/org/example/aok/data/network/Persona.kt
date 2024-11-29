@@ -10,7 +10,7 @@ data class Persona(
     val emailinst: String,
     val esInscripcion: Boolean,
     val esDocente: Boolean,
-    val foto: String,
+    var foto: String,
     val idInscripcion: Int?,
     val idDocente: Int?,
     val idPersona: Int,

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,15 +25,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Start
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -56,6 +61,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import io.github.vinceglb.filekit.core.FileKit
+import io.github.vinceglb.filekit.core.pickFile
+import kotlinx.coroutines.launch
 import org.example.aok.core.MainViewModel
 import org.example.aok.core.formatoText
 import org.example.aok.data.network.AluSolicitud
@@ -82,7 +90,8 @@ fun AluSolicitudesScreen(
         content = {
             Screen(
                 homeViewModel,
-                aluSolicitudesViewModel
+                aluSolicitudesViewModel,
+                navController
             )
         },
         mainViewModel = mainViewModel,
@@ -94,12 +103,13 @@ fun AluSolicitudesScreen(
 @Composable
 fun Screen(
     homeViewModel: HomeViewModel,
-    aluSolicitudesViewModel: AluSolicitudesViewModel
+    aluSolicitudesViewModel: AluSolicitudesViewModel,
+    navController: NavHostController
 ) {
     val data by aluSolicitudesViewModel.data.collectAsState()
     val isLoading by homeViewModel.isLoading.collectAsState(false)
     val query by homeViewModel.searchQuery.collectAsState("")
-    val showForm by aluSolicitudesViewModel.showForm.collectAsState(false)
+    val uploadFormLoading by aluSolicitudesViewModel.uploadFormLoading.collectAsState(false)
 
     LaunchedEffect(query) {
         homeViewModel.homeData.value?.persona?.idInscripcion?.let {
@@ -148,17 +158,30 @@ fun Screen(
                         }
                     }
                 }
-                //            Spacer(modifier = Modifier.height(8.dp))
             }
-            MyAddButton(
-                modifier = Modifier.align(Alignment.BottomEnd),
-                onclick = {
-                    aluSolicitudesViewModel.changeShowForm()
+
+            Box(
+                modifier = Modifier
+                    .width(80.dp)
+                    .height(80.dp)
+                    .align(Alignment.BottomEnd)
+            ) {
+                if (uploadFormLoading) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary,
+                        strokeWidth = 4.dp,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                } else {
+                    MyAddButton(
+                        modifier = Modifier.align(Alignment.Center),
+                        onclick = {
+                            navController.navigate("addSolicitud")
+                        }
+                    )
                 }
-            )
-        }
-        if (showForm) {
-            FormAddSolicitud(aluSolicitudesViewModel, homeViewModel)
+            }
+
         }
     }
 }

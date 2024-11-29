@@ -3,10 +3,8 @@ package org.example.aok.data.network
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TipoEspecie(
+data class TipoEspecieAsignatura(
     val id: Int,
     val nombre: String,
-    val precio: Double,
-    val usaArchivo: Boolean,
-    val relacionaDocente: Boolean
+    val docentes: List<TipoEspecieDocente>?
 )

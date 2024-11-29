@@ -61,8 +61,8 @@ fun DashBoardScreen(
         },
         content = {
             Scaffold(
-                topBar = { MyTopBar(title = title, drawerState = drawerState, homeViewModel = homeViewModel, mainViewModel = mainViewModel) },
-                bottomBar = { MyBottomBar(navController = navController, homeViewModel = homeViewModel, mainViewModel = mainViewModel) }
+                topBar = { MyTopBar(title = title, drawerState = drawerState, homeViewModel = homeViewModel) },
+                bottomBar = { MyBottomBar(navController = navController, homeViewModel = homeViewModel) }
             ) { innerPadding ->
                 Surface(
                     Modifier

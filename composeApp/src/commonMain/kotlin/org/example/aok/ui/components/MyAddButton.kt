@@ -27,7 +27,6 @@ fun MyAddButton(
             onclick()
         },
         modifier = modifier
-            .padding(16.dp)
             .size(48.dp),
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(

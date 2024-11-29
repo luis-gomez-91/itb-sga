@@ -14,10 +14,12 @@ import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.student.facturacion_electronica.AluFacturacionViewModel
 import android.content.Intent
 import android.net.Uri
+import io.github.vinceglb.filekit.core.FileKit
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FileKit.init(this)
         setContent {
             Surface(color = Color.Transparent) {
                 WindowCompat.setDecorFitsSystemWindows(window, false)

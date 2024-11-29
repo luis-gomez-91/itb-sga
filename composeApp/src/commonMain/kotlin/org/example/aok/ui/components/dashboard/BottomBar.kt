@@ -44,8 +44,7 @@ import org.example.aok.features.common.home.HomeViewModel
 @Composable
 fun MyBottomBar(
     navController: NavHostController,
-    homeViewModel: HomeViewModel,
-    mainViewModel: MainViewModel
+    homeViewModel: HomeViewModel
 //    perfilViewModel: PerfilViewModel
 ) {
     Surface (

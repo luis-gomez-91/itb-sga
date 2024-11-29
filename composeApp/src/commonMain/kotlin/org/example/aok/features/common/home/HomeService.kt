@@ -7,9 +7,11 @@ import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import org.example.aok.core.SERVER_URL
 import org.example.aok.data.network.Error
 import org.example.aok.data.network.Home
@@ -17,6 +19,7 @@ import org.example.aok.data.network.HomeResult
 import org.example.aok.data.network.Report
 import org.example.aok.data.network.ReportForm
 import org.example.aok.data.network.ReportResult
+import org.example.aok.data.network.Response
 import org.example.aok.data.network.form.PagoOnlineForm
 import org.example.aok.data.network.form.UploadPhotoForm
 
@@ -62,10 +65,21 @@ class HomeService(
         }
     }
 
-    suspend fun uploadPhoto(form: UploadPhotoForm): HttpResponse {
-        return client.post("${SERVER_URL}api_rest?action=postDispatcher") {
-            contentType(ContentType.Application.Json)
-            setBody(form)
+    suspend fun uploadPhoto(form: UploadPhotoForm): Response {
+        return try {
+            val response = client.post("${SERVER_URL}api_rest?action=postDispatcher") {
+                contentType(ContentType.Application.Json)
+                setBody(form)
+            }
+            if (response.status.isSuccess()) {
+                val successResponse = response.body<Response>()
+                successResponse
+            } else {
+                Response(status = "error", message = "Unexpected response status: ${response.status}")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Response(status = "error", message = "Exception occurred: ${e.message}")
         }
     }
 
