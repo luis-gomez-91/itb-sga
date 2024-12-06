@@ -14,8 +14,8 @@ import org.example.aok.data.network.Periodo
 import org.example.aok.data.network.Report
 import org.example.aok.data.network.ReportForm
 import org.example.aok.data.network.ReportResult
-import org.example.aok.data.network.Error
 import org.example.aok.data.network.form.UploadPhotoForm
+import org.example.aok.data.network.Error
 
 class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
     val client = createHttpClient()
@@ -47,7 +47,7 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
                 }
 
             } catch (e: Exception) {
-                addError(title = "Error", text = "${e.message}")
+                addError(error = Error(title = "Error", error = "${e.message}"))
             } finally {
                 _isLoading.value = false
             }
@@ -62,12 +62,8 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
         _error.value = null
     }
 
-    fun addError(title: String, text: String) {
-        val newError = Error(
-            title = title,
-            error = text
-        )
-        _error.value = newError
+    fun addError(error: Error) {
+        _error.value = error
     }
 
 //  ----------------------------------------------------------  LOADING ---------------------------------------------------------
@@ -122,7 +118,7 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
                 }
             } catch (e: Exception) {
                 logInfo("report", "$e")
-                addError(title = "Error", text = "${e.message}")
+                addError(error = Error(title = "Error", error = "${e.message}"))
             } finally {
                 _isLoading.value = false
             }

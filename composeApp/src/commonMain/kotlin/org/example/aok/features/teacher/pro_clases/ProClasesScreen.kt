@@ -59,6 +59,7 @@ import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.ui.components.MyAssistChip
 import org.example.aok.ui.components.MyCard
 import org.example.aok.ui.components.MyCircularProgressIndicator
+import org.example.aok.ui.components.MyErrorAlert
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 
 @Composable
@@ -97,6 +98,7 @@ fun Screen(
     val isLoading by homeViewModel.isLoading.collectAsState(false)
     val query by homeViewModel.searchQuery.collectAsState("")
     val actualPage by homeViewModel.actualPage.collectAsState(2)
+    val error by homeViewModel.error.collectAsState(null)
 
     LaunchedEffect(query) {
         proClasesViewModel.onloadProClases(query, actualPage, homeViewModel)
@@ -142,6 +144,18 @@ fun Screen(
                     it.paging
                 )
             }
+        }
+
+        if (error != null) {
+            MyErrorAlert(
+                titulo = error!!.title,
+                mensaje = error!!.error,
+                onDismiss = {
+                    homeViewModel.clearError()
+                    navController.popBackStack()
+                },
+                showAlert = true
+            )
         }
     }
 }

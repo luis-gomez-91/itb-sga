@@ -73,12 +73,15 @@ fun Screen(
     aluFinanzasViewModel: AluFinanzasViewModel
 ) {
     val data by aluFinanzasViewModel.data.collectAsState(emptyList())
-    val isLoading by aluFinanzasViewModel.isLoading.collectAsState(false)
+    val isLoading by homeViewModel.isLoading.collectAsState(false)
     val searchQuery by homeViewModel.searchQuery.collectAsState("")
 
     LaunchedEffect(Unit) {
         homeViewModel.clearSearchQuery()
-        aluFinanzasViewModel.onloadAluFinanzas(homeViewModel.homeData.value!!.persona.idPersona)
+        homeViewModel.homeData.value!!.persona.idInscripcion?.let {
+            aluFinanzasViewModel.onloadAluFinanzas(
+                it, homeViewModel)
+        }
     }
 
     val rubrosFiltados = if (searchQuery.isNotEmpty()) {

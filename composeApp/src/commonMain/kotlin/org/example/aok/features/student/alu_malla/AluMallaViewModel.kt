@@ -9,6 +9,8 @@ import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
 import org.example.aok.data.network.AluMalla
 import org.example.aok.data.network.AluMallaResult
+import org.example.aok.data.network.Error
+import org.example.aok.features.common.home.HomeViewModel
 
 class AluMallaViewModel: ViewModel() {
     val client = createHttpClient()
@@ -17,32 +19,23 @@ class AluMallaViewModel: ViewModel() {
     private val _data = MutableStateFlow<List<AluMalla>>(emptyList())
     val data: StateFlow<List<AluMalla>> = _data
 
-    private val _error = MutableStateFlow<String>("")
-    val error: StateFlow<String?> = _error
-
-    private val _isLoading = MutableStateFlow<Boolean>(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
-
-    fun onloadAluMalla(id: Int) {
-        _isLoading.value = true
+    fun onloadAluMalla(id: Int, homeViewModel: HomeViewModel) {
+        homeViewModel.changeLoading(true)
         viewModelScope.launch {
             try {
                 val result = service.fetchAluMalla(id)
-                logInfo("alu_malla", "$result")
-
                 when (result) {
                     is AluMallaResult.Success -> {
                         _data.value = result.aluMalla
-                        _error.value = ""
                     }
                     is AluMallaResult.Failure -> {
-                        _error.value = result.error.error ?: "An unknown error occurred"
+                        homeViewModel.addError(result.error)
                     }
                 }
             } catch (e: Exception) {
-                _error.value = "Error loading data: ${e.message}"
+                homeViewModel.addError(Error(title = "Error", error = "${e.message}"))
             } finally {
-                _isLoading.value = false
+                homeViewModel.changeLoading(true)
             }
         }
     }

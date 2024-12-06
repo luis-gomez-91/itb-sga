@@ -88,7 +88,7 @@ fun Screen(
     navController: NavHostController
 ) {
     val data: List<AluCronograma> by aluCronogramaViewModel.data.collectAsState(emptyList())
-    val error by aluCronogramaViewModel.error.collectAsState(null)
+    val error by homeViewModel.error.collectAsState(null)
     val searchQuery by homeViewModel.searchQuery.collectAsState("")
     val isLoading by homeViewModel.isLoading.collectAsState(false)
 
@@ -99,6 +99,7 @@ fun Screen(
     }
 
     LaunchedEffect(Unit) {
+        homeViewModel.clearError()
         homeViewModel.clearSearchQuery()
         aluCronogramaViewModel.onloadAluCronograma(homeViewModel.homeData.value!!.persona.idInscripcion!!, homeViewModel)
     }
@@ -121,7 +122,7 @@ fun Screen(
                 titulo = error!!.title,
                 mensaje = error!!.error,
                 onDismiss = {
-                    aluCronogramaViewModel.clearError()
+                    homeViewModel.clearError()
                     navController.popBackStack()
                 },
                 showAlert = true

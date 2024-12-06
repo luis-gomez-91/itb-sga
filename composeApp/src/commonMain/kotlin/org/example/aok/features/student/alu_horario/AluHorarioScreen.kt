@@ -94,9 +94,10 @@ fun Screen(
     val data by aluHorarioViewModel.data.collectAsState(emptyList())
     val isLoading by homeViewModel.isLoading.collectAsState(false)
     val searchQuery by homeViewModel.searchQuery.collectAsState("")
-    val error by aluHorarioViewModel.error.collectAsState(null)
+    val error by homeViewModel.error.collectAsState(null)
 
     LaunchedEffect(Unit) {
+        homeViewModel.clearError()
         homeViewModel.clearSearchQuery()
         homeViewModel.homeData.value!!.persona.idInscripcion?.let {
             aluHorarioViewModel.onloadAluHorario(
@@ -137,7 +138,7 @@ fun Screen(
                 titulo = error!!.title,
                 mensaje = error!!.error,
                 onDismiss = {
-                    aluHorarioViewModel.clearError()
+                    homeViewModel.clearError()
                     navController.popBackStack()
                 },
                 showAlert = true

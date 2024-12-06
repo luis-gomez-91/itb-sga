@@ -11,6 +11,7 @@ import org.example.aok.data.network.AluSolicitud
 import org.example.aok.data.network.AluSolicitudDepartamentos
 import org.example.aok.data.network.AluSolicitudes
 import org.example.aok.data.network.AluSolicitudesResult
+import org.example.aok.data.network.Error
 import org.example.aok.data.network.Response
 import org.example.aok.data.network.TipoEspecie
 import org.example.aok.data.network.TipoEspecieAsignatura
@@ -26,9 +27,6 @@ class AluSolicitudesViewModel: ViewModel() {
     private val _data = MutableStateFlow<List<AluSolicitud>>(emptyList())
     val data: StateFlow<List<AluSolicitud>> = _data
 
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error
-
     fun onloadAluSolicitudes(id: Int, homeViewModel: HomeViewModel) {
         homeViewModel.changeLoading(true)
         viewModelScope.launch {
@@ -39,15 +37,14 @@ class AluSolicitudesViewModel: ViewModel() {
                 when (result) {
                     is AluSolicitudesResult.Success -> {
                         _data.value = result.aluSolicitudes
-                        _error.value = ""
+                        homeViewModel.clearError()
                     }
                     is AluSolicitudesResult.Failure -> {
-                        _error.value = result.error.error
+                        homeViewModel.addError(result.error)
                     }
                 }
             } catch (e: Exception) {
-                _error.value = "Error loading data: ${e.message}"
-                logInfo("alu_solicitudes", "${e.message}")
+                homeViewModel.addError(Error(title = "Error", error = "${e.message}"))
             } finally {
                 homeViewModel.changeLoading(false)
             }
@@ -117,8 +114,7 @@ class AluSolicitudesViewModel: ViewModel() {
 //                    logInfo("alu_solicitudes", "${result}")
                 }
             } catch (e: Exception) {
-                _error.value = "Error: ${e.message}"
-                logInfo("alu_solicitudes", "ERROR: ${e.message}")
+                homeViewModel.addError(Error(title = "Error", error = "${e.message}"))
             } finally {
                 _uploadFormLoading.value = false
             }
@@ -166,8 +162,7 @@ class AluSolicitudesViewModel: ViewModel() {
                 logInfo("solicitudes", "${result.message}")
 
             } catch (e: Exception) {
-                logInfo("alu_solicitudes", "${e.message}")
-                _error.value = "Error: ${e.message}"
+                homeViewModel.addError(Error(title = "Error", error = "${e.message}"))
             } finally {
                 _sendFormLoading.value = false
             }

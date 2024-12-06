@@ -93,16 +93,17 @@ fun Screen(
     aluMallaViewModel: AluMallaViewModel
 ) {
     val data by aluMallaViewModel.data.collectAsState(emptyList())
-    val isLoading by aluMallaViewModel.isLoading.collectAsState(false)
+    val isLoading by homeViewModel.isLoading.collectAsState(false)
     val searchQuery by homeViewModel.searchQuery.collectAsState("")
     val pagerState = rememberPagerState { data.size }
     var selectedTabIndex by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
+        homeViewModel.clearError()
         homeViewModel.clearSearchQuery()
         homeViewModel.homeData.value!!.persona.idInscripcion?.let {
             aluMallaViewModel.onloadAluMalla(
-                it
+                it, homeViewModel
             )
         }
     }

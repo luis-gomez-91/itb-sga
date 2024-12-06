@@ -93,7 +93,7 @@ fun Screen(
     val searchQuery by homeViewModel.searchQuery.collectAsState("")
     var selectedTabIndex by remember { mutableStateOf(0) }
     val pagerState = rememberPagerState { 2 }
-    val error by pagoOnlineViewModel.error.collectAsState(null)
+    val error by homeViewModel.error.collectAsState(null)
 
     LaunchedEffect(Unit) {
         homeViewModel.clearSearchQuery()
@@ -148,7 +148,7 @@ fun Screen(
                 titulo = error!!.title,
                 mensaje = error!!.error,
                 onDismiss = {
-                    pagoOnlineViewModel.clearError()
+                    homeViewModel.clearError()
                     navController.popBackStack()
                 },
                 showAlert = true
@@ -317,7 +317,8 @@ fun CardRubros(
                         pagoOnlineViewModel.sendPagoOnline(
                             idInscripcion = it,
                             valor = total,
-                            datosFacturacion = pagoOnlineViewModel.data.value!!.datosFacturacion
+                            datosFacturacion = pagoOnlineViewModel.data.value!!.datosFacturacion,
+                            homeViewModel = homeViewModel
                         )
                     }
                 }

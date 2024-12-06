@@ -11,6 +11,7 @@ import org.example.aok.core.logInfo
 import org.example.aok.data.network.AluFacturacion
 import org.example.aok.data.network.Report
 import org.example.aok.data.network.AluFacturacionResult
+import org.example.aok.data.network.Error
 import org.example.aok.data.network.ReportForm
 import org.example.aok.features.common.home.HomeViewModel
 
@@ -20,9 +21,6 @@ class AluFacturacionViewModel() : ViewModel() {
 
     private val _data = MutableStateFlow<List<AluFacturacion>>(emptyList())
     val data: StateFlow<List<AluFacturacion>> = _data
-
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error
 
     private val _RIDE = MutableStateFlow<Report?>(null)
     val RIDE: StateFlow<Report?> = _RIDE
@@ -38,14 +36,14 @@ class AluFacturacionViewModel() : ViewModel() {
                 when (result) {
                     is AluFacturacionResult.Success -> {
                         _data.value = result.aluFacturacion
-                        _error.value = null
+                        homeViewModel.clearError()
                     }
                     is AluFacturacionResult.Failure -> {
-                        _error.value = result.error.error ?: "Ocurrió un error desconocido"
+                        homeViewModel.addError(result.error)
                     }
                 }
             } catch (e: Exception) {
-                _error.value = "Error al cargar los datos: ${e.message}"
+                homeViewModel.addError(Error(title = "Error", error = "${e.message}"))
             } finally {
                 homeViewModel.changeLoading(false)
             }
@@ -64,8 +62,7 @@ class AluFacturacionViewModel() : ViewModel() {
                 )
                 homeViewModel.onloadReport(form)
             } catch (e: Exception) {
-                logInfo("alu_facturacion", "Error: ${e.message}")
-                _error.value = "Error al descargar y abrir el archivo: ${e.message}"
+                homeViewModel.addError(Error(title = "Error", error = "${e.message}"))
             } finally {
                 homeViewModel.changeLoading(false)
             }

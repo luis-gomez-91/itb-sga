@@ -34,6 +34,7 @@ import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.ui.components.MyAssistChip
 import org.example.aok.ui.components.MyCard
 import org.example.aok.ui.components.MyCircularProgressIndicator
+import org.example.aok.ui.components.MyErrorAlert
 import org.example.aok.ui.components.MyFilledTonalButton
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 
@@ -51,7 +52,8 @@ fun AluFacturacionScreen(
         content = {
             Screen(
                 homeViewModel,
-                aluFacturacionViewModel
+                aluFacturacionViewModel,
+                navController
             )
         },
         mainViewModel = mainViewModel,
@@ -63,11 +65,13 @@ fun AluFacturacionScreen(
 @Composable
 fun Screen(
     homeViewModel: HomeViewModel,
-    aluFacturacionViewModel: AluFacturacionViewModel
+    aluFacturacionViewModel: AluFacturacionViewModel,
+    navController: NavHostController
 ) {
     val data by aluFacturacionViewModel.data.collectAsState(emptyList())
     val isLoading by homeViewModel.isLoading.collectAsState(false)
     val searchQuery by homeViewModel.searchQuery.collectAsState("")
+    val error by homeViewModel.error.collectAsState(null)
 
     LaunchedEffect(Unit) {
         homeViewModel.clearSearchQuery()
@@ -106,6 +110,17 @@ fun Screen(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
+        }
+        if (error != null) {
+            MyErrorAlert(
+                titulo = error!!.title,
+                mensaje = error!!.error,
+                onDismiss = {
+                    homeViewModel.clearError()
+                    navController.popBackStack()
+                },
+                showAlert = true
+            )
         }
     }
 }

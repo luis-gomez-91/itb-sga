@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
+import org.example.aok.data.network.Error
 import org.example.aok.data.network.ProClases
 import org.example.aok.data.network.ProClasesResult
 import org.example.aok.features.common.home.HomeViewModel
@@ -18,9 +19,6 @@ class ProClasesViewModel: ViewModel() {
     private val _data = MutableStateFlow<ProClases?>(null)
     val data: StateFlow<ProClases?> = _data
 
-    private val _error = MutableStateFlow<String>("")
-    val error: StateFlow<String?> = _error
-
     fun onloadProClases(search: String, page: Int, homeViewModel: HomeViewModel) {
         homeViewModel.changeLoading(true)
         viewModelScope.launch {
@@ -30,20 +28,18 @@ class ProClasesViewModel: ViewModel() {
                         it
                     )
                 }
-                logInfo("pro_clases", "$result")
-
                 when (result) {
                     is ProClasesResult.Success -> {
                         _data.value = result.proClases
-                        _error.value = ""
+                        homeViewModel.clearError()
                     }
                     is ProClasesResult.Failure -> {
-                        _error.value = result.error.error ?: "An unknown error occurred"
+                        homeViewModel.addError(result.error)
                     }
                     else -> {}
                 }
             } catch (e: Exception) {
-                _error.value = "Error loading data: ${e.message}"
+                homeViewModel.addError(Error(title = "Error", error = "${e.message}"))
             } finally {
                 homeViewModel.changeLoading(false)
             }

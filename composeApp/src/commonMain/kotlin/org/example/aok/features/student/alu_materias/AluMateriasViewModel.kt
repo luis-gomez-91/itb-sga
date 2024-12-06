@@ -19,29 +19,22 @@ class AluMateriasViewModel: ViewModel() {
     private val _data = MutableStateFlow<List<AluMateria>>(emptyList())
     val data: StateFlow<List<AluMateria>> = _data
 
-    private val _error = MutableStateFlow<Error?>(null)
-    val error: StateFlow<Error?> = _error
-
-    fun clearError() { _error.value = null }
-
     fun onloadAluMaterias(id: Int, homeViewModel: HomeViewModel) {
         homeViewModel.changeLoading(true)
         viewModelScope.launch {
             try {
                 val result = service.fetchAluMaterias(id)
-                logInfo("alu_materias", "$result")
-
                 when (result) {
                     is AluMateriasResult.Success -> {
                         _data.value = result.aluMateria
-                        _error.value = null
+                        homeViewModel.clearError()
                     }
                     is AluMateriasResult.Failure -> {
-                        _error.value = result.error
+                        homeViewModel.addError(result.error)
                     }
                 }
             } catch (e: Exception) {
-                _error.value = Error(title = "Error", error = "${e.message}")
+                homeViewModel.addError(Error(title = "Error", error = "${e.message}"))
             } finally {
                 homeViewModel.changeLoading(false)
             }

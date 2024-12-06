@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
+import org.example.aok.data.network.Error
 import org.example.aok.data.network.Periodo
 import org.example.aok.data.network.ProHorario
 import org.example.aok.data.network.ProHorariosResult
@@ -18,9 +19,6 @@ class ProHorariosViewModel : ViewModel() {
 
     private val _data = MutableStateFlow<List<ProHorario>>(emptyList())
     val data: StateFlow<List<ProHorario>> = _data
-
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error
 
     fun onloadProHorarios(
         id: Int,
@@ -36,15 +34,15 @@ class ProHorariosViewModel : ViewModel() {
                 when (result) {
                     is ProHorariosResult.Success -> {
                         _data.value = result.proHorarios
-                        _error.value = ""
+                        homeViewModel.clearError()
                     }
                     is ProHorariosResult.Failure -> {
-                        _error.value = result.error.error
+                        homeViewModel.addError(result.error)
                     }
                 }
 
             } catch (e: Exception) {
-                _error.value = "Error: ${e.message}"
+                homeViewModel.addError(Error(title = "Error", error = "${e.message}"))
             } finally {
                 homeViewModel.changeLoading(false)
             }

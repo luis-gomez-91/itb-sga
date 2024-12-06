@@ -18,11 +18,6 @@ class AluCronogramaViewModel: ViewModel() {
     private val _data = MutableStateFlow<List<AluCronograma>>(emptyList())
     val data: StateFlow<List<AluCronograma>> = _data
 
-    private val _error = MutableStateFlow<Error?>(null)
-    val error: StateFlow<Error?> = _error
-
-    fun clearError() { _error.value = null }
-
     fun onloadAluCronograma(id: Int, homeViewModel: HomeViewModel) {
         homeViewModel.changeLoading(true)
         viewModelScope.launch {
@@ -31,14 +26,14 @@ class AluCronogramaViewModel: ViewModel() {
                 when (result) {
                     is AluCronogramaResult.Success -> {
                         _data.value = result.aluCronograma
-                        _error.value = null
+                        homeViewModel.clearError()
                     }
                     is AluCronogramaResult.Failure -> {
-                        _error.value = result.error
+                        homeViewModel.addError(result.error)
                     }
                 }
             } catch (e: Exception) {
-                _error.value = Error(title = "Error", error = "${e.message}")
+                homeViewModel.addError(Error(title = "Error", error = "${e.message}"))
             } finally {
                 homeViewModel.changeLoading(false)
             }

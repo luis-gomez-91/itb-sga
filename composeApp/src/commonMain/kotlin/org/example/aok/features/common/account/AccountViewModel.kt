@@ -9,7 +9,9 @@ import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
 import org.example.aok.data.network.Account
 import org.example.aok.data.network.AccountResult
+import org.example.aok.data.network.Error
 import org.example.aok.data.network.InscripcionResult
+import org.example.aok.features.common.home.HomeViewModel
 
 class AccountViewModel: ViewModel() {
     val client = createHttpClient()
@@ -18,14 +20,8 @@ class AccountViewModel: ViewModel() {
     private val _data = MutableStateFlow<Account?>(null)
     val data: StateFlow<Account?> = _data
 
-    private val _error = MutableStateFlow<String>("")
-    val error: StateFlow<String?> = _error
-
-    private val _isLoading = MutableStateFlow<Boolean>(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
-
-    fun onloadAccount(id: Int) {
-        _isLoading.value = true
+    fun onloadAccount(id: Int, homeViewModel: HomeViewModel) {
+        homeViewModel.changeLoading(true)
         viewModelScope.launch {
             try {
                 val result = accountService.fetchAccount(id)
@@ -33,16 +29,16 @@ class AccountViewModel: ViewModel() {
                 when (result) {
                     is AccountResult.Success -> {
                         _data.value = result.account
-                        _error.value = ""
+                        homeViewModel.clearError()
                     }
                     is AccountResult.Failure -> {
-                        _error.value = result.error.error ?: "An unknown error occurred"
+                        homeViewModel.addError(result.error)
                     }
                 }
             } catch (e: Exception) {
-                _error.value = "account: ${e.message}"
+                homeViewModel.addError(Error(title = "Error", error = "${e.message}"))
             } finally {
-                _isLoading.value = false
+                homeViewModel.changeLoading(false)
             }
         }
     }

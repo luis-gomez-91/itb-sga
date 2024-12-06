@@ -103,7 +103,7 @@ fun Screen(
     val isLoading by homeViewModel.isLoading.collectAsState(false)
     val pagerState = rememberPagerState { data.size }
     var selectedTabIndex by remember { mutableStateOf(0) }
-    val error by aluMateriasViewModel.error.collectAsState(null)
+    val error by homeViewModel.error.collectAsState(null)
 
     val dataFiltada = if (searchQuery.isNotEmpty()) {
         data.filter { it.materiaNombre .contains(searchQuery, ignoreCase = true) }
@@ -112,6 +112,7 @@ fun Screen(
     }
 
     LaunchedEffect(Unit) {
+        homeViewModel.clearError()
         homeViewModel.clearSearchQuery()
         homeViewModel.homeData.value!!.persona.idInscripcion?.let {
             aluMateriasViewModel.onloadAluMaterias(
@@ -166,7 +167,7 @@ fun Screen(
                 titulo = error!!.title,
                 mensaje = error!!.error,
                 onDismiss = {
-                    aluMateriasViewModel.clearError()
+                    homeViewModel.clearError()
                     navController.popBackStack()
                 },
                 showAlert = true

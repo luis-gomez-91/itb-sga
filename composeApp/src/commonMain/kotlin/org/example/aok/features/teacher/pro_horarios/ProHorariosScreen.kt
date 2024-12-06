@@ -64,6 +64,7 @@ import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.ui.components.MyAssistChip
 import org.example.aok.ui.components.MyCard
 import org.example.aok.ui.components.MyCircularProgressIndicator
+import org.example.aok.ui.components.MyErrorAlert
 import org.example.aok.ui.components.MyFilledTonalButton
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 
@@ -81,7 +82,8 @@ fun ProHorariosScreen(
         content = {
             Screen(
                 homeViewModel,
-                proHorariosViewModel
+                proHorariosViewModel,
+                navController
             )
         },
         mainViewModel = mainViewModel,
@@ -94,7 +96,8 @@ fun ProHorariosScreen(
 @Composable
 fun Screen(
     homeViewModel: HomeViewModel,
-    proHorariosViewModel: ProHorariosViewModel
+    proHorariosViewModel: ProHorariosViewModel,
+    navController: NavHostController
 ) {
 
     val data by proHorariosViewModel.data.collectAsState(emptyList())
@@ -149,12 +152,19 @@ fun Screen(
                 ) { index ->
                     Clases(data[selectedTabIndex])
                 }
-            } else {
-                homeViewModel.addError("Sin Horarios", "NO EXISTEN HORARIOS PROGRAMADOS PARA EL PERIODO ${periodoSelect!!.nombre}")
-                if (error != null) {
-                    emptyHorarios(error)
-                }
             }
+        }
+
+        if (error != null) {
+            MyErrorAlert(
+                titulo = error!!.title,
+                mensaje = error!!.error,
+                onDismiss = {
+                    homeViewModel.clearError()
+                    navController.popBackStack()
+                },
+                showAlert = true
+            )
         }
     }
 }

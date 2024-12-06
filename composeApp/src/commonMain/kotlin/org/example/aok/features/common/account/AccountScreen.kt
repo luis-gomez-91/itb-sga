@@ -19,6 +19,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -37,6 +38,7 @@ import org.example.aok.features.common.home.GrupoItem
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.ui.components.MyCircularProgressIndicator
+import org.example.aok.ui.components.MyErrorAlert
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 
 @Composable
@@ -59,7 +61,6 @@ fun AccountScreen(
         },
         mainViewModel = mainViewModel,
         homeViewModel = homeViewModel,
-//            perfilViewModel = perfilViewModel,
         loginViewModel = loginViewModel
     )
 }
@@ -70,22 +71,43 @@ fun Screen(
     accountViewModel: AccountViewModel,
     homeViewModel: HomeViewModel
 ) {
-
-    accountViewModel.onloadAccount(homeViewModel.homeData.value!!.persona.idPersona)
     val data by accountViewModel.data.collectAsState()
+    val error by homeViewModel.error.collectAsState(null)
+    val isLoading by homeViewModel.isLoading.collectAsState(false)
 
-    data?.let { persona ->
-        dataPersona(navController, persona)
-    } ?: run {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            MyCircularProgressIndicator()
-        }
+    LaunchedEffect(Unit) {
+        homeViewModel.clearError()
+        homeViewModel.clearSearchQuery()
+        accountViewModel.onloadAccount(homeViewModel.homeData.value!!.persona.idPersona, homeViewModel)
     }
 
+    if (isLoading) {
+        MyCircularProgressIndicator()
+    } else {
+        data?.let { persona ->
+            dataPersona(navController, persona)
+        } ?: run {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                MyCircularProgressIndicator()
+            }
+        }
+
+        if (error != null) {
+            MyErrorAlert(
+                titulo = error!!.title,
+                mensaje = error!!.error,
+                onDismiss = {
+                    homeViewModel.clearError()
+                    navController.popBackStack()
+                },
+                showAlert = true
+            )
+        }
+    }
 }
 
 @Composable
