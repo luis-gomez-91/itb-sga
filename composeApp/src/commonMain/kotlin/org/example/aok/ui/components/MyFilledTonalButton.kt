@@ -24,38 +24,38 @@ import androidx.compose.ui.unit.TextUnit
 
 @Composable
 fun MyFilledTonalButton(
-    text: String = "Ingresar", // Texto opcional
-    enabled: Boolean = true, // Estado del botón
-    onClickAction: () -> Unit, // Acción al hacer clic
+    text: String = "Ingresar",
+    enabled: Boolean = true,
+    onClickAction: () -> Unit,
     icon: ImageVector? = null,
-    buttonColor: Color = MaterialTheme.colorScheme.primaryContainer, // Color del botón opcional
-    textColor: Color = MaterialTheme.colorScheme.primary, // Color del texto opcional
+    buttonColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    textColor: Color = MaterialTheme.colorScheme.primary,
     iconSize: Dp = 16.dp,
     textSize: TextUnit = 12.sp
 ) {
     FilledTonalButton(
         onClick = onClickAction,
         enabled = enabled,
-        shape = RoundedCornerShape(8.dp), // Esquinas redondeadas
+        shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.filledTonalButtonColors(
-            containerColor = buttonColor, // Usar color pasado como parámetro o predeterminado
-            contentColor = textColor // Usar color del texto pasado como parámetro o predeterminado
+            containerColor = buttonColor,
+            contentColor = textColor
         )
     ) {
         if (icon != null) {
             Icon(
                 imageVector = icon,
-                contentDescription = text, // Descripción del ícono para accesibilidad
-                modifier = Modifier.size(iconSize), // Tamaño del ícono
-                tint = textColor // Color del ícono
+                contentDescription = text,
+                modifier = Modifier.size(iconSize),
+                tint = textColor
             )
-            Spacer(modifier = Modifier.width(4.dp)) // Espacio entre ícono y texto
+            Spacer(modifier = Modifier.width(4.dp))
         }
         Text(
             text = text,
             fontSize = textSize,
             fontWeight = FontWeight.Bold,
-            color = textColor // Aplicar el color del texto
+            color = textColor
         )
     }
 }

@@ -19,7 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.MoneyOff
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -45,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.example.aok.core.MainViewModel
-import org.example.aok.core.formatoText
 import org.example.aok.core.logInfo
 import org.example.aok.data.network.DatosFacturacion
 import org.example.aok.data.network.RubroX
@@ -54,6 +52,7 @@ import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.ui.components.MyAssistChip
 import org.example.aok.ui.components.MyCard
 import org.example.aok.ui.components.MyCircularProgressIndicator
+import org.example.aok.ui.components.MyErrorAlert
 import org.example.aok.ui.components.MyFilledTonalButton
 import org.example.aok.ui.components.MyOutlinedTextField
 import org.example.aok.ui.components.dashboard.DashBoardScreen
@@ -72,7 +71,8 @@ fun PagoOnlineScreen(
         content = {
             Screen(
                 homeViewModel,
-                pagoOnlineViewModel
+                pagoOnlineViewModel,
+                navController
             )
         },
         mainViewModel = mainViewModel,
@@ -85,20 +85,21 @@ fun PagoOnlineScreen(
 @Composable
 fun Screen(
     homeViewModel: HomeViewModel,
-    pagoOnlineViewModel: PagoOnlineViewModel
+    pagoOnlineViewModel: PagoOnlineViewModel,
+    navController: NavHostController
 ) {
     val data by pagoOnlineViewModel.data.collectAsState(null)
-    val isLoading by pagoOnlineViewModel.isLoading.collectAsState(false)
+    val isLoading by homeViewModel.isLoading.collectAsState(false)
     val searchQuery by homeViewModel.searchQuery.collectAsState("")
     var selectedTabIndex by remember { mutableStateOf(0) }
     val pagerState = rememberPagerState { 2 }
-
+    val error by pagoOnlineViewModel.error.collectAsState(null)
 
     LaunchedEffect(Unit) {
         homeViewModel.clearSearchQuery()
         homeViewModel.homeData.value!!.persona.idInscripcion?.let {
             pagoOnlineViewModel.onloadPagoOnline(
-                it
+                it, homeViewModel
             )
         }
     }
@@ -110,7 +111,7 @@ fun Screen(
 
     if (isLoading) {
         MyCircularProgressIndicator()
-    } else if (data != null) {
+    } else {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -136,11 +137,22 @@ fun Screen(
                     .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp)
             ) { page ->
                 when(page) {
-                    0 -> CardDatosFacturacion(data!!.datosFacturacion, pagoOnlineViewModel)
-                    1 -> CardRubros(data!!.rubros, pagoOnlineViewModel, homeViewModel)
+                    0 -> data?.let { CardDatosFacturacion(it.datosFacturacion, pagoOnlineViewModel) }
+                    1 -> data?.let { CardRubros(it.rubros, pagoOnlineViewModel, homeViewModel) }
                 }
             }
+        }
 
+        if (error != null) {
+            MyErrorAlert(
+                titulo = error!!.title,
+                mensaje = error!!.error,
+                onDismiss = {
+                    pagoOnlineViewModel.clearError()
+                    navController.popBackStack()
+                },
+                showAlert = true
+            )
         }
     }
 }

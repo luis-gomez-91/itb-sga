@@ -51,8 +51,10 @@ import org.example.aok.data.network.Horario
 import org.example.aok.data.network.Profesor
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
+import org.example.aok.ui.components.MyErrorAlert
 import org.example.aok.ui.components.MyAssistChip
 import org.example.aok.ui.components.MyCard
+import org.example.aok.ui.components.MyCircularProgressIndicator
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 
 @Composable
@@ -69,7 +71,8 @@ fun AluCronogramaScreen(
         content = {
             Screen(
                 homeViewModel,
-                aluCronogramaViewModel
+                aluCronogramaViewModel,
+                navController
             )
         },
         mainViewModel = mainViewModel,
@@ -81,10 +84,13 @@ fun AluCronogramaScreen(
 @Composable
 fun Screen(
     homeViewModel: HomeViewModel,
-    aluCronogramaViewModel: AluCronogramaViewModel
+    aluCronogramaViewModel: AluCronogramaViewModel,
+    navController: NavHostController
 ) {
     val data: List<AluCronograma> by aluCronogramaViewModel.data.collectAsState(emptyList())
+    val error by aluCronogramaViewModel.error.collectAsState(null)
     val searchQuery by homeViewModel.searchQuery.collectAsState("")
+    val isLoading by homeViewModel.isLoading.collectAsState(false)
 
     val dataFiltada = if (searchQuery.isNotEmpty()) {
         data.filter { it.asignatura.contains(searchQuery, ignoreCase = true) }
@@ -94,21 +100,11 @@ fun Screen(
 
     LaunchedEffect(Unit) {
         homeViewModel.clearSearchQuery()
-        aluCronogramaViewModel.onloadAluCronograma(homeViewModel.homeData.value!!.persona.idInscripcion!!)
+        aluCronogramaViewModel.onloadAluCronograma(homeViewModel.homeData.value!!.persona.idInscripcion!!, homeViewModel)
     }
 
-    if (dataFiltada.isEmpty()) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Usted no se encuentra matriculado",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
+    if (isLoading) {
+        MyCircularProgressIndicator()
     } else {
         LazyColumn(modifier = Modifier
             .fillMaxWidth()
@@ -119,8 +115,19 @@ fun Screen(
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
-    }
 
+        if (error != null) {
+            MyErrorAlert(
+                titulo = error!!.title,
+                mensaje = error!!.error,
+                onDismiss = {
+                    aluCronogramaViewModel.clearError()
+                    navController.popBackStack()
+                },
+                showAlert = true
+            )
+        }
+    }
 }
 
 @Composable

@@ -16,7 +16,6 @@ class AluCronogramaService(
 ) {
     suspend fun fetchAluCronograma(id: Int): AluCronogramaResult {
         return try {
-            logInfo("alu_cronograma", id.toString())
             val response = client.get("${SERVER_URL}api_rest?action=alu_cronograma&id=$id")
 
             if (response.status == HttpStatusCode.OK) {
@@ -27,7 +26,7 @@ class AluCronogramaService(
                 AluCronogramaResult.Failure(error)
             }
         } catch (e: Exception) {
-            val error = Error("Error", "Error inesperado: ${e.message}")
+            val error = Error("Error",  "${e.message}")
             AluCronogramaResult.Failure(error)
         }
     }

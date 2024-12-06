@@ -42,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -57,6 +58,7 @@ import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.ui.components.MyAssistChip
 import org.example.aok.ui.components.MyCard
 import org.example.aok.ui.components.MyCircularProgressIndicator
+import org.example.aok.ui.components.MyErrorAlert
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 
 @Composable
@@ -73,7 +75,8 @@ fun AluHorarioScreen(
         content = {
             Screen(
                 homeViewModel,
-                aluHorarioViewModel
+                aluHorarioViewModel,
+                navController
             )
         },
         mainViewModel = mainViewModel,
@@ -85,17 +88,19 @@ fun AluHorarioScreen(
 @Composable
 fun Screen(
     homeViewModel: HomeViewModel,
-    aluHorarioViewModel: AluHorarioViewModel
+    aluHorarioViewModel: AluHorarioViewModel,
+    navController: NavHostController
 ) {
     val data by aluHorarioViewModel.data.collectAsState(emptyList())
-    val isLoading by aluHorarioViewModel.isLoading.collectAsState(false)
+    val isLoading by homeViewModel.isLoading.collectAsState(false)
     val searchQuery by homeViewModel.searchQuery.collectAsState("")
+    val error by aluHorarioViewModel.error.collectAsState(null)
 
     LaunchedEffect(Unit) {
         homeViewModel.clearSearchQuery()
         homeViewModel.homeData.value!!.persona.idInscripcion?.let {
             aluHorarioViewModel.onloadAluHorario(
-                it
+                it, homeViewModel
             )
         }
     }
@@ -125,6 +130,18 @@ fun Screen(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
+        }
+
+        if (error != null) {
+            MyErrorAlert(
+                titulo = error!!.title,
+                mensaje = error!!.error,
+                onDismiss = {
+                    aluHorarioViewModel.clearError()
+                    navController.popBackStack()
+                },
+                showAlert = true
+            )
         }
     }
 }

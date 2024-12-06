@@ -6,9 +6,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.example.aok.core.createHttpClient
-import org.example.aok.core.logInfo
 import org.example.aok.data.network.AluCronograma
 import org.example.aok.data.network.AluCronogramaResult
+import org.example.aok.data.network.Error
+import org.example.aok.features.common.home.HomeViewModel
 
 class AluCronogramaViewModel: ViewModel() {
     val client = createHttpClient()
@@ -17,32 +18,29 @@ class AluCronogramaViewModel: ViewModel() {
     private val _data = MutableStateFlow<List<AluCronograma>>(emptyList())
     val data: StateFlow<List<AluCronograma>> = _data
 
-    private val _error = MutableStateFlow<String>("")
-    val error: StateFlow<String?> = _error
+    private val _error = MutableStateFlow<Error?>(null)
+    val error: StateFlow<Error?> = _error
 
-    private val _isLoading = MutableStateFlow<Boolean>(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
+    fun clearError() { _error.value = null }
 
-    fun onloadAluCronograma(id: Int) {
-        _isLoading.value = true
+    fun onloadAluCronograma(id: Int, homeViewModel: HomeViewModel) {
+        homeViewModel.changeLoading(true)
         viewModelScope.launch {
             try {
                 val result = service.fetchAluCronograma(id)
-                logInfo("alu_cronograma", "$result")
-
                 when (result) {
                     is AluCronogramaResult.Success -> {
                         _data.value = result.aluCronograma
-                        _error.value = ""
+                        _error.value = null
                     }
                     is AluCronogramaResult.Failure -> {
-                        _error.value = result.error.error ?: "An unknown error occurred"
+                        _error.value = result.error
                     }
                 }
             } catch (e: Exception) {
-                _error.value = "Error loading data: ${e.message}"
+                _error.value = Error(title = "Error", error = "${e.message}")
             } finally {
-                _isLoading.value = false
+                homeViewModel.changeLoading(false)
             }
         }
     }

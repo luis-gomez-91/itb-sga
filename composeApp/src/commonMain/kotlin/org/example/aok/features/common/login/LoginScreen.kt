@@ -1,6 +1,10 @@
 package org.example.aok.features.common.login
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -13,25 +17,41 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -44,8 +64,11 @@ import aok.composeapp.generated.resources.logo
 import aok.composeapp.generated.resources.logo_dark
 import aok.composeapp.generated.resources.tiktok
 import org.example.aok.features.common.home.HomeViewModel
-import org.example.aok.ui.components.MyAlert
+import org.example.aok.ui.components.MyErrorAlert
 import org.example.aok.ui.components.MyCircularProgressIndicator
+import org.example.aok.ui.components.MyFilledTonalButton
+import org.example.aok.ui.components.MyOutlinedTextField
+import org.example.aok.ui.components.dashboard.PeriodoItem
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,6 +83,9 @@ fun LoginScreen(
     val isLoading by loginViewModel.isLoading.collectAsState()
     val verPassword: Boolean by loginViewModel.verPassword.collectAsState(false)
     val error: String? by loginViewModel.error.collectAsState(null)
+    val showBottomSheet by homeViewModel.showBottomSheet.collectAsState(false)
+    val showResponse by loginViewModel.showResponse.collectAsState()
+    val response by loginViewModel.response.collectAsState()
 
     val imageLogo =
         if (isSystemInDarkTheme()) {
@@ -121,9 +147,6 @@ fun LoginScreen(
                                 onIconClick = { loginViewModel.togglePasswordVisibility() }
                             )
                         }
-                        else {
-                            null
-                        }
                     }
                 )
 
@@ -137,7 +160,7 @@ fun LoginScreen(
                         text = "Recuperar contraseña",
                         modifier = Modifier
                             .clickable {
-//                            navController.navigate("forgot_password")
+                                homeViewModel.changeBottomSheet()
                             },
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -178,14 +201,29 @@ fun LoginScreen(
         }
 
         if (error != null) {
-            MyAlert(
+            MyErrorAlert(
                 titulo = "Error",
                 mensaje = error!!,
-                onDismiss = {
-                    loginViewModel.clearError()
-                },
+                onDismiss = { loginViewModel.clearError() },
                 showAlert = true
             )
+        }
+
+        if (showBottomSheet) {
+            PasswordRecoveryForm(homeViewModel, loginViewModel)
+        }
+
+        if (showResponse) {
+            response?.message?.let {
+                MyErrorAlert(
+                    titulo = "¡Alerta!",
+                    mensaje = it,
+                    onDismiss = {
+                        loginViewModel.showResponseChange(false)
+                    },
+                    showAlert = true
+                )
+            }
         }
     }
 
@@ -203,7 +241,7 @@ fun PasswordIcon(
     }
 
     IconButton(onClick = onIconClick) {
-        androidx.compose.material3.Icon(imageVector = image, contentDescription = null)
+        Icon(imageVector = image, contentDescription = null)
     }
 }
 
@@ -244,4 +282,74 @@ fun RedesSociales(
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PasswordRecoveryForm(
+    homeViewModel: HomeViewModel,
+    loginViewModel: LoginViewModel
+) {
+    val userInput by loginViewModel.userInput.collectAsState()
+    val phoneInput by loginViewModel.phoneInput.collectAsState()
+
+
+    ModalBottomSheet(
+        onDismissRequest = {
+            homeViewModel.changeBottomSheet()
+        }
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+        ) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "Recuperar contraseña",
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            MyOutlinedTextField(
+                value = userInput,
+                onValueChange = { loginViewModel.onPasswordRecoveryChange(it, phoneInput) },
+                placeholder = "Usuario",
+                label = "Usuario",
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(8.dp))
+            MyOutlinedTextField(
+                value = phoneInput,
+                onValueChange = { newPhoneInput ->
+                    // Filtra solo los dígitos y limita la longitud a 10
+                    val sanitizedInput = newPhoneInput.filter { it.isDigit() }.take(10)
+                    loginViewModel.onPasswordRecoveryChange(userInput, sanitizedInput)
+                },
+                placeholder = "Celular",
+                label = "Celular",
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(8.dp))
+            Row (
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                MyFilledTonalButton(
+                    text = "Enviar",
+                    enabled = true,
+                    icon = Icons.Filled.Save,
+                    iconSize = 20.dp,
+                    textSize = 16.sp,
+                    onClickAction = {
+                        homeViewModel.changeBottomSheet()
+                        loginViewModel.requestPasswordRecovery()
+                    }
+                )
+            }
+        }
+    }
+
 }

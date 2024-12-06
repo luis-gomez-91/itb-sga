@@ -9,6 +9,8 @@ import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
 import org.example.aok.data.network.AluMateria
 import org.example.aok.data.network.AluMateriasResult
+import org.example.aok.features.common.home.HomeViewModel
+import org.example.aok.data.network.Error
 
 class AluMateriasViewModel: ViewModel() {
     val client = createHttpClient()
@@ -17,14 +19,13 @@ class AluMateriasViewModel: ViewModel() {
     private val _data = MutableStateFlow<List<AluMateria>>(emptyList())
     val data: StateFlow<List<AluMateria>> = _data
 
-    private val _error = MutableStateFlow<String>("")
-    val error: StateFlow<String?> = _error
+    private val _error = MutableStateFlow<Error?>(null)
+    val error: StateFlow<Error?> = _error
 
-    private val _isLoading = MutableStateFlow<Boolean>(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
+    fun clearError() { _error.value = null }
 
-    fun onloadAluMaterias(id: Int) {
-        _isLoading.value = true
+    fun onloadAluMaterias(id: Int, homeViewModel: HomeViewModel) {
+        homeViewModel.changeLoading(true)
         viewModelScope.launch {
             try {
                 val result = service.fetchAluMaterias(id)
@@ -33,16 +34,16 @@ class AluMateriasViewModel: ViewModel() {
                 when (result) {
                     is AluMateriasResult.Success -> {
                         _data.value = result.aluMateria
-                        _error.value = ""
+                        _error.value = null
                     }
                     is AluMateriasResult.Failure -> {
-                        _error.value = result.error.error ?: "An unknown error occurred"
+                        _error.value = result.error
                     }
                 }
             } catch (e: Exception) {
-                _error.value = "Error loading data: ${e.message}"
+                _error.value = Error(title = "Error", error = "${e.message}")
             } finally {
-                _isLoading.value = false
+                homeViewModel.changeLoading(false)
             }
         }
     }

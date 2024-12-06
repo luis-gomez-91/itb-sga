@@ -64,6 +64,7 @@ import org.example.aok.features.student.alu_malla.CardStyle
 import org.example.aok.ui.components.MyAssistChip
 import org.example.aok.ui.components.MyCard
 import org.example.aok.ui.components.MyCircularProgressIndicator
+import org.example.aok.ui.components.MyErrorAlert
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 
 @Composable
@@ -80,7 +81,8 @@ fun AluMateriasScreen(
         content = {
             Screen(
                 homeViewModel,
-                aluMateriasViewModel
+                aluMateriasViewModel,
+                navController
             )
         },
         mainViewModel = mainViewModel,
@@ -93,13 +95,15 @@ fun AluMateriasScreen(
 @Composable
 fun Screen(
     homeViewModel: HomeViewModel,
-    aluMateriasViewModel: AluMateriasViewModel
+    aluMateriasViewModel: AluMateriasViewModel,
+    navController: NavHostController
 ) {
     val data: List<AluMateria> by aluMateriasViewModel.data.collectAsState(emptyList())
     val searchQuery by homeViewModel.searchQuery.collectAsState("")
-    val isLoading by aluMateriasViewModel.isLoading.collectAsState(false)
+    val isLoading by homeViewModel.isLoading.collectAsState(false)
     val pagerState = rememberPagerState { data.size }
     var selectedTabIndex by remember { mutableStateOf(0) }
+    val error by aluMateriasViewModel.error.collectAsState(null)
 
     val dataFiltada = if (searchQuery.isNotEmpty()) {
         data.filter { it.materiaNombre .contains(searchQuery, ignoreCase = true) }
@@ -111,7 +115,7 @@ fun Screen(
         homeViewModel.clearSearchQuery()
         homeViewModel.homeData.value!!.persona.idInscripcion?.let {
             aluMateriasViewModel.onloadAluMaterias(
-                it
+                it, homeViewModel
             )
         }
     }
@@ -154,13 +158,19 @@ fun Screen(
                         AluMateriaItem(data[selectedTabIndex])
                     }
                 }
-            } else {
-                Text(
-                    text = "No hay datos disponibles",
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyMedium
-                )
             }
+        }
+
+        if (error != null) {
+            MyErrorAlert(
+                titulo = error!!.title,
+                mensaje = error!!.error,
+                onDismiss = {
+                    aluMateriasViewModel.clearError()
+                    navController.popBackStack()
+                },
+                showAlert = true
+            )
         }
     }
 }

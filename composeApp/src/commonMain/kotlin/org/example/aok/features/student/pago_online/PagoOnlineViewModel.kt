@@ -11,6 +11,8 @@ import org.example.aok.data.network.DatosFacturacion
 import org.example.aok.data.network.PagoOnline
 import org.example.aok.data.network.form.PagoOnlineForm
 import org.example.aok.data.network.PagoOnlineResult
+import org.example.aok.data.network.Error
+import org.example.aok.features.common.home.HomeViewModel
 
 class PagoOnlineViewModel : ViewModel() {
     val client = createHttpClient()
@@ -19,14 +21,11 @@ class PagoOnlineViewModel : ViewModel() {
     private val _data = MutableStateFlow<PagoOnline?>(null)
     val data: StateFlow<PagoOnline?> = _data
 
-    private val _error = MutableStateFlow<String>("")
-    val error: StateFlow<String> = _error
+    private val _error = MutableStateFlow<Error?>(null)
+    val error: StateFlow<Error?> = _error
 
     private val _searchQuery = MutableStateFlow<String>("")
     val searchQuery: StateFlow<String> get() = _searchQuery
-
-    private val _isLoading = MutableStateFlow<Boolean>(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
 
     private val _selectedRubros = MutableStateFlow<List<Double>>(emptyList())
     val selectedRubros: StateFlow<List<Double>> = _selectedRubros
@@ -36,6 +35,8 @@ class PagoOnlineViewModel : ViewModel() {
 
     private val _switchStates = MutableStateFlow<List<Boolean>>(emptyList())
     val switchStates: StateFlow<List<Boolean>> = _switchStates
+
+    fun clearError() { _error.value = null }
 
     fun initializeSwitchStates(size: Int) {
         _switchStates.value = List(size) { index -> index == 0 }
@@ -70,11 +71,9 @@ class PagoOnlineViewModel : ViewModel() {
         return _selectedRubros.value.sum()
     }
 
-
-
-    fun onloadPagoOnline(id: Int) {
+    fun onloadPagoOnline(id: Int, homeViewModel: HomeViewModel) {
         viewModelScope.launch {
-            _isLoading.value = true
+            homeViewModel.changeLoading(true)
             try {
                 val result = service.fetchPagoOnline(id)
                 logInfo("pago_online", "$result")
@@ -82,24 +81,23 @@ class PagoOnlineViewModel : ViewModel() {
                 when (result) {
                     is PagoOnlineResult.Success -> {
                         _data.value = result.pagoOnline
-                        _error.value = ""
+                        _error.value = null
                     }
                     is PagoOnlineResult.Failure -> {
-                        _error.value = result.error.error
+                        _error.value = result.error
                     }
                 }
 
             } catch (e: Exception) {
-                _error.value = "Error: ${e.message}"
+                _error.value = Error(title = "Error", error = "${e.message}")
             } finally {
-                _isLoading.value = false
+                homeViewModel.changeLoading(false)
             }
         }
     }
 
     fun sendPagoOnline(idInscripcion: Int, valor: Double, datosFacturacion: DatosFacturacion) {
         viewModelScope.launch {
-            _isLoading.value = true
             val form = PagoOnlineForm(
                 inscripcion = idInscripcion,
                 valor = valor,
@@ -112,12 +110,10 @@ class PagoOnlineViewModel : ViewModel() {
                 val result = service.sendPagoOnline(form)
 //                logInfo("pago_online", "$result")
 
-
-
             } catch (e: Exception) {
-                _error.value = "Error: ${e.message}"
+                _error.value = Error(title = "Error", error = "${e.message}")
             } finally {
-                _isLoading.value = false
+
             }
         }
     }

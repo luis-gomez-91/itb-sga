@@ -10,6 +10,9 @@ import org.example.aok.data.network.Login
 import org.example.aok.data.network.LoginResult
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
+import org.example.aok.data.network.Response
+import org.example.aok.data.network.form.RequestPasswordRecoveryForm
+import org.example.aok.data.network.form.SolicitudEspecieForm
 import org.example.aok.features.common.home.HomeViewModel
 
 class LoginViewModel : ViewModel() {
@@ -57,11 +60,6 @@ class LoginViewModel : ViewModel() {
     }
 
     fun onLoginSelector(navController: NavHostController) {
-        if (_username.value.isBlank() || _password.value.isBlank()) {
-            _error.value = "Username or Password cannot be empty"
-            return
-        }
-
         viewModelScope.launch {
             try {
                 _isLoading.value = true
@@ -107,6 +105,62 @@ class LoginViewModel : ViewModel() {
             }
         }
     }
+
+//    RECUPERAR PASSWORD
+    private val _userInput = MutableStateFlow<String>("")
+    val userInput: StateFlow<String> = _userInput
+
+    private val _phoneInput = MutableStateFlow<String>("")
+    val phoneInput: StateFlow<String> = _phoneInput
+
+    private val _response = MutableStateFlow<Response?>(null)
+    val response: StateFlow<Response?> = _response
+
+    private val _showResponse = MutableStateFlow(false)
+    val showResponse: StateFlow<Boolean> = _showResponse
+
+    fun onPasswordRecoveryChange(user: String, phone: String) {
+        _userInput.value = user
+        _phoneInput.value = phone
+    }
+
+    fun showResponseChange(value: Boolean) {
+        _showResponse.value = value
+    }
+
+    fun requestPasswordRecovery() {
+        _isLoading.value = true
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+
+                val form = RequestPasswordRecoveryForm(
+                    action = "requestPasswordRecovery",
+                    username = _userInput.value,
+                    phone = _phoneInput.value,
+                    password = null
+                )
+
+                val result = loginService.requestPasswordRecovery(form)
+                _response.value = result
+                _showResponse.value = true
+                logInfo("LoginViewModel", "$result")
+
+
+            } catch (e: Exception) {
+                logInfo("LoginViewModel", "Exception: ${e.message}")
+                _error.value = "Password recovery failed: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun sendPasswordRecoveryRequest() {
+
+    }
+
+
 
 
 }

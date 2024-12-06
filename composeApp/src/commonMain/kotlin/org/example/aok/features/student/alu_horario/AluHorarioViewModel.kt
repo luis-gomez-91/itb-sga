@@ -9,6 +9,8 @@ import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
 import org.example.aok.data.network.AluHorario
 import org.example.aok.data.network.AluHorarioResult
+import org.example.aok.features.common.home.HomeViewModel
+import org.example.aok.data.network.Error
 
 class AluHorarioViewModel: ViewModel() {
     val client = createHttpClient()
@@ -17,32 +19,29 @@ class AluHorarioViewModel: ViewModel() {
     private val _data = MutableStateFlow<List<AluHorario>>(emptyList())
     val data: StateFlow<List<AluHorario>> = _data
 
-    private val _error = MutableStateFlow<String>("")
-    val error: StateFlow<String?> = _error
+    private val _error = MutableStateFlow<Error?>(null)
+    val error: StateFlow<Error?> = _error
 
-    private val _isLoading = MutableStateFlow<Boolean>(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
+    fun clearError() { _error.value = null }
 
-    fun onloadAluHorario(id: Int) {
-        _isLoading.value = true
+    fun onloadAluHorario(id: Int, homeViewModel: HomeViewModel) {
+        homeViewModel.changeLoading(true)
         viewModelScope.launch {
             try {
                 val result = service.fetchAluHorario(id)
-                logInfo("alu_horario", "$result")
-
                 when (result) {
                     is AluHorarioResult.Success -> {
                         _data.value = result.aluHorario
-                        _error.value = ""
+                        _error.value = null
                     }
                     is AluHorarioResult.Failure -> {
-                        _error.value = result.error.error ?: "An unknown error occurred"
+                        _error.value = result.error
                     }
                 }
             } catch (e: Exception) {
-                _error.value = "Error loading data: ${e.message}"
+                _error.value = Error(title = "Error", error = "${e.message}")
             } finally {
-                _isLoading.value = false
+                homeViewModel.changeLoading(false)
             }
         }
     }
