@@ -46,12 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import org.example.aok.core.MainViewModel
 import org.example.aok.core.formatoText
-import org.example.aok.core.parseTime
 import org.example.aok.data.network.ClaseX
 import org.example.aok.data.network.Paging
 import org.example.aok.features.common.home.HomeViewModel
@@ -59,13 +54,12 @@ import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.ui.components.MyAssistChip
 import org.example.aok.ui.components.MyCard
 import org.example.aok.ui.components.MyCircularProgressIndicator
-import org.example.aok.ui.components.MyErrorAlert
+import org.example.aok.ui.components.alerts.MyErrorAlert
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 
 @Composable
 fun ProClasesScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel,
     homeViewModel: HomeViewModel,
     loginViewModel: LoginViewModel,
     proClasesViewModel: ProClasesViewModel
@@ -81,7 +75,6 @@ fun ProClasesScreen(
                 loginViewModel
             )
         },
-        mainViewModel = mainViewModel,
         homeViewModel = homeViewModel,
         loginViewModel = loginViewModel
     )

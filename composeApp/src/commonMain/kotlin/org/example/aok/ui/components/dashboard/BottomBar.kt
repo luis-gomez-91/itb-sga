@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.filled.ViewList
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Divider
@@ -37,7 +39,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import org.example.aok.core.MainViewModel
 import org.example.aok.features.common.home.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,7 +69,7 @@ fun MyBottomBar(
                     }
                 )
                 BottomBarItem(
-                    icon = Icons.Filled.ViewList,
+                    icon = Icons.Filled.Menu,
                     label = "Periodos",
                     onClick = {
                         homeViewModel.changeBottomSheet()

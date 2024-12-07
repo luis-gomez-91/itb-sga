@@ -17,22 +17,16 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.Event
-import androidx.compose.material.icons.filled.GroupWork
 import androidx.compose.material.icons.filled.Pending
 import androidx.compose.material.icons.filled.School
-import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
@@ -44,33 +38,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import org.example.aok.core.MainViewModel
-import org.example.aok.core.formatoText
 import org.example.aok.data.network.AluMateria
 import org.example.aok.data.network.AluMateriaLeccion
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.features.student.alu_malla.CardStyle
 import org.example.aok.ui.components.MyAssistChip
-import org.example.aok.ui.components.MyCard
 import org.example.aok.ui.components.MyCircularProgressIndicator
-import org.example.aok.ui.components.MyErrorAlert
+import org.example.aok.ui.components.alerts.MyErrorAlert
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 
 @Composable
 fun AluMateriasScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel,
     homeViewModel: HomeViewModel,
     loginViewModel: LoginViewModel,
     aluMateriasViewModel: AluMateriasViewModel
@@ -85,7 +72,6 @@ fun AluMateriasScreen(
                 navController
             )
         },
-        mainViewModel = mainViewModel,
         homeViewModel = homeViewModel,
         loginViewModel = loginViewModel
     )

@@ -15,19 +15,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.LockPerson
+import androidx.compose.material.icons.filled.LockReset
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
@@ -45,6 +49,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,10 +66,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.example.aok.core.SERVER_URL
 import org.example.aok.core.logInfo
+import org.example.aok.core.resizeOptions
 import org.example.aok.data.domain.DrawerItem
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.features.common.login.RedesSociales
+import org.example.aok.ui.components.MyFilledTonalButton
+import org.example.aok.ui.components.MyOutlinedTextField
 
 @Composable
 fun MyDrawerContent(
@@ -74,11 +82,12 @@ fun MyDrawerContent(
     loginViewModel: LoginViewModel
 ) {
     val scope = rememberCoroutineScope()
+    val showPasswordForm by homeViewModel.showPasswordForm.collectAsState(false)
 
     val items = listOf(
-        DrawerItem("Perfil", Icons.Filled.Person, "account"),
-        DrawerItem("Cambiar contraseña", Icons.Filled.LockPerson, ""),
-        DrawerItem("Cerrar sesión", Icons.Filled.Logout, "logout")
+        DrawerItem("Perfil", Icons.Filled.Person, { navHostController.navigate("account") }),
+        DrawerItem("Cambiar contraseña", Icons.Filled.LockPerson, { homeViewModel.changeShowPasswordForm(true) }),
+        DrawerItem("Cerrar sesión", Icons.Filled.Logout, { loginViewModel.onLogout(navHostController) })
     )
 
     val imageLogo =
@@ -144,11 +153,7 @@ fun MyDrawerContent(
                             scope.launch {
                                 drawerState.close()
                             }
-                            if (item.label == "Cerrar sesión") {
-                                loginViewModel.onLogout(navHostController)
-                            } else {
-                                navHostController.navigate(item.navigate)
-                            }
+                            item.onclick()
                         },
                         icon = {
                             Icon(
@@ -167,6 +172,10 @@ fun MyDrawerContent(
                 homeViewModel = homeViewModel
             )
         }
+    }
+
+    if (showPasswordForm) {
+        ChangePasswordForm(homeViewModel)
     }
 }
 
@@ -187,13 +196,6 @@ fun PhotoProfile(
             homeViewModel.resetPhotoUploadedFlag() // Restablece el estado en el ViewModel
         }
     }
-
-    val resizeOptions = ResizeOptions(
-        width = 1200, // Custom width
-        height = 1200, // Custom height
-        resizeThresholdBytes = 2 * 1024 * 1024L, // Custom threshold for 2MB,
-        compressionQuality = 0.5 // Adjust compression quality (0.0 to 1.0)
-    )
 
     val singleImagePicker = rememberImagePickerLauncher(
         selectionMode = SelectionMode.Single,
@@ -306,9 +308,78 @@ fun PhotoProfile(
                     }
                 }
             }
+        }
+    }
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChangePasswordForm(
+    homeViewModel: HomeViewModel
+) {
+    val previousPassword by homeViewModel.previousPassword.collectAsState("")
+    val newPassword1 by homeViewModel.newPassword1.collectAsState("")
+    val newPassword2 by homeViewModel.newPassword2.collectAsState("")
+    val isFormValid by homeViewModel.isFormValid.collectAsState(false)
 
-
+    ModalBottomSheet(
+        onDismissRequest = {
+            homeViewModel.changeBottomSheet()
+        }
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+        ) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "Cambiar contraseña",
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            MyOutlinedTextField(
+                value = previousPassword,
+                onValueChange = { homeViewModel.onPasswordChange(it, newPassword1, newPassword2) },
+                placeholder = "Contraseña actual",
+                label = "Contraseña actual",
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(8.dp))
+            MyOutlinedTextField(
+                value = newPassword1,
+                onValueChange = { homeViewModel.onPasswordChange(previousPassword, it, newPassword2) },
+                placeholder = "Nueva contraseña",
+                label = "Nueva contraseña",
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(8.dp))
+            MyOutlinedTextField(
+                value = newPassword2,
+                onValueChange = { homeViewModel.onPasswordChange(previousPassword, newPassword1, it) },
+                placeholder = "Nueva contraseña",
+                label = "Nueva contraseña",
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(8.dp))
+            Row (
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                MyFilledTonalButton(
+                    text = "Enviar",
+                    enabled = isFormValid,
+                    icon = Icons.Filled.Save,
+                    iconSize = 20.dp,
+                    onClickAction = {
+                        homeViewModel.requestChangePassword()
+                    }
+                )
+            }
         }
     }
 }

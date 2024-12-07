@@ -1,21 +1,15 @@
 package org.example.aok.features.common.account
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,20 +25,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
-import org.example.aok.core.MainViewModel
 import org.example.aok.data.network.Account
-import org.example.aok.data.network.Persona
-import org.example.aok.features.common.home.GrupoItem
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.ui.components.MyCircularProgressIndicator
-import org.example.aok.ui.components.MyErrorAlert
+import org.example.aok.ui.components.alerts.MyErrorAlert
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 
 @Composable
 fun AccountScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel,
     homeViewModel: HomeViewModel,
     loginViewModel: LoginViewModel,
     accountViewModel: AccountViewModel
@@ -59,7 +49,6 @@ fun AccountScreen(
                 homeViewModel,
             )
         },
-        mainViewModel = mainViewModel,
         homeViewModel = homeViewModel,
         loginViewModel = loginViewModel
     )

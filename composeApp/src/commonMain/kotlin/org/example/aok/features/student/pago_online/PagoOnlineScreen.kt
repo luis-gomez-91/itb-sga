@@ -43,7 +43,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import org.example.aok.core.MainViewModel
 import org.example.aok.core.logInfo
 import org.example.aok.data.network.DatosFacturacion
 import org.example.aok.data.network.RubroX
@@ -52,15 +51,15 @@ import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.ui.components.MyAssistChip
 import org.example.aok.ui.components.MyCard
 import org.example.aok.ui.components.MyCircularProgressIndicator
-import org.example.aok.ui.components.MyErrorAlert
+import org.example.aok.ui.components.alerts.MyErrorAlert
 import org.example.aok.ui.components.MyFilledTonalButton
 import org.example.aok.ui.components.MyOutlinedTextField
+import org.example.aok.ui.components.alerts.MyInfoAlert
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 
 @Composable
 fun PagoOnlineScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel,
     homeViewModel: HomeViewModel,
     loginViewModel: LoginViewModel,
     pagoOnlineViewModel: PagoOnlineViewModel
@@ -75,7 +74,6 @@ fun PagoOnlineScreen(
                 navController
             )
         },
-        mainViewModel = mainViewModel,
         homeViewModel = homeViewModel,
         loginViewModel = loginViewModel
     )
@@ -144,7 +142,7 @@ fun Screen(
         }
 
         if (error != null) {
-            MyErrorAlert(
+            MyInfoAlert(
                 titulo = error!!.title,
                 mensaje = error!!.error,
                 onDismiss = {

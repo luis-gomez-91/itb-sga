@@ -13,6 +13,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import org.example.aok.core.SERVER_URL
+import org.example.aok.core.logInfo
 import org.example.aok.data.network.Error
 import org.example.aok.data.network.Home
 import org.example.aok.data.network.HomeResult
@@ -21,6 +22,7 @@ import org.example.aok.data.network.ReportForm
 import org.example.aok.data.network.ReportResult
 import org.example.aok.data.network.Response
 import org.example.aok.data.network.form.PagoOnlineForm
+import org.example.aok.data.network.form.RequestPasswordRecoveryForm
 import org.example.aok.data.network.form.UploadPhotoForm
 
 class HomeService(
@@ -65,7 +67,7 @@ class HomeService(
         }
     }
 
-    suspend fun uploadPhoto(form: UploadPhotoForm): Response {
+    suspend fun requestPostDispatcher(form: Any): Response {
         return try {
             val response = client.post("${SERVER_URL}api_rest?action=postDispatcher") {
                 contentType(ContentType.Application.Json)
@@ -78,6 +80,7 @@ class HomeService(
                 Response(status = "error", message = "Unexpected response status: ${response.status}")
             }
         } catch (e: Exception) {
+            logInfo("prueba", "ERROR: ${e.message}")
             e.printStackTrace()
             Response(status = "error", message = "Exception occurred: ${e.message}")
         }

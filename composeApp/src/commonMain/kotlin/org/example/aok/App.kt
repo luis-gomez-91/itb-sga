@@ -6,7 +6,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
-import org.example.aok.core.MainViewModel
 import org.example.aok.core.MyNavigation
 import org.example.aok.features.admin.docentes.DocentesViewModel
 import org.example.aok.features.admin.inscripciones.InscripcionesViewModel
@@ -14,6 +13,7 @@ import org.example.aok.features.common.account.AccountViewModel
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.features.student.alu_cronograma.AluCronogramaViewModel
+import org.example.aok.features.student.alu_documentos.AluDocumentosViewModel
 import org.example.aok.features.student.alu_finanzas.AluFinanzasViewModel
 import org.example.aok.features.student.alu_horario.AluHorarioViewModel
 import org.example.aok.features.student.alu_malla.AluMallaViewModel
@@ -29,7 +29,6 @@ import org.example.aok.features.teacher.pro_horarios.ProHorariosViewModel
 fun App(
     homeViewModel : HomeViewModel
 ) {
-    val mainViewModel = remember { MainViewModel() }
     val loginViewModel = remember { LoginViewModel() }
 //    val homeViewModel = remember { HomeViewModel() }
     val accountViewModel = remember { AccountViewModel() }
@@ -46,6 +45,7 @@ fun App(
     val docentesViewModel = remember { DocentesViewModel() }
     val proClasesViewModel = remember { ProClasesViewModel() }
     val proHorariosViewModel = remember { ProHorariosViewModel() }
+    val aluDocumentosViewModel = remember { AluDocumentosViewModel() }
 
     AppTheme {
         Surface(
@@ -53,7 +53,6 @@ fun App(
             color = MaterialTheme.colorScheme.background
         ) {
             MyNavigation(
-                mainViewModel = mainViewModel,
                 loginViewModel = loginViewModel,
                 homeViewModel = homeViewModel,
                 inscripcionesViewModel = inscripcionesViewModel,
@@ -69,7 +68,8 @@ fun App(
                 docentesViewModel = docentesViewModel,
                 proClasesViewModel = proClasesViewModel,
                 proHorariosViewModel = proHorariosViewModel,
-                aluSolicitudesViewModel = aluSolicitudesViewModel
+                aluSolicitudesViewModel = aluSolicitudesViewModel,
+                aluDocumentosViewModel = aluDocumentosViewModel
             )
         }
     }

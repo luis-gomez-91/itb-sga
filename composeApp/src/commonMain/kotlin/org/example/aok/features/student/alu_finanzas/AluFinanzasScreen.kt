@@ -33,7 +33,6 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.example.aok.core.MainViewModel
 import org.example.aok.core.formatoText
 import org.example.aok.core.logInfo
 import org.example.aok.data.network.Rubro
@@ -47,7 +46,6 @@ import org.example.aok.ui.components.dashboard.DashBoardScreen
 @Composable
 fun AluFinannzasScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel,
     homeViewModel: HomeViewModel,
     loginViewModel: LoginViewModel,
     aluFinanzasViewModel: AluFinanzasViewModel
@@ -61,7 +59,6 @@ fun AluFinannzasScreen(
                 aluFinanzasViewModel
             )
         },
-        mainViewModel = mainViewModel,
         homeViewModel = homeViewModel,
         loginViewModel = loginViewModel
     )

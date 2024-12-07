@@ -30,7 +30,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import org.example.aok.core.MainViewModel
 import org.example.aok.data.network.Periodo
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
@@ -41,7 +40,6 @@ fun DashBoardScreen(
     title: String,
     navController: NavHostController,
     content: @Composable () -> Unit = {},
-    mainViewModel: MainViewModel,
     homeViewModel: HomeViewModel,
     loginViewModel: LoginViewModel
 ) {

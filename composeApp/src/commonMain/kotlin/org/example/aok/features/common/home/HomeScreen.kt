@@ -42,19 +42,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
-import org.example.aok.core.MainViewModel
+import org.example.aok.core.ROUTES
 import org.example.aok.core.capitalizeWords
+import org.example.aok.core.logInfo
 import org.example.aok.data.network.GrupoModulo
 import org.example.aok.data.network.Modulo
 import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.ui.components.MyCircularProgressIndicator
+import org.example.aok.ui.components.alerts.MyErrorAlert
+import org.example.aok.ui.components.alerts.MySuccessAlert
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 
 
 @Composable
 fun HomeScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel,
     homeViewModel: HomeViewModel,
     loginViewModel: LoginViewModel
 ) {
@@ -73,9 +75,7 @@ fun HomeScreen(
                 homeViewModel
             )
         },
-        mainViewModel = mainViewModel,
         homeViewModel = homeViewModel,
-//            perfilViewModel = perfilViewModel,
         loginViewModel = loginViewModel
     )
 }
@@ -87,26 +87,54 @@ fun Screen(
 ) {
     val homeData by homeViewModel.homeData.collectAsState()
     val isLoading by homeViewModel.isLoading.collectAsState(false)
+    val response by homeViewModel.response.collectAsState(null)
+
     homeViewModel.actualPageRestart()
 
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+    if (isLoading) {
+        MyCircularProgressIndicator()
+    } else {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
 
-    ) {
-        homeData?.grupoModulos?.let { grupoModulos ->
-            grupoModulos.forEach { item ->
-                GrupoItem(item, navController, homeViewModel)
-                Spacer(modifier = Modifier.height(16.dp))
+        ) {
+            homeData?.grupoModulos?.let { grupoModulos ->
+                grupoModulos.forEach { item ->
+                    GrupoItem(item, navController, homeViewModel)
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            } ?: run {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    MyCircularProgressIndicator()
+                }
             }
-        } ?: run {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                MyCircularProgressIndicator()
-            }
+        }
+    }
+
+    if (response != null) {
+        if (response!!.status == "success") {
+            MySuccessAlert(
+                titulo = "Realizado",
+                mensaje = response!!.message,
+                onDismiss = {
+                    homeViewModel.clearResponse()
+                },
+                showAlert = true
+            )
+        } else {
+            MyErrorAlert(
+                titulo = "Error",
+                mensaje = response!!.message,
+                onDismiss = {
+                    homeViewModel.clearResponse()
+                },
+                showAlert = true
+            )
         }
     }
 }
@@ -212,7 +240,12 @@ fun cardModulo(
             contentColor = MaterialTheme.colorScheme.primary
         ),
         onClick = {
-            navController.navigate(modulo.url)
+            logInfo("prueba", modulo.url)
+            if (modulo.url in ROUTES) {
+                navController.navigate(modulo.url)
+            } else {
+                navController.navigate("404")
+            }
             homeViewModel.clearSearchQuery()
         }
     ) {

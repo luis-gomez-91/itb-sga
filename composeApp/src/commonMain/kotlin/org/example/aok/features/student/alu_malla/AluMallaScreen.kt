@@ -51,7 +51,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import org.example.aok.core.MainViewModel
 import org.example.aok.core.formatoText
 import org.example.aok.data.network.AluMalla
 import org.example.aok.data.network.AluMallaAsignatura
@@ -65,7 +64,6 @@ import org.example.aok.ui.components.dashboard.DashBoardScreen
 @Composable
 fun AluMallaScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel,
     homeViewModel: HomeViewModel,
     loginViewModel: LoginViewModel,
     aluMallaViewModel: AluMallaViewModel
@@ -79,7 +77,6 @@ fun AluMallaScreen(
                 aluMallaViewModel
             )
         },
-        mainViewModel = mainViewModel,
         homeViewModel = homeViewModel,
         loginViewModel = loginViewModel
     )

@@ -84,3 +84,8 @@ sealed class AluSolicitudesResult {
     data class Success(val aluSolicitudes: List<AluSolicitud>) : AluSolicitudesResult()
     data class Failure(val error: Error) : AluSolicitudesResult()
 }
+
+sealed class AluDocumentosResult {
+    data class Success(val aluDocumentos: List<AluDocumento>) : AluDocumentosResult()
+    data class Failure(val error: Error) : AluDocumentosResult()
+}

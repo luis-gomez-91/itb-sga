@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.example.aok.core.createHttpClient
-import org.example.aok.core.logInfo
 import org.example.aok.data.network.Rubro
 import org.example.aok.data.network.AluFinanzasResult
 import org.example.aok.features.common.home.HomeViewModel

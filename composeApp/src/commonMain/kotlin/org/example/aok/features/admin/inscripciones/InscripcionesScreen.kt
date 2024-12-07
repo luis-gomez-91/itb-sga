@@ -58,7 +58,6 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
-import org.example.aok.core.MainViewModel
 import org.example.aok.data.network.Inscripcion
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
@@ -70,7 +69,6 @@ import org.example.aok.ui.components.dashboard.DashBoardScreen
 @Composable
 fun InscripcionesScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel,
     homeViewModel: HomeViewModel,
     loginViewModel: LoginViewModel,
     inscripcionesViewModel: InscripcionesViewModel
@@ -86,7 +84,6 @@ fun InscripcionesScreen(
                 loginViewModel
             )
         },
-        mainViewModel = mainViewModel,
         homeViewModel = homeViewModel,
         loginViewModel = loginViewModel
     )

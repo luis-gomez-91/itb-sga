@@ -12,8 +12,6 @@ import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
 import org.example.aok.data.network.Response
 import org.example.aok.data.network.form.RequestPasswordRecoveryForm
-import org.example.aok.data.network.form.SolicitudEspecieForm
-import org.example.aok.features.common.home.HomeViewModel
 
 class LoginViewModel : ViewModel() {
     val client = createHttpClient()
@@ -155,12 +153,4 @@ class LoginViewModel : ViewModel() {
             }
         }
     }
-
-    fun sendPasswordRecoveryRequest() {
-
-    }
-
-
-
-
 }

@@ -53,7 +53,6 @@ import androidx.navigation.NavHostController
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.example.aok.core.MainViewModel
 import org.example.aok.core.formatoText
 import org.example.aok.core.parseTime
 import org.example.aok.data.network.Error
@@ -64,14 +63,13 @@ import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.ui.components.MyAssistChip
 import org.example.aok.ui.components.MyCard
 import org.example.aok.ui.components.MyCircularProgressIndicator
-import org.example.aok.ui.components.MyErrorAlert
+import org.example.aok.ui.components.alerts.MyErrorAlert
 import org.example.aok.ui.components.MyFilledTonalButton
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 
 @Composable
 fun ProHorariosScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel,
     homeViewModel: HomeViewModel,
     loginViewModel: LoginViewModel,
     proHorariosViewModel: ProHorariosViewModel
@@ -86,7 +84,6 @@ fun ProHorariosScreen(
                 navController
             )
         },
-        mainViewModel = mainViewModel,
         homeViewModel = homeViewModel,
         loginViewModel = loginViewModel
     )

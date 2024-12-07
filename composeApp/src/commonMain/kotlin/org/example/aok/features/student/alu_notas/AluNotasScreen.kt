@@ -44,7 +44,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import org.example.aok.core.MainViewModel
 import org.example.aok.core.capitalizeWords
 import org.example.aok.data.network.AluNotas
 import org.example.aok.data.network.OtraNotaAsignatura
@@ -59,7 +58,6 @@ import org.example.aok.ui.components.dashboard.DashBoardScreen
 @Composable
 fun AluNotasScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel,
     homeViewModel: HomeViewModel,
     loginViewModel: LoginViewModel,
     aluNotasViewModel: AluNotasViewModel
@@ -73,7 +71,6 @@ fun AluNotasScreen(
                 aluNotasViewModel
             )
         },
-        mainViewModel = mainViewModel,
         homeViewModel = homeViewModel,
         loginViewModel = loginViewModel
     )

@@ -14,8 +14,11 @@ import org.example.aok.features.common.home.HomeScreen
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginScreen
 import org.example.aok.features.common.login.LoginViewModel
+import org.example.aok.features.student.alu_ayuda_financiera.AluAyudaFinancieraScreen
 import org.example.aok.features.student.alu_cronograma.AluCronogramaScreen
 import org.example.aok.features.student.alu_cronograma.AluCronogramaViewModel
+import org.example.aok.features.student.alu_documentos.AluDocumentosScreen
+import org.example.aok.features.student.alu_documentos.AluDocumentosViewModel
 import org.example.aok.features.student.alu_finanzas.AluFinannzasScreen
 import org.example.aok.features.student.alu_finanzas.AluFinanzasViewModel
 import org.example.aok.features.student.alu_horario.AluHorarioScreen
@@ -40,7 +43,6 @@ import org.example.aok.features.teacher.pro_horarios.ProHorariosViewModel
 
 @Composable
 fun MyNavigation(
-    mainViewModel: MainViewModel,
     loginViewModel: LoginViewModel,
     homeViewModel: HomeViewModel,
     inscripcionesViewModel: InscripcionesViewModel,
@@ -56,30 +58,33 @@ fun MyNavigation(
     docentesViewModel: DocentesViewModel,
     proClasesViewModel: ProClasesViewModel,
     proHorariosViewModel: ProHorariosViewModel,
-    aluSolicitudesViewModel: AluSolicitudesViewModel
+    aluSolicitudesViewModel: AluSolicitudesViewModel,
+    aluDocumentosViewModel: AluDocumentosViewModel
 ) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
         startDestination = "login"
     ) {
+        composable("404") {NotFoundScreen(onNavigateBack = { navController.popBackStack() }) }
         composable("login") { LoginScreen(navController, loginViewModel, homeViewModel) }
-        composable("home") { HomeScreen(navController, mainViewModel, homeViewModel, loginViewModel) }
-        composable("inscripciones") { InscripcionesScreen(navController, mainViewModel, homeViewModel, loginViewModel, inscripcionesViewModel) }
-        composable("account") { AccountScreen(navController, mainViewModel, homeViewModel, loginViewModel, accountViewModel) }
-        composable("alu_finanzas") { AluFinannzasScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluFinanzasViewModel) }
-        composable("alu_cronograma") { AluCronogramaScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluCronogramaViewModel) }
-        composable("alu_malla") { AluMallaScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluMallaViewModel) }
-        composable("alu_horarios") { AluHorarioScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluHorarioViewModel) }
-        composable("online") { PagoOnlineScreen(navController, mainViewModel, homeViewModel, loginViewModel, pagoOnlineViewModel) }
-        composable("alu_materias") { AluMateriasScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluMateriasViewModel) }
-        composable("alu_facturacion_electronica") { AluFacturacionScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluFacturacionViewModel) }
-        composable("alu_notas") { AluNotasScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluNotasViewModel) }
-        composable("docentes") { DocentesScreen(navController, mainViewModel, homeViewModel, loginViewModel, docentesViewModel) }
-        composable("pro_clases") { ProClasesScreen(navController, mainViewModel, homeViewModel, loginViewModel, proClasesViewModel) }
-        composable("pro_horarios") { ProHorariosScreen(navController, mainViewModel, homeViewModel, loginViewModel, proHorariosViewModel) }
-        composable("solicitudonline") { AluSolicitudesScreen(navController, mainViewModel, homeViewModel, loginViewModel, aluSolicitudesViewModel) }
+        composable("home") { HomeScreen(navController, homeViewModel, loginViewModel) }
+        composable("inscripciones") { InscripcionesScreen(navController, homeViewModel, loginViewModel, inscripcionesViewModel) }
+        composable("account") { AccountScreen(navController, homeViewModel, loginViewModel, accountViewModel) }
+        composable("alu_finanzas") { AluFinannzasScreen(navController, homeViewModel, loginViewModel, aluFinanzasViewModel) }
+        composable("alu_cronograma") { AluCronogramaScreen(navController, homeViewModel, loginViewModel, aluCronogramaViewModel) }
+        composable("alu_malla") { AluMallaScreen(navController, homeViewModel, loginViewModel, aluMallaViewModel) }
+        composable("alu_horarios") { AluHorarioScreen(navController, homeViewModel, loginViewModel, aluHorarioViewModel) }
+        composable("online") { PagoOnlineScreen(navController, homeViewModel, loginViewModel, pagoOnlineViewModel) }
+        composable("alu_materias") { AluMateriasScreen(navController, homeViewModel, loginViewModel, aluMateriasViewModel) }
+        composable("alu_facturacion_electronica") { AluFacturacionScreen(navController, homeViewModel, loginViewModel, aluFacturacionViewModel) }
+        composable("alu_notas") { AluNotasScreen(navController, homeViewModel, loginViewModel, aluNotasViewModel) }
+        composable("docentes") { DocentesScreen(navController, homeViewModel, loginViewModel, docentesViewModel) }
+        composable("pro_clases") { ProClasesScreen(navController, homeViewModel, loginViewModel, proClasesViewModel) }
+        composable("pro_horarios") { ProHorariosScreen(navController, homeViewModel, loginViewModel, proHorariosViewModel) }
+        composable("solicitudonline") { AluSolicitudesScreen(navController, homeViewModel, loginViewModel, aluSolicitudesViewModel) }
         composable("addSolicitud") { AddSolicitudForm(aluSolicitudesViewModel, homeViewModel, navController) }
-
+        composable("admin_ayudafinanciera") { AluAyudaFinancieraScreen(navController, homeViewModel, loginViewModel) }
+        composable("documentos_alu") { AluDocumentosScreen(navController, homeViewModel, loginViewModel, aluDocumentosViewModel) }
     }
 }
