@@ -16,7 +16,7 @@ import org.example.aok.data.network.Response
 import org.example.aok.data.network.TipoEspecie
 import org.example.aok.data.network.TipoEspecieAsignatura
 import org.example.aok.data.network.TipoEspecieDocente
-import org.example.aok.data.network.form.File
+import org.example.aok.data.network.form.FileForm
 import org.example.aok.data.network.form.SolicitudEspecieForm
 import org.example.aok.features.common.home.HomeViewModel
 
@@ -142,10 +142,10 @@ class AluSolicitudesViewModel: ViewModel() {
     ) {
         viewModelScope.launch {
             _sendFormLoading.value = true
-            var fileForm: File? = null
+            var fileForm: FileForm? = null
             if (_byteArray.value != null) {
                 val fileAsIntList = _byteArray.value!!.map { it.toUByte().toInt() }
-                fileForm = File(file = fileAsIntList, name = _fileName.value)
+                fileForm = FileForm(file = fileAsIntList, name = _fileName.value)
             }
             val form = SolicitudEspecieForm(
                 action = "addSolicitud",
@@ -159,7 +159,7 @@ class AluSolicitudesViewModel: ViewModel() {
             try {
                 val result = service.addSolicitud(form)
                 _response.value = result
-                logInfo("solicitudes", "${result.message}")
+                logInfo("solicitudes", result.message)
 
             } catch (e: Exception) {
                 homeViewModel.addError(Error(title = "Error", error = "${e.message}"))

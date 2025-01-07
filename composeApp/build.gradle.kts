@@ -1,4 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -39,17 +38,13 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
 
-            // Enables FileKit without Compose dependencies
-            implementation("io.github.vinceglb:filekit-core:0.8.7")
-            // Enables FileKit with Composable utilities
-            implementation("io.github.vinceglb:filekit-compose:0.8.7")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
-            implementation("org.jetbrains.compose.material:material-icons-extended:1.5.2")
+            implementation(libs.material.icons.extended)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
@@ -62,11 +57,11 @@ kotlin {
             implementation(libs.kotlin.serialization)
             implementation(libs.androidx.navigation.compose)
 
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+            implementation(libs.kotlinx.datetime)
 
-            implementation("com.mohamedrejeb.calf:calf-file-picker:0.5.3")
-            implementation("com.mohamedrejeb.calf:calf-file-picker-coil:0.5.1")
-            implementation("io.coil-kt.coil3:coil-compose:3.0.0-alpha8")
+            implementation(libs.calf.file.picker)
+            implementation(libs.calf.file.picker.coil)
+            implementation(libs.coil.compose.v300alpha8)
 
             // peekaboo-ui
             implementation(libs.peekaboo.ui)
@@ -74,10 +69,8 @@ kotlin {
             // peekaboo-image-picker
             implementation(libs.peekaboo.image.picker)
 
-            // Enables FileKit without Compose dependencies
-            implementation("io.github.vinceglb:filekit-core:0.8.7")
-            // Enables FileKit with Composable utilities
-            implementation("io.github.vinceglb:filekit-compose:0.8.7")
+            implementation(libs.filekit.core)
+            implementation(libs.filekit.compose)
 
 
         }
@@ -93,7 +86,7 @@ android {
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
+//    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
         applicationId = "org.example.aok"
@@ -145,10 +138,10 @@ dependencies {
     implementation(libs.protolite.well.known.types)
     implementation(libs.androidx.core.i18n)
 
-    implementation("io.github.vinceglb:filekit-core:0.8.7")
+//    implementation("io.github.vinceglb:filekit-core:0.8.7")
 
     // Enables FileKit with Composable utilities
-    implementation("io.github.vinceglb:filekit-compose:0.8.7")
+//    implementation("io.github.vinceglb:filekit-compose:0.8.7")
 
 }
 

@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import org.example.aok.core.URLOpener
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
+import org.example.aok.core.requestPostDispatcher
 import org.example.aok.data.network.Home
 import org.example.aok.data.network.HomeResult
 import org.example.aok.data.network.Periodo
@@ -16,6 +17,8 @@ import org.example.aok.data.network.ReportForm
 import org.example.aok.data.network.ReportResult
 import org.example.aok.data.network.form.UploadPhotoForm
 import org.example.aok.data.network.Error
+import org.example.aok.data.network.Response
+import org.example.aok.data.network.form.RequestPasswordChangeForm
 
 class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
     val client = createHttpClient()
@@ -35,15 +38,12 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
                     is HomeResult.Success -> {
                         _homeData.value = result.home
                         clearError()
-                        if (_periodoSelect.value == null) {
-                            _periodoSelect.value = result.home.periodos[0]
-                        }
+                        _periodoSelect.value = _periodoSelect.value ?: result.home.periodos.getOrNull(0)
                     }
                     is HomeResult.Failure -> {
                         _error.value = result.error
                         _error.value!!.title = "Error al cargar datos"
                     }
-                    else -> {}
                 }
 
             } catch (e: Exception) {
@@ -95,7 +95,6 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
 
 //  ----------------------------------------------------------  REPORTES ---------------------------------------------------------
     private val _report = MutableStateFlow<Report?>(null)
-    val report: StateFlow<Report?> = _report
 
     fun onloadReport(form: ReportForm) {
         viewModelScope.launch {
@@ -114,10 +113,8 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
                         _error.value!!.title = "Error al generar reporte"
                     }
 
-                    else -> {}
                 }
             } catch (e: Exception) {
-                logInfo("report", "$e")
                 addError(error = Error(title = "Error", error = "${e.message}"))
             } finally {
                 _isLoading.value = false
@@ -193,7 +190,9 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
                     action = "uploadPhoto"
                 )
             }
-            val result = form?.let { service.uploadPhoto(it) }
+//            val result = form?.let { service.requestPostDispatcher(it) }
+            val result = form?.let { requestPostDispatcher(client, it) }
+
             _homeData.value!!.persona.foto = result?.message ?: _homeData.value!!.persona.foto
             logInfo("prueba", "${result}")
             _photoUploaded.value = true
@@ -203,6 +202,85 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
             ReportResult.Failure(error)
         } finally {
             changeImageLoading(false)
+        }
+    }
+
+    //  --------------------------------------------------- BOTTOM SHEET CAMBIAR CONTRASEÑA ---------------------------------------------------
+    private val _showPasswordForm = MutableStateFlow(false)
+    val showPasswordForm: StateFlow<Boolean> = _showPasswordForm
+
+    fun changeShowPasswordForm(value: Boolean) {
+        _showPasswordForm.value = value
+    }
+
+    private val _previousPassword = MutableStateFlow("")
+    val previousPassword: StateFlow<String> = _previousPassword
+
+    private val _newPassword1 = MutableStateFlow("")
+    val newPassword1: StateFlow<String> = _newPassword1
+
+    private val _newPassword2 = MutableStateFlow("")
+    val newPassword2: StateFlow<String> = _newPassword2
+
+    private val _response = MutableStateFlow<Response?>(null)
+    val response: StateFlow<Response?> = _response
+
+    private val _isFormValid = MutableStateFlow(false)
+    val isFormValid: StateFlow<Boolean> = _isFormValid
+
+    fun clearResponse() {
+        _response.value = null
+    }
+
+    fun isChangePasswordFormValid() {
+        _isFormValid.value = false
+        if (_previousPassword.value != "" && _newPassword1.value != "" && _newPassword2.value != "" && _newPassword1.value == _newPassword2.value) {
+            _isFormValid.value = true
+        }
+    }
+
+    fun onPasswordChange(
+        previousPassword: String,
+        newPassword1: String,
+        newPassword2: String
+    ) {
+        _previousPassword.value = previousPassword
+        _newPassword1.value = newPassword1
+        _newPassword2.value = newPassword2
+        isChangePasswordFormValid()
+    }
+
+    fun requestChangePassword() {
+        changeLoading(true)
+        changeShowPasswordForm(false)
+        viewModelScope.launch {
+            try {
+                changeLoading(true)
+                val form = homeData.value?.persona?.let {
+                    RequestPasswordChangeForm(
+                        action = "requestChangePassword",
+                        idPersona = it.idPersona,
+                        previousPassword = _previousPassword.value,
+                        newPassword = _newPassword2.value
+                    )
+                }
+
+                val result = form?.let {
+//                    service.requestPostDispatcher(it)
+                    requestPostDispatcher(client, it)
+                }
+
+                _response.value = result
+                clearError()
+                logInfo("homeViewModel", "$result")
+
+
+            } catch (e: Exception) {
+                logInfo("homeViewModel", "Exception: ${e.message}")
+                addError(Error(title = "Error", error = "${e.message}"))
+            } finally {
+                changeLoading(false)
+            }
         }
     }
 

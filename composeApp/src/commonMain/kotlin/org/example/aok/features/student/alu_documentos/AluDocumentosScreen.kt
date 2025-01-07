@@ -28,15 +28,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.mohamedrejeb.calf.picker.toImageBitmap
-import com.preat.peekaboo.image.picker.SelectionMode
-import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
+import io.github.vinceglb.filekit.core.FileKit
+import io.github.vinceglb.filekit.core.pickFile
+import kotlinx.coroutines.launch
 import org.example.aok.core.SERVER_URL
 import org.example.aok.core.getChipState
-import org.example.aok.core.resizeOptions
 import org.example.aok.data.network.AluDocumento
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
@@ -59,8 +57,7 @@ fun AluDocumentosScreen(
         content = {
             Screen(
                 homeViewModel,
-                aluDocumentosViewModel,
-                navController
+                aluDocumentosViewModel
             )
         },
         homeViewModel = homeViewModel,
@@ -72,13 +69,13 @@ fun AluDocumentosScreen(
 fun Screen(
     homeViewModel: HomeViewModel,
     aluDocumentosViewModel: AluDocumentosViewModel,
-    navController: NavHostController
 ) {
     val data by aluDocumentosViewModel.data.collectAsState(emptyList())
     val isLoading by homeViewModel.isLoading.collectAsState(false)
     val searchQuery by homeViewModel.searchQuery.collectAsState("")
+    val response by aluDocumentosViewModel.response.collectAsState(null)
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(response) {
         homeViewModel.clearSearchQuery()
         homeViewModel.homeData.value!!.persona.idInscripcion?.let {
             aluDocumentosViewModel.onloadAluDcoumentos(
@@ -123,23 +120,11 @@ fun DocumentoItem(
     homeViewModel: HomeViewModel,
     aluDocumentosViewModel: AluDocumentosViewModel
 ) {
-    val documentSelect by aluDocumentosViewModel.documentSelect.collectAsState(null)
-    val scope = rememberCoroutineScope()
-    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
-    var imageByteArray by remember { mutableStateOf<ByteArray?>(null) }
-    var mensaje by remember { mutableStateOf<String>("") }
 
-    val singleImagePicker = rememberImagePickerLauncher(
-        selectionMode = SelectionMode.Single,
-        scope = scope,
-        resizeOptions = resizeOptions,
-        onResult = { byteArrays ->
-            byteArrays.firstOrNull()?.let {
-                imageBitmap = it.toImageBitmap()
-                imageByteArray = it
-            }
-        }
-    )
+    val documentSelect by aluDocumentosViewModel.documentSelect.collectAsState(null)
+    val action by aluDocumentosViewModel.action.collectAsState(null)
+    val scope = rememberCoroutineScope()
+    var mensaje by remember { mutableStateOf<String>("") }
 
     MyCard (
         onClick = { }
@@ -167,31 +152,25 @@ fun DocumentoItem(
                 horizontalArrangement = Arrangement.End
             ) {
                 if (documento.archivo.isNullOrBlank()) {
-                    IconButton(
-                        onClick = {  }
-                    ) {
-                        Icon(imageVector = Icons.Filled.UploadFile, contentDescription = "Subir archivo", tint = MaterialTheme.colorScheme.onPrimary)
-                    }
+                    mensaje = UploadFile(
+                        aluDocumentosViewModel = aluDocumentosViewModel,
+                        documento = documento
+                    )
                 } else {
                     if (!documento.verificado) {
-                        IconButton(
-                            onClick = {
-                                aluDocumentosViewModel.changeDocumentSelect(documento)
-                                singleImagePicker.launch()
-                                mensaje = "Va a modificar el archivo para el documento: ${documento.nombreDocumento}."
-                            },
-                            colors = IconButtonDefaults.iconButtonColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                contentColor = MaterialTheme.colorScheme.secondary
-                            ),
-                        ) {
-                            Icon(imageVector = Icons.Filled.UploadFile, contentDescription = "Modificar archivo")
-                        }
+                        mensaje = UploadFile(
+                            aluDocumentosViewModel = aluDocumentosViewModel,
+                            documento = documento
+                        )
 
                         IconButton(
-                            onClick = {  },
+                            onClick = {
+                                mensaje = "Va a eliminar documento: ${documento.nombreDocumento}"
+                                aluDocumentosViewModel.changeDocumentSelect(documento)
+                                aluDocumentosViewModel.changeAction("removeDocument")
+                            },
                             colors = IconButtonDefaults.iconButtonColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+//                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
                                 contentColor = MaterialTheme.colorScheme.secondary
                             )
                         ) {
@@ -202,7 +181,7 @@ fun DocumentoItem(
                     IconButton(
                         onClick = { homeViewModel.openURL("${SERVER_URL}media/${documento.archivo}") },
                         colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+//                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
                             contentColor = MaterialTheme.colorScheme.secondary
                         )
                     ) {
@@ -216,22 +195,56 @@ fun DocumentoItem(
         }
     }
 
-    if (imageByteArray != null) {
+    if (documentSelect != null) {
         MyConfirmAlert(
             titulo = "¿Desea continuar?",
             mensaje = mensaje,
             onCancel = {
-                imageBitmap = null
-                imageByteArray = null
+                aluDocumentosViewModel.changeFile(null)
                 mensaje = ""
-                aluDocumentosViewModel.clearDocunentSelect()
+                aluDocumentosViewModel.changeDocumentSelect(null)
             },
             onConfirm = {
-
+                scope.launch {
+                    when (action) {
+                        "removeDocument" -> aluDocumentosViewModel.removeDocument(homeViewModel.homeData.value!!.persona.idPersona)
+                        "sendDocument" -> aluDocumentosViewModel.sendDocument(homeViewModel.homeData.value!!.persona.idPersona)
+                    }
+                }
             },
             showAlert = true
         )
     }
+}
 
-
+@Composable
+fun UploadFile(
+    aluDocumentosViewModel: AluDocumentosViewModel,
+    documento: AluDocumento
+) :String {
+    val scope = rememberCoroutineScope()
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    val fileName by aluDocumentosViewModel.fileName.collectAsState(null)
+    IconButton(
+        onClick = {
+            aluDocumentosViewModel.changeDocumentSelect(documento)
+            aluDocumentosViewModel.changeAction("sendDocument")
+            scope.launch {
+                try {
+                    val file = FileKit.pickFile()
+                    if (file != null) {
+                        aluDocumentosViewModel.changeFile(file.readBytes())
+                        aluDocumentosViewModel.changeFileName(file.name)
+                    } else {
+                        errorMessage = "No se seleccionó ningún archivo."
+                    }
+                } catch (e: Exception) {
+                    errorMessage = "Error al seleccionar archivo: ${e.message}"
+                }
+            }
+        }
+    ) {
+        Icon(imageVector = Icons.Filled.UploadFile, contentDescription = "Subir archivo", tint = MaterialTheme.colorScheme.onPrimary)
+    }
+    return "Archivo seleccionado: ${fileName}"
 }
