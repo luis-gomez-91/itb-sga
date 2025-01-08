@@ -44,7 +44,6 @@ import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import org.example.aok.core.ROUTES
 import org.example.aok.core.capitalizeWords
-import org.example.aok.core.logInfo
 import org.example.aok.data.network.GrupoModulo
 import org.example.aok.data.network.Modulo
 import org.example.aok.features.common.login.LoginViewModel
@@ -67,7 +66,7 @@ fun HomeScreen(
         }
     }
     DashBoardScreen(
-        title = "${loginViewModel.userData.value!!.nombre}",
+        title = loginViewModel.userData.value!!.nombre,
         navController = navController,
         content = {
             Screen(
@@ -240,7 +239,6 @@ fun cardModulo(
             contentColor = MaterialTheme.colorScheme.primary
         ),
         onClick = {
-            logInfo("prueba", modulo.url)
             if (modulo.url in ROUTES) {
                 navController.navigate(modulo.url)
             } else {

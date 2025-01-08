@@ -10,6 +10,8 @@ import org.example.aok.features.admin.inscripciones.InscripcionesScreen
 import org.example.aok.features.admin.inscripciones.InscripcionesViewModel
 import org.example.aok.features.common.account.AccountScreen
 import org.example.aok.features.common.account.AccountViewModel
+import org.example.aok.features.common.docBiblioteca.DocBibliotecaScreen
+import org.example.aok.features.common.docBiblioteca.DocBibliotecaViewModel
 import org.example.aok.features.common.home.HomeScreen
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginScreen
@@ -59,7 +61,8 @@ fun MyNavigation(
     proClasesViewModel: ProClasesViewModel,
     proHorariosViewModel: ProHorariosViewModel,
     aluSolicitudesViewModel: AluSolicitudesViewModel,
-    aluDocumentosViewModel: AluDocumentosViewModel
+    aluDocumentosViewModel: AluDocumentosViewModel,
+    docBibliotecaViewModel: DocBibliotecaViewModel
 ) {
     val navController = rememberNavController()
     NavHost(
@@ -86,5 +89,6 @@ fun MyNavigation(
         composable("addSolicitud") { AddSolicitudForm(aluSolicitudesViewModel, homeViewModel, navController) }
         composable("admin_ayudafinanciera") { AluAyudaFinancieraScreen(navController, homeViewModel, loginViewModel) }
         composable("documentos_alu") { AluDocumentosScreen(navController, homeViewModel, loginViewModel, aluDocumentosViewModel) }
+        composable("documentos") { DocBibliotecaScreen(navController, homeViewModel, loginViewModel, docBibliotecaViewModel) }
     }
 }

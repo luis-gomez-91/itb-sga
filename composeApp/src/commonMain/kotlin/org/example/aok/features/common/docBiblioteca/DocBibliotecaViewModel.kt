@@ -1,4 +1,4 @@
-package org.example.aok.features.teacher.pro_clases
+package org.example.aok.features.common.docBiblioteca
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,36 +6,31 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.example.aok.core.createHttpClient
+import org.example.aok.data.network.DocBibliotecaResult
+import org.example.aok.data.network.DocBibliotecas
 import org.example.aok.data.network.Error
-import org.example.aok.data.network.ProClases
-import org.example.aok.data.network.ProClasesResult
 import org.example.aok.features.common.home.HomeViewModel
 
-class ProClasesViewModel: ViewModel() {
+class DocBibliotecaViewModel: ViewModel() {
     val client = createHttpClient()
-    val service = ProClasesService(client)
+    val service = DocBibliotecaService(client)
 
-    private val _data = MutableStateFlow<ProClases?>(null)
-    val data: StateFlow<ProClases?> = _data
+    private val _data = MutableStateFlow<DocBibliotecas?>(null)
+    val data: StateFlow<DocBibliotecas?> = _data
 
-    fun onloadProClases(search: String, page: Int, homeViewModel: HomeViewModel) {
+    fun onloadDocBiblioteca(search: String, page: Int, homeViewModel: HomeViewModel) {
         homeViewModel.changeLoading(true)
         viewModelScope.launch {
             try {
-                val result = homeViewModel.homeData.value?.persona?.idDocente?.let {
-                    service.fetchProClases(search, 2,
-                        it
-                    )
-                }
+                val result = service.fetchDocBiblioteca(search, 1)
                 when (result) {
-                    is ProClasesResult.Success -> {
-                        _data.value = result.proClases
+                    is DocBibliotecaResult.Success -> {
+                        _data.value = result.docBiblioteca
                         homeViewModel.clearError()
                     }
-                    is ProClasesResult.Failure -> {
+                    is DocBibliotecaResult.Failure -> {
                         homeViewModel.addError(result.error)
                     }
-                    else -> {}
                 }
             } catch (e: Exception) {
                 homeViewModel.addError(Error(title = "Error", error = "${e.message}"))

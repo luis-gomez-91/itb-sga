@@ -114,8 +114,11 @@ fun Screen(
 fun CardAluFinanza(
     rubro: Rubro
 ) {
-    val date = LocalDate.parse(rubro.fechaVencimiento)
+    val vencimientoDate = LocalDate.parse(rubro.fechaVencimiento)
     val currentDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+    logInfo("posi", "${vencimientoDate}")
+    logInfo("posi", "${currentDate}")
 
     val cardStyle = when {
         rubro.cancelado -> {
@@ -127,7 +130,7 @@ fun CardAluFinanza(
                 estado = "Pagado"
             )
         }
-        date > currentDate -> {
+        vencimientoDate < currentDate -> {
             logInfo("home", "Fecha vencida: ${rubro.fechaVencimiento}, Actual: $currentDate")
             CardStyle(
                 containerColor = MaterialTheme.colorScheme.errorContainer,
@@ -165,7 +168,7 @@ fun CardAluFinanza(
 
             Row() {
                 MyAssistChip(
-                    label = formatoText("Fecha vencimiento: ", "${rubro.fechaVencimiento}").toString(),
+                    label = formatoText("Fecha vencimiento: ", rubro.fechaVencimiento).toString(),
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     labelColor = MaterialTheme.colorScheme.secondary,
                     icon = Icons.Filled.DateRange

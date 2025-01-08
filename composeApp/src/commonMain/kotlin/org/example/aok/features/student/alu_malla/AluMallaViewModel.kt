@@ -24,6 +24,7 @@ class AluMallaViewModel: ViewModel() {
         viewModelScope.launch {
             try {
                 val result = service.fetchAluMalla(id)
+                logInfo("malla", "${result}")
                 when (result) {
                     is AluMallaResult.Success -> {
                         _data.value = result.aluMalla
@@ -35,7 +36,7 @@ class AluMallaViewModel: ViewModel() {
             } catch (e: Exception) {
                 homeViewModel.addError(Error(title = "Error", error = "${e.message}"))
             } finally {
-                homeViewModel.changeLoading(true)
+                homeViewModel.changeLoading(false)
             }
         }
     }

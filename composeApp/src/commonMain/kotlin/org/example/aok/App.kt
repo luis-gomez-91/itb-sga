@@ -10,6 +10,7 @@ import org.example.aok.core.MyNavigation
 import org.example.aok.features.admin.docentes.DocentesViewModel
 import org.example.aok.features.admin.inscripciones.InscripcionesViewModel
 import org.example.aok.features.common.account.AccountViewModel
+import org.example.aok.features.common.docBiblioteca.DocBibliotecaViewModel
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.features.student.alu_cronograma.AluCronogramaViewModel
@@ -46,6 +47,7 @@ fun App(
     val proClasesViewModel = remember { ProClasesViewModel() }
     val proHorariosViewModel = remember { ProHorariosViewModel() }
     val aluDocumentosViewModel = remember { AluDocumentosViewModel() }
+    val docBibliotecaViewModel = remember { DocBibliotecaViewModel() }
 
     AppTheme {
         Surface(
@@ -69,7 +71,8 @@ fun App(
                 proClasesViewModel = proClasesViewModel,
                 proHorariosViewModel = proHorariosViewModel,
                 aluSolicitudesViewModel = aluSolicitudesViewModel,
-                aluDocumentosViewModel = aluDocumentosViewModel
+                aluDocumentosViewModel = aluDocumentosViewModel,
+                docBibliotecaViewModel = docBibliotecaViewModel
             )
         }
     }
