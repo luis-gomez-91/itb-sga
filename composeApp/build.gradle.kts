@@ -145,6 +145,7 @@ dependencies {
 
 //    implementation("dev.icerock.moko:biometry:0.9.0")
 //    implementation("androidx.biometric:biometric:1.2.0-alpha05")
+    commonMainApi("dev.icerock.moko:biometry-compose:0.4.0")
 }
 
 //dependencies {
