@@ -11,15 +11,19 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
 import org.example.aok.core.URLOpenerAndroid
 import org.example.aok.features.common.home.HomeViewModel
-import org.example.aok.features.student.facturacion_electronica.AluFacturacionViewModel
 import android.content.Intent
 import android.net.Uri
 import io.github.vinceglb.filekit.core.FileKit
+//import org.example.aok.core.BiometricAuth
+import org.example.aok.features.common.login.LoginViewModel
 
 class MainActivity : ComponentActivity() {
+    private lateinit var loginViewModel: LoginViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FileKit.init(this)
+
         setContent {
             Surface(color = Color.Transparent) {
                 WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -31,13 +35,15 @@ class MainActivity : ComponentActivity() {
                 insetsController.isAppearanceLightStatusBars = !darkTheme
                 insetsController.isAppearanceLightNavigationBars = !darkTheme
                 val urlOpener = URLOpenerAndroid(this)
+//                val biometricAuth = BiometricAuth(this)
+
 
                 setContent {
+//                    val loginViewModel = LoginViewModel(biometricAuth)
+                    val loginViewModel = LoginViewModel()
                     val homeViewModel = HomeViewModel(urlOpener)
-                    App(homeViewModel)
+                    App(homeViewModel, loginViewModel)
                 }
-
-//                App()
             }
         }
         // ATTENTION: This was auto-generated to handle app links.

@@ -18,19 +18,31 @@ fun MyOutlinedTextField(
     label: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    enabled: Boolean = true
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier,
-        placeholder = { Text(text = placeholder) },
-        label = { Text(text = label) },
+//        placeholder = { Text(text = placeholder) },
+        label = {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (enabled) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.outlineVariant
+            )
+        },
         keyboardOptions = keyboardOptions,
-        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
-            unfocusedBorderColor = MaterialTheme.colorScheme.secondaryContainer,
-        )
+        textStyle = TextStyle(
+            color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outlineVariant,
+            fontSize = MaterialTheme.typography.bodyMedium.fontSize
+        ),
+//        colors = TextFieldDefaults.outlinedTextFieldColors(
+//            focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 1f),
+//            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+//            disabledBorderColor = MaterialTheme.colorScheme.outlineVariant
+//        ),
+        enabled = enabled
     )
 }

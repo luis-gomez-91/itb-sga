@@ -59,9 +59,9 @@ fun getChipState(documentoVerificado: Boolean): ChipState {
     }
 }
 
-suspend fun requestPostDispatcher(client: HttpClient, form: Any): Response {
+suspend fun requestPostDispatcher(client: HttpClient, form: Any, action: String = "postDispatcher"): Response {
     return try {
-        val response = client.post("${SERVER_URL}api_rest?action=postDispatcher") {
+        val response = client.post("${SERVER_URL}api_rest?action=${action}") {
             contentType(ContentType.Application.Json)
             setBody(form)
         }

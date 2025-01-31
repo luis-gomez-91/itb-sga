@@ -3,34 +3,34 @@ agp = "8.3.2"
 android-compileSdk = "35"
 android-minSdk = "25"
 android-targetSdk = "35"
-androidx-activityCompose = "1.9.3"
+androidx-activityCompose = "1.10.0"
 androidx-appcompat = "1.7.0"
 androidx-constraintlayout = "2.2.0"
 androidx-core-ktx = "1.15.0"
 androidx-espresso-core = "3.6.1"
-androidx-lifecycle = "2.8.0"
+androidx-lifecycle = "2.8.4"
 androidx-material = "1.12.0"
 androidx-test-junit = "1.2.1"
 calfFilePicker = "0.5.3"
 calfFilePickerCoil = "0.5.1"
 coilCompose = "3.0.0-alpha8"
-compose-plugin = "1.6.11"
+compose-plugin = "1.7.0"
 filekitCore = "0.8.7"
 junit = "4.13.2"
-kotlin = "2.0.10"
-foundationAndroid = "1.7.6"
+kotlin = "2.1.0"
+foundationAndroid = "1.7.7"
 kotlinxDatetime = "0.6.0"
 materialIconsExtended = "1.5.2"
-runtimeAndroid = "1.7.6"
-uiGraphicsAndroid = "1.7.6"
+runtimeAndroid = "1.7.7"
+uiGraphicsAndroid = "1.7.7"
 lifecycleLivedataCoreKtx = "2.8.7"
 lifecycleViewmodelAndroid = "2.8.7"
-uiAndroid = "1.7.6"
+uiAndroid = "1.7.7"
 constraintlayoutCompose = "1.1.0"
 coil = "3.0.0-alpha06"
 ktor = "2.3.11"
 composeMaterial = "1.4.0"
-uiTextGoogleFonts = "1.7.6"
+uiTextGoogleFonts = "1.7.7"
 navigation-compose = "2.8.0-alpha02"
 core = "1.15.0"
 places = "4.1.0"
@@ -38,7 +38,17 @@ protoliteWellKnownTypes = "18.0.0"
 coreI18n = "1.0.0-alpha01"
 peekaboo = "0.5.2"
 
+#ksp = "2.0.0-1.0.21"
+ksp = "2.1.0-1.0.29"
+#androix-room = "2.7.0-alpha13"
+#androidx-sqliteBundled = "2.5.0-alpha13"
+#biometricKtx = "1.1.0"
+#biometryCompose = "0.4.0"
+#biometry = "0.4.0"
+
 [libraries]
+#biometry = { module = "dev.icerock.moko:biometry", version.ref = "biometry" }
+#biometry-compose = { module = "dev.icerock.moko:biometry-compose", version.ref = "biometryCompose" }
 calf-file-picker = { module = "com.mohamedrejeb.calf:calf-file-picker", version.ref = "calfFilePicker" }
 calf-file-picker-coil = { module = "com.mohamedrejeb.calf:calf-file-picker-coil", version.ref = "calfFilePickerCoil" }
 coil-compose-v300alpha8 = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
@@ -85,6 +95,10 @@ androidx-core-i18n = { group = "androidx.core", name = "core-i18n", version.ref 
 peekaboo-ui = { module = "io.github.onseok:peekaboo-ui", version.ref = "peekaboo" }
 peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", version.ref = "peekaboo" }
 
+#androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "androix-room" }
+#androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "androix-room" }
+#androidx-sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "androidx-sqliteBundled"}
+#androidx-biometric-ktx = { group = "androidx.biometric", name = "biometric-ktx", version.ref = "biometricKtx" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -94,3 +108,5 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
+#ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+#androidxRoom = { id = "androidx.room", version.ref = "androix-room"}

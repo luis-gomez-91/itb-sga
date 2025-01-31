@@ -190,7 +190,6 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
                     action = "uploadPhoto"
                 )
             }
-//            val result = form?.let { service.requestPostDispatcher(it) }
             val result = form?.let { requestPostDispatcher(client, it) }
 
             _homeData.value!!.persona.foto = result?.message ?: _homeData.value!!.persona.foto
@@ -284,6 +283,12 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
         }
     }
 
+    private val _screenSelect = MutableStateFlow<String>("screen")
+    val screenSelect: StateFlow<String> = _screenSelect
+
+    fun changeScreenSelect(value: String) {
+        _screenSelect.value = value
+    }
 }
 
 

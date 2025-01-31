@@ -31,6 +31,8 @@ import org.example.aok.features.student.alu_materias.AluMateriasScreen
 import org.example.aok.features.student.alu_materias.AluMateriasViewModel
 import org.example.aok.features.student.alu_notas.AluNotasScreen
 import org.example.aok.features.student.alu_notas.AluNotasViewModel
+import org.example.aok.features.student.alu_solicitud_beca.AluSolicitudBecaScreen
+import org.example.aok.features.student.alu_solicitud_beca.AluSolicitudBecaViewModel
 import org.example.aok.features.student.alu_solicitudes_online.AddSolicitudForm
 import org.example.aok.features.student.alu_solicitudes_online.AluSolicitudesScreen
 import org.example.aok.features.student.alu_solicitudes_online.AluSolicitudesViewModel
@@ -62,7 +64,8 @@ fun MyNavigation(
     proHorariosViewModel: ProHorariosViewModel,
     aluSolicitudesViewModel: AluSolicitudesViewModel,
     aluDocumentosViewModel: AluDocumentosViewModel,
-    docBibliotecaViewModel: DocBibliotecaViewModel
+    docBibliotecaViewModel: DocBibliotecaViewModel,
+    aluSolicitudBecaViewModel: AluSolicitudBecaViewModel
 ) {
     val navController = rememberNavController()
     NavHost(
@@ -90,5 +93,6 @@ fun MyNavigation(
         composable("admin_ayudafinanciera") { AluAyudaFinancieraScreen(navController, homeViewModel, loginViewModel) }
         composable("documentos_alu") { AluDocumentosScreen(navController, homeViewModel, loginViewModel, aluDocumentosViewModel) }
         composable("documentos") { DocBibliotecaScreen(navController, homeViewModel, loginViewModel, docBibliotecaViewModel) }
+        composable("beca_solicitud") { AluSolicitudBecaScreen(navController, homeViewModel, loginViewModel, aluSolicitudBecaViewModel) }
     }
 }

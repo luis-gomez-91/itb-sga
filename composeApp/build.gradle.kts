@@ -7,10 +7,12 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinxSerialization)
+
+//    alias(libs.plugins.ksp)
+//    alias(libs.plugins.androidxRoom)
 }
 
 kotlin {
-
     tasks.create("testClasses")
 
     androidTarget {
@@ -37,7 +39,6 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
-
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -69,24 +70,28 @@ kotlin {
             // peekaboo-image-picker
             implementation(libs.peekaboo.image.picker)
 
+//            filekit
             implementation(libs.filekit.core)
             implementation(libs.filekit.compose)
 
-
+//            room y sqlite
+//            implementation(libs.androidx.room.runtime)
+//            implementation(libs.androidx.sqlite.bundled)
         }
+
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
     }
+
+//    sourceSets.commonMain {
+//        kotlin.srcDir("build/generated/ksp/metadata")
+//    }
 }
 
 android {
     namespace = "org.example.aok"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
-
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
-//    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
         applicationId = "org.example.aok"
@@ -138,10 +143,20 @@ dependencies {
     implementation(libs.protolite.well.known.types)
     implementation(libs.androidx.core.i18n)
 
-//    implementation("io.github.vinceglb:filekit-core:0.8.7")
-
-    // Enables FileKit with Composable utilities
-//    implementation("io.github.vinceglb:filekit-compose:0.8.7")
-
+//    implementation("dev.icerock.moko:biometry:0.9.0")
+//    implementation("androidx.biometric:biometric:1.2.0-alpha05")
 }
 
+//dependencies {
+//    add("kspCommonMainMetadata", libs.androidx.room.compiler)
+//}
+//
+//tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().configureEach {
+//    if (name != "kspCommonMainKotlinMetadata") {
+//        dependsOn("kspCommonMainKotlinMetadata")
+//    }
+//}
+//
+//room {
+//    schemaDirectory("$projectDir/schemas")
+//}

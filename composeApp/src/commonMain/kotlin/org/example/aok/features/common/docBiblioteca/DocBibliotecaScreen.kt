@@ -3,7 +3,7 @@ package org.example.aok.features.common.docBiblioteca
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -107,19 +107,22 @@ fun Screen(
                             blue = Random.nextFloat(),
                             alpha = 0.15f
                         )
-                        Box(
+
+                        BoxWithConstraints(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(250.dp)
                                 .background(color = randomColor)
                                 .clickable(onClick = {
                                     homeViewModel.openURL("${SERVER_URL}media/${documento.url}")
                                 })
                         ) {
+                            val width = maxWidth
+                            val itemHeight = width * 4f / 3f
                             Column (
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(16.dp),
+                                    .padding(16.dp)
+                                    .height(itemHeight),
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
@@ -131,13 +134,6 @@ fun Screen(
                                 Column (
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Text(
-                                        text = documento.anno.toString(),
-                                        modifier = Modifier.fillMaxWidth(),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        textAlign = TextAlign.End,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
                                     documento.autor?.let { author ->
                                         Text(
                                             text = author,
@@ -146,15 +142,20 @@ fun Screen(
                                             textAlign = TextAlign.End,
                                         )
                                     }
+                                    Text(
+                                        text = documento.anno.toString(),
+                                        modifier = Modifier.fillMaxWidth(),
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        textAlign = TextAlign.End,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
                                 }
-
                             }
                         }
                     }
                 }
             }
 
-//            Spacer(modifier = Modifier.height(4.dp))
             data?.let {
                 Paginado(
                     homeViewModel,

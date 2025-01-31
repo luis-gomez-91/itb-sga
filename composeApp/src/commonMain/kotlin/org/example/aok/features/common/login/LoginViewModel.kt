@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+//import org.example.aok.core.BiometricAuth
 import org.example.aok.data.network.Login
 import org.example.aok.data.network.LoginResult
 import org.example.aok.core.createHttpClient
@@ -13,7 +14,9 @@ import org.example.aok.core.logInfo
 import org.example.aok.data.network.Response
 import org.example.aok.data.network.form.RequestPasswordRecoveryForm
 
-class LoginViewModel : ViewModel() {
+
+//class LoginViewModel(private val biometricAuth: BiometricAuth) : ViewModel() {
+class LoginViewModel() : ViewModel() {
     val client = createHttpClient()
     val loginService = LoginService(client)
 
@@ -153,4 +156,24 @@ class LoginViewModel : ViewModel() {
             }
         }
     }
+
+
+//    Biometric Login
+
+//    private val _isAuthenticated = MutableStateFlow(false)
+//    val isAuthenticated: StateFlow<Boolean> get() = _isAuthenticated
+//
+//    fun authenticateWithBiometrics() {
+//        viewModelScope.launch {
+//            biometricAuth.authenticate { success, error ->
+//                if (success) {
+//                    _isAuthenticated.value = true
+//                } else {
+//                    _error.value = error ?: "Error en la autenticación"
+//                }
+//            }
+//        }
+//    }
+
+
 }

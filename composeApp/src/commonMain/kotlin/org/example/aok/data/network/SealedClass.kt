@@ -1,5 +1,8 @@
 package org.example.aok.data.network
 
+import org.example.aok.data.network.solicitud_becas.FichaSocioeconomica
+import org.example.aok.data.network.solicitud_becas.SolicitudBeca
+
 sealed class LoginResult {
     data class Success(val login: Login) : LoginResult()
     data class Failure(val error: Error) : LoginResult()
@@ -93,4 +96,14 @@ sealed class AluDocumentosResult {
 sealed class DocBibliotecaResult {
     data class Success(val docBiblioteca: DocBibliotecas) : DocBibliotecaResult()
     data class Failure(val error: Error) : DocBibliotecaResult()
+}
+
+sealed class AluSolicitudBecaResult {
+    data class Success(val data: List<SolicitudBeca>) : AluSolicitudBecaResult()
+    data class Failure(val error: Error) : AluSolicitudBecaResult()
+}
+
+sealed class FichaSocioeconomicaResult {
+    data class Success(val data: FichaSocioeconomica) : FichaSocioeconomicaResult()
+    data class Failure(val error: Error) : FichaSocioeconomicaResult()
 }

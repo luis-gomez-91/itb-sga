@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -154,9 +155,10 @@ fun Departamentos(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandedDepartamento) },
             modifier = Modifier.menuAnchor().fillMaxWidth(),
             textStyle = TextStyle(fontSize = 10.sp),
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            )
+//            colors = TextFieldDefaults.textFieldColors(
+//                containerColor = MaterialTheme.colorScheme.surfaceContainer
+//            )
+
         )
 
         ExposedDropdownMenu(
@@ -215,9 +217,9 @@ fun Especies(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandedTipoSolicitud) },
             modifier = Modifier.menuAnchor().fillMaxWidth(),
             textStyle = TextStyle(fontSize = 10.sp),
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            )
+//            colors = TextFieldDefaults.textFieldColors(
+//                containerColor = MaterialTheme.colorScheme.surfaceContainer
+//            )
         )
 
         ExposedDropdownMenu(
@@ -314,9 +316,9 @@ fun Observaciones(
         maxLines = 5,
         singleLine = false,
         shape = RoundedCornerShape(8.dp),
-        colors = TextFieldDefaults.textFieldColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
-        )
+//        colors = TextFieldDefaults.textFieldColors(
+//            containerColor = MaterialTheme.colorScheme.surfaceContainer
+//        )
     )
     Spacer(Modifier.height(8.dp))
 }
@@ -345,9 +347,9 @@ fun Materias(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
             modifier = Modifier.menuAnchor().fillMaxWidth(),
             textStyle = TextStyle(fontSize = 10.sp),
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            )
+//            colors = TextFieldDefaults.textFieldColors(
+//                containerColor = MaterialTheme.colorScheme.surfaceContainer
+//            )
         )
 
         ExposedDropdownMenu(
@@ -409,9 +411,9 @@ fun Docentes(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
             modifier = Modifier.menuAnchor().fillMaxWidth(),
             textStyle = TextStyle(fontSize = 10.sp),
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            )
+//            colors = TextFieldDefaults.Container(
+//                colors = contentColorFor(MaterialTheme.colorScheme.surfaceContainer)
+//            )
         )
 
         ExposedDropdownMenu(

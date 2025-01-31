@@ -85,11 +85,11 @@ fun MyTopBar(
                             textStyle = TextStyle(
                                 fontSize = 16.sp
                             ),
-                            colors = TextFieldDefaults.textFieldColors(
-                                containerColor = MaterialTheme.colorScheme.surface,
-                                unfocusedIndicatorColor = Color.Transparent,
-                                focusedIndicatorColor = Color.Transparent
-                            ),
+//                            colors = TextFieldDefaults.textFieldColors(
+//                                containerColor = MaterialTheme.colorScheme.surface,
+//                                unfocusedIndicatorColor = Color.Transparent,
+//                                focusedIndicatorColor = Color.Transparent
+//                            ),
                             placeholder = {
                                 Text(text = "Ingrese texto aqui...")
                             },
@@ -126,10 +126,10 @@ fun MyTopBar(
             }
         },
 
-        colors = TopAppBarDefaults.smallTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            navigationIconContentColor = MaterialTheme.colorScheme.onSurface
-        ),
+//        colors = TopAppBarDefaults.smallTopAppBarColors(
+//            containerColor = MaterialTheme.colorScheme.surface,
+//            navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+//        ),
         actions = {
             AnimatedContent(targetState = onSearch) { isSearch ->
                 IconButton(

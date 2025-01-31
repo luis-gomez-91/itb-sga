@@ -106,10 +106,10 @@ fun FormTopBar(
             }
         },
 
-        colors = TopAppBarDefaults.smallTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            navigationIconContentColor = MaterialTheme.colorScheme.onSurface
-        ),
+//        colors = TopAppBarDefaults.smallTopAppBarColors(
+//            containerColor = MaterialTheme.colorScheme.surface,
+//            navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+//        ),
 
         navigationIcon = {
             IconButton(

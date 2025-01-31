@@ -110,10 +110,10 @@ fun LoginScreen(
                     placeholder = { Text(text = "Usuario") },
                     label = { Text(text = "Usuario") },
                     textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
-                        unfocusedBorderColor = MaterialTheme.colorScheme.secondaryContainer,
-                    )
+//                    colors = TextFieldDefaults.outlinedTextFieldColors(
+//                        focusedBorderColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+//                        unfocusedBorderColor = MaterialTheme.colorScheme.secondaryContainer,
+//                    )
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
@@ -124,10 +124,10 @@ fun LoginScreen(
                     label = { Text(text = "Contraseña") },
                     visualTransformation = if(!verPassword) PasswordVisualTransformation() else VisualTransformation.None,
                     textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
-                        unfocusedBorderColor = MaterialTheme.colorScheme.secondaryContainer,
-                    ),
+//                    colors = TextFieldDefaults.outlinedTextFieldColors(
+//                        focusedBorderColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+//                        unfocusedBorderColor = MaterialTheme.colorScheme.secondaryContainer,
+//                    ),
                     trailingIcon = {
                         if (password.isNotBlank()) {
                             PasswordIcon(
@@ -137,6 +137,15 @@ fun LoginScreen(
                         }
                     }
                 )
+
+//                MyOutlinedTextField(
+//                    value = password,
+//                    onValueChange = { loginViewModel.onLoginChanged(username, it) },
+//                    placeholder = "Contraseña",
+//                    label = "Contraseña",
+//                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+//                    modifier = Modifier.fillMaxWidth()
+//                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -149,6 +158,15 @@ fun LoginScreen(
                         modifier = Modifier
                             .clickable {
                                 homeViewModel.changeBottomSheet()
+                            },
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    Text(
+                        text = "Ingresar con huella o Face ID",
+                        modifier = Modifier
+                            .clickable {
+//                                loginViewModel.authenticateWithBiometrics()
                             },
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -240,9 +258,9 @@ fun PasswordIcon(
     } else {
         Icons.Default.VisibilityOff
     }
-
+    val description = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
     IconButton(onClick = onIconClick) {
-        Icon(imageVector = image, contentDescription = null)
+        Icon(imageVector = image, contentDescription = description)
     }
 }
 
@@ -251,36 +269,24 @@ fun RedesSociales(
     modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel
 ) {
+    val redes = listOf(
+        Pair(Res.drawable.instagram, "https://www.instagram.com/itb_ec"),
+        Pair(Res.drawable.facebook, "https://www.facebook.com/itb.edu.ec"),
+        Pair(Res.drawable.tiktok, "https://www.tiktok.com/@itb_ec?lang=es")
+    )
+
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
-        IconButton(onClick = {
-            homeViewModel.openURL(url = "https://www.instagram.com/itb_ec")
-        }) {
-            Image(
-                painter = painterResource(Res.drawable.instagram),
-                contentDescription = "Instagram",
-                modifier = Modifier.size(120.dp)
-            )
-        }
-        IconButton(onClick = {
-            homeViewModel.openURL(url = "https://www.facebook.com/itb.edu.ec")
-        }) {
-            Image(
-                painter = painterResource(Res.drawable.facebook),
-                contentDescription = "Facebook",
-                modifier = Modifier.size(120.dp)
-            )
-        }
-        IconButton(onClick = {
-            homeViewModel.openURL(url = "https://www.tiktok.com/@itb_ec?lang=es")
-        }) {
-            Image(
-                painter = painterResource(Res.drawable.tiktok),
-                contentDescription = "Tik Tok",
-                modifier = Modifier.size(120.dp)
-            )
+        redes.forEach { (icono, url) ->
+            IconButton(onClick = { homeViewModel.openURL(url) }) {
+                Image(
+                    painter = painterResource(icono),
+                    contentDescription = null,
+                    modifier = Modifier.size(64.dp)
+                )
+            }
         }
     }
 }
@@ -352,3 +358,4 @@ fun PasswordRecoveryForm(
         }
     }
 }
+
