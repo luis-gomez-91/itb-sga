@@ -39,11 +39,13 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
+            implementation("dev.icerock.moko:biometry-compose:0.4.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
+//            implementation(libs.androidx.compose.material3)
             implementation(compose.ui)
             implementation(libs.material.icons.extended)
             implementation(compose.components.resources)
@@ -73,6 +75,7 @@ kotlin {
 //            filekit
             implementation(libs.filekit.core)
             implementation(libs.filekit.compose)
+            implementation("dev.icerock.moko:mvvm-core:0.16.1")
 
 //            room y sqlite
 //            implementation(libs.androidx.room.runtime)
@@ -136,16 +139,16 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.android)
     implementation(libs.androidx.ui.android)
     implementation(libs.androidx.constraintlayout.compose)
-    implementation(libs.androidx.compose.material)
+//    implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.core)
     implementation(libs.places)
     implementation(libs.protolite.well.known.types)
     implementation(libs.androidx.core.i18n)
+    implementation(libs.androidx.appcompat)
 
-//    implementation("dev.icerock.moko:biometry:0.9.0")
-//    implementation("androidx.biometric:biometric:1.2.0-alpha05")
     commonMainApi("dev.icerock.moko:biometry-compose:0.4.0")
+    commonMainApi("dev.icerock.moko:biometry:0.4.0")
 }
 
 //dependencies {

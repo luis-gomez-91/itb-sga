@@ -70,9 +70,9 @@ import org.example.aok.core.resizeOptions
 import org.example.aok.data.domain.DrawerItem
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
-import org.example.aok.features.common.login.RedesSociales
 import org.example.aok.ui.components.MyFilledTonalButton
 import org.example.aok.ui.components.MyOutlinedTextField
+import org.example.aok.ui.components.SocialMedia
 
 @Composable
 fun MyDrawerContent(
@@ -103,7 +103,7 @@ fun MyDrawerContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 40.dp),
+                .padding(vertical = 24.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
@@ -167,7 +167,7 @@ fun MyDrawerContent(
                 }
             }
 
-            RedesSociales(
+            SocialMedia(
                 modifier = Modifier,
                 homeViewModel = homeViewModel
             )

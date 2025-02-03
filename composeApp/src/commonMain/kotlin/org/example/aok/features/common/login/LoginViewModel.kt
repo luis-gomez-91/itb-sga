@@ -2,10 +2,18 @@ package org.example.aok.features.common.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil3.EventListener
+import dev.icerock.moko.biometry.BiometryAuthenticator
+import dev.icerock.moko.mvvm.dispatcher.EventsDispatcher
+import dev.icerock.moko.mvvm.dispatcher.EventsDispatcherOwner
+import dev.icerock.moko.resources.desc.desc
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 //import org.example.aok.core.BiometricAuth
 import org.example.aok.data.network.Login
 import org.example.aok.data.network.LoginResult
@@ -15,8 +23,9 @@ import org.example.aok.data.network.Response
 import org.example.aok.data.network.form.RequestPasswordRecoveryForm
 
 
-//class LoginViewModel(private val biometricAuth: BiometricAuth) : ViewModel() {
-class LoginViewModel() : ViewModel() {
+class LoginViewModel(
+    val biometryAuthenticator: BiometryAuthenticator
+) : ViewModel(){
     val client = createHttpClient()
     val loginService = LoginService(client)
 
@@ -157,23 +166,29 @@ class LoginViewModel() : ViewModel() {
         }
     }
 
-
 //    Biometric Login
+    fun tryToAuth() = viewModelScope.launch {
+        try {
+            logInfo("LoginViewModel", "Intentando autenticación biométrica...")
 
-//    private val _isAuthenticated = MutableStateFlow(false)
-//    val isAuthenticated: StateFlow<Boolean> get() = _isAuthenticated
-//
-//    fun authenticateWithBiometrics() {
-//        viewModelScope.launch {
-//            biometricAuth.authenticate { success, error ->
-//                if (success) {
-//                    _isAuthenticated.value = true
-//                } else {
-//                    _error.value = error ?: "Error en la autenticación"
-//                }
-//            }
-//        }
-//    }
+            val isSuccess = biometryAuthenticator.checkBiometryAuthentication(
+                requestTitle = "Iniciar sesión".desc(),
+                requestReason = "Just for test".desc(),
+                failureButtonText = "Oops".desc(),
+                allowDeviceCredentials = false // true - if biometric permission is not granted user can authorise by device creds
+            )
 
+            logInfo("Biometry", "Resultado autenticación: $isSuccess")
+
+            if (isSuccess) {
+                logInfo("LoginViewModel", "Autenticación biométrica exitosa")
+            } else {
+                logInfo("LoginViewModel", "Autenticación fallida o cancelada")
+            }
+
+        } catch (throwable: Throwable) {
+            logInfo("LoginViewModel", "Error en autenticación biométrica: ${throwable.message}")
+        }
+    }
 
 }

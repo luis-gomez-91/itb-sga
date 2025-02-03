@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -46,7 +47,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import org.example.aok.features.common.home.HomeViewModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyTopBar(
     title: String,
@@ -64,72 +65,74 @@ fun MyTopBar(
     }
 
     TopAppBar(
+//        modifier = Modifier.padding(top = 48.dp),
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth().height(68.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(68.dp)
             ) {
                 Crossfade(targetState = onSearch) { isSearch ->
-                    if (!onSearch) {
-                        var searchQuery by remember { mutableStateOf("") }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        if (!isSearch) {
+                            var searchQuery by remember { mutableStateOf("") }
 
-                        TextField(
-                            value = searchQuery,
-                            onValueChange = { newQuery ->
-                                searchQuery = newQuery
-                                if (homeViewModel.fastSearch.value) {
-                                    homeViewModel.onSearchQueryChanged(newQuery)
-                                }
-                            },
-                            textStyle = TextStyle(
-                                fontSize = 16.sp
-                            ),
-//                            colors = TextFieldDefaults.textFieldColors(
-//                                containerColor = MaterialTheme.colorScheme.surface,
-//                                unfocusedIndicatorColor = Color.Transparent,
-//                                focusedIndicatorColor = Color.Transparent
-//                            ),
-                            placeholder = {
-                                Text(text = "Ingrese texto aqui...")
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp)
-                                .focusRequester(focusRequester),
-                            label = { Text("Buscar") },
-
-
-                            keyboardOptions = KeyboardOptions.Default.copy(
-                                imeAction = ImeAction.Search,
-                                keyboardType = KeyboardType.Text
-                            ),
-
-                            keyboardActions = KeyboardActions(
-                                onSearch = {
-                                    homeViewModel.actualPageRestart()
-                                    homeViewModel.onSearchQueryChanged(searchQuery)
-                                    focusRequester.freeFocus()
-                                }
+                            TextField(
+                                value = searchQuery,
+                                onValueChange = { newQuery ->
+                                    searchQuery = newQuery
+                                    if (homeViewModel.fastSearch.value) {
+                                        homeViewModel.onSearchQueryChanged(newQuery)
+                                    }
+                                },
+                                textStyle = TextStyle(fontSize = 16.sp),
+                                colors = TextFieldDefaults.colors(
+                                    unfocusedIndicatorColor = Color.Transparent,
+                                    focusedIndicatorColor = Color.Transparent,
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                ),
+//                                placeholder = { Text("Ingrese texto aqui...") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .focusRequester(focusRequester),
+                                label = { Text("Buscar") },
+                                keyboardOptions = KeyboardOptions.Default.copy(
+                                    imeAction = ImeAction.Search,
+                                    keyboardType = KeyboardType.Text
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onSearch = {
+                                        homeViewModel.actualPageRestart()
+                                        homeViewModel.onSearchQueryChanged(searchQuery)
+                                        focusRequester.freeFocus()
+                                    }
+                                )
                             )
-                        )
-                    } else {
-                        Text(
-                            text = title,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.secondary,
-//                            modifier = Modifier.padding(start = 8.dp)
-                        )
+                        } else {
+                            Text(
+                                text = title,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.secondary,
+                            )
+                        }
                     }
                 }
             }
         },
 
-//        colors = TopAppBarDefaults.smallTopAppBarColors(
-//            containerColor = MaterialTheme.colorScheme.surface,
-//            navigationIconContentColor = MaterialTheme.colorScheme.onSurface
-//        ),
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+        ),
         actions = {
             AnimatedContent(targetState = onSearch) { isSearch ->
                 IconButton(

@@ -104,13 +104,7 @@ fun Screen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
             } ?: run {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    MyCircularProgressIndicator()
-                }
+                MyCircularProgressIndicator()
             }
         }
     }

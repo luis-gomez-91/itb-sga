@@ -46,7 +46,6 @@ fun DashBoardScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val showBottomSheet by homeViewModel.showBottomSheet.collectAsState(false)
 
-//    val context = LocalContext.current
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {

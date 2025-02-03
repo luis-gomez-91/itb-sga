@@ -13,8 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.FaceRetouchingNatural
+import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -29,6 +35,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -58,6 +65,20 @@ import org.example.aok.ui.components.MyOutlinedTextField
 import org.example.aok.ui.components.alerts.MyInfoAlert
 import org.example.aok.ui.components.alerts.MySuccessAlert
 
+import dev.icerock.moko.biometry.compose.rememberBiometryAuthenticatorFactory
+import androidx.compose.runtime.*
+import androidx.compose.material3.*
+import dev.icerock.moko.biometry.compose.BindBiometryAuthenticatorEffect
+import dev.icerock.moko.biometry.compose.BiometryAuthenticatorFactory
+import dev.icerock.moko.resources.desc.Raw
+import dev.icerock.moko.resources.desc.StringDesc
+import dev.icerock.moko.resources.desc.desc
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.example.aok.core.logInfo
+import org.example.aok.ui.components.SocialMedia
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,6 +95,8 @@ fun LoginScreen(
     val showBottomSheet by homeViewModel.showBottomSheet.collectAsState(false)
     val showResponse by loginViewModel.showResponse.collectAsState()
     val response by loginViewModel.response.collectAsState()
+
+
 
     val imageLogo =
         if (isSystemInDarkTheme()) {
@@ -149,27 +172,43 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    horizontalAlignment = Alignment.End
                 ) {
-                    Text(
-                        text = "Recuperar contraseña",
-                        modifier = Modifier
-                            .clickable {
-                                homeViewModel.changeBottomSheet()
-                            },
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    TextButton(
+                        onClick = {
+                            homeViewModel.changeBottomSheet()
+                        }
+                    ) {
+                        Text(
+                            text = "Recuperar contraseña",
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Icon(
+                            imageVector = Icons.Filled.Lock,
+                            contentDescription = "More Information",
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                    }
 
-                    Text(
-                        text = "Ingresar con huella o Face ID",
-                        modifier = Modifier
-                            .clickable {
-//                                loginViewModel.authenticateWithBiometrics()
-                            },
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    TextButton(
+                        onClick = {
+                            loginViewModel.tryToAuth()
+                        }
+                    ) {
+                        Text(
+                            text = "Ingresar con huella o Face ID",
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Icon(
+                            imageVector = Icons.Filled.Fingerprint,
+                            contentDescription = "More Information",
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -199,7 +238,7 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                RedesSociales(
+                SocialMedia(
                     modifier = Modifier,
                     homeViewModel = homeViewModel
                 )
@@ -261,33 +300,6 @@ fun PasswordIcon(
     val description = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
     IconButton(onClick = onIconClick) {
         Icon(imageVector = image, contentDescription = description)
-    }
-}
-
-@Composable
-fun RedesSociales(
-    modifier: Modifier = Modifier,
-    homeViewModel: HomeViewModel
-) {
-    val redes = listOf(
-        Pair(Res.drawable.instagram, "https://www.instagram.com/itb_ec"),
-        Pair(Res.drawable.facebook, "https://www.facebook.com/itb.edu.ec"),
-        Pair(Res.drawable.tiktok, "https://www.tiktok.com/@itb_ec?lang=es")
-    )
-
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceAround
-    ) {
-        redes.forEach { (icono, url) ->
-            IconButton(onClick = { homeViewModel.openURL(url) }) {
-                Image(
-                    painter = painterResource(icono),
-                    contentDescription = null,
-                    modifier = Modifier.size(64.dp)
-                )
-            }
-        }
     }
 }
 
@@ -358,4 +370,3 @@ fun PasswordRecoveryForm(
         }
     }
 }
-
