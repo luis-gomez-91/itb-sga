@@ -8,8 +8,8 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinxSerialization)
 
-//    alias(libs.plugins.ksp)
-//    alias(libs.plugins.androidxRoom)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.androidxRoom)
 }
 
 kotlin {
@@ -78,8 +78,8 @@ kotlin {
             implementation("dev.icerock.moko:mvvm-core:0.16.1")
 
 //            room y sqlite
-//            implementation(libs.androidx.room.runtime)
-//            implementation(libs.androidx.sqlite.bundled)
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.sqlite.bundled)
         }
 
         iosMain.dependencies {
@@ -87,9 +87,9 @@ kotlin {
         }
     }
 
-//    sourceSets.commonMain {
-//        kotlin.srcDir("build/generated/ksp/metadata")
-//    }
+    sourceSets.commonMain {
+        kotlin.srcDir("build/generated/ksp/metadata")
+    }
 }
 
 android {
@@ -151,16 +151,16 @@ dependencies {
     commonMainApi("dev.icerock.moko:biometry:0.4.0")
 }
 
-//dependencies {
-//    add("kspCommonMainMetadata", libs.androidx.room.compiler)
-//}
-//
-//tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().configureEach {
-//    if (name != "kspCommonMainKotlinMetadata") {
-//        dependsOn("kspCommonMainKotlinMetadata")
-//    }
-//}
-//
-//room {
-//    schemaDirectory("$projectDir/schemas")
-//}
+dependencies {
+    add("kspCommonMainMetadata", libs.androidx.room.compiler)
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().configureEach {
+    if (name != "kspCommonMainKotlinMetadata") {
+        dependsOn("kspCommonMainKotlinMetadata")
+    }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
+}

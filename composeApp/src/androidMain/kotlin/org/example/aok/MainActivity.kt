@@ -18,6 +18,7 @@ import dev.icerock.moko.biometry.compose.BiometryAuthenticatorFactory
 import dev.icerock.moko.biometry.compose.rememberBiometryAuthenticatorFactory
 import dev.icerock.moko.mvvm.getViewModel
 import io.github.vinceglb.filekit.core.FileKit
+import org.example.aok.data.database.getAppDatabase
 import org.example.aok.features.common.login.LoginViewModel
 
 class MainActivity : AppCompatActivity() {
@@ -34,6 +35,7 @@ class MainActivity : AppCompatActivity() {
         window.statusBarColor = Color.Transparent.toArgb()
         window.navigationBarColor = Color.Transparent.toArgb()
         val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+        val dao = getAppDatabase(context = applicationContext).userDao()
 
         setContent {
             Surface(color = Color.Transparent) {
@@ -55,7 +57,8 @@ class MainActivity : AppCompatActivity() {
 
                 App(
                     homeViewModel = homeViewModel,
-                    loginViewModel = loginViewModel
+                    loginViewModel = loginViewModel,
+                    userDao = dao
                 )
             }
         }

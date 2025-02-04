@@ -1,12 +1,21 @@
 package org.example.aok
 
 import AppTheme
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Text
+import androidx.compose.ui.unit.dp
 import org.example.aok.core.MyNavigation
+import org.example.aok.data.database.UserDao
+import org.example.aok.data.entity.User
+import org.example.aok.data.network.Persona
 import org.example.aok.features.admin.docentes.DocentesViewModel
 import org.example.aok.features.admin.inscripciones.InscripcionesViewModel
 import org.example.aok.features.common.account.AccountViewModel
@@ -30,7 +39,8 @@ import org.example.aok.features.teacher.pro_horarios.ProHorariosViewModel
 @Composable
 fun App(
     homeViewModel : HomeViewModel,
-    loginViewModel: LoginViewModel
+    loginViewModel: LoginViewModel,
+    userDao: UserDao
 ) {
 //    val loginViewModel = remember { LoginViewModel() }
 //    val homeViewModel = remember { HomeViewModel() }
@@ -53,32 +63,59 @@ fun App(
     val aluSolicitudBecaViewModel = remember { AluSolicitudBecaViewModel() }
 
     AppTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            MyNavigation(
-                loginViewModel = loginViewModel,
-                homeViewModel = homeViewModel,
-                inscripcionesViewModel = inscripcionesViewModel,
-                accountViewModel = accountViewModel,
-                aluFinanzasViewModel = aluFinanzasViewModel,
-                aluCronogramaViewModel = aluCronogramaViewModel,
-                aluMallaViewModel = aluMallaViewModel,
-                aluHorarioViewModel = aluHorarioViewModel,
-                pagoOnlineViewModel = pagoOnlineViewModel,
-                aluMateriasViewModel = aluMateriasViewModel,
-                aluFacturacionViewModel = aluFacturacionViewModel,
-                aluNotasViewModel = aluNotasViewModel,
-                docentesViewModel = docentesViewModel,
-                proClasesViewModel = proClasesViewModel,
-                proHorariosViewModel = proHorariosViewModel,
-                aluSolicitudesViewModel = aluSolicitudesViewModel,
-                aluDocumentosViewModel = aluDocumentosViewModel,
-                docBibliotecaViewModel = docBibliotecaViewModel,
-                aluSolicitudBecaViewModel = aluSolicitudBecaViewModel
+        if (false) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                MyNavigation(
+                    loginViewModel = loginViewModel,
+                    homeViewModel = homeViewModel,
+                    inscripcionesViewModel = inscripcionesViewModel,
+                    accountViewModel = accountViewModel,
+                    aluFinanzasViewModel = aluFinanzasViewModel,
+                    aluCronogramaViewModel = aluCronogramaViewModel,
+                    aluMallaViewModel = aluMallaViewModel,
+                    aluHorarioViewModel = aluHorarioViewModel,
+                    pagoOnlineViewModel = pagoOnlineViewModel,
+                    aluMateriasViewModel = aluMateriasViewModel,
+                    aluFacturacionViewModel = aluFacturacionViewModel,
+                    aluNotasViewModel = aluNotasViewModel,
+                    docentesViewModel = docentesViewModel,
+                    proClasesViewModel = proClasesViewModel,
+                    proHorariosViewModel = proHorariosViewModel,
+                    aluSolicitudesViewModel = aluSolicitudesViewModel,
+                    aluDocumentosViewModel = aluDocumentosViewModel,
+                    docBibliotecaViewModel = docBibliotecaViewModel,
+                    aluSolicitudBecaViewModel = aluSolicitudBecaViewModel
 
-            )
+                )
+            }
+        } else {
+            val users by userDao.getAllUsers().collectAsState(initial = emptyList())
+            val scope = rememberCoroutineScope()
+
+            LaunchedEffect(true) {
+                val list = listOf(
+                    User(username = "lagomez5", password = "Mariajose18"),
+                    User(username = "lagomez8", password = "Mariajose18"),
+                    User(username = "mjmorales4", password = "itb")
+                )
+
+                list.forEach {
+                    userDao.upsert(it)
+                }
+            }
+
+            LazyColumn (
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp)
+            ) {
+                items(users) { user ->
+                    Text(text = user.username)
+                }
+            }
         }
+
     }
 }
