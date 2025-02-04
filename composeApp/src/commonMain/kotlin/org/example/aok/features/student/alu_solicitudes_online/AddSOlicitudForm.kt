@@ -21,8 +21,6 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -46,10 +44,9 @@ import io.github.vinceglb.filekit.core.FileKit
 import io.github.vinceglb.filekit.core.pickFile
 import org.example.aok.data.network.TipoEspecieAsignatura
 import org.example.aok.data.network.TipoEspecieDocente
-import org.example.aok.ui.components.AnimatedShimmer
 import org.example.aok.ui.components.MyCircularProgressIndicator
-import org.example.aok.ui.components.ShimmerGridItem
 import org.example.aok.ui.components.form.FormContainer
+import org.example.aok.ui.components.shimmer.ShimmerFormLoadingAnimation
 
 @Composable
 fun AddSolicitudForm(
@@ -89,7 +86,7 @@ fun FormScreen(
         MyCircularProgressIndicator()
     } else {
         if (sendFormLoading) {
-            AnimatedShimmer()
+            ShimmerFormLoadingAnimation()
         } else {
             Column(
                 modifier = Modifier

@@ -36,7 +36,7 @@ fun SocialMedia(
                 Image(
                     painter = painterResource(icono),
                     contentDescription = null,
-                    modifier = Modifier.size(64.dp)
+                    modifier = Modifier.size(80.dp)
                 )
             }
         }

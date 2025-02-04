@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.Dp
 
 @Composable
 fun MyFilledTonalButton(
-    text: String = "Ingresar",
+    text: String,
     enabled: Boolean = true,
     onClickAction: () -> Unit,
     icon: ImageVector? = null,
@@ -33,7 +33,7 @@ fun MyFilledTonalButton(
         enabled = enabled,
         colors = ButtonDefaults.filledTonalButtonColors(
             containerColor = buttonColor,
-            contentColor = textColor
+            contentColor = if (enabled) textColor else MaterialTheme.colorScheme.outline
         ),
         modifier = modifier
     ) {
@@ -42,14 +42,14 @@ fun MyFilledTonalButton(
                 imageVector = icon,
                 contentDescription = text,
                 modifier = Modifier.size(iconSize),
-                tint = textColor
+                tint = if (enabled) textColor else MaterialTheme.colorScheme.outline
             )
             Spacer(modifier = Modifier.width(4.dp))
         }
         Text(
             text = text,
             style = textStyle,
-            color = textColor
+            color = if (enabled) textColor else MaterialTheme.colorScheme.outline
         )
     }
 }

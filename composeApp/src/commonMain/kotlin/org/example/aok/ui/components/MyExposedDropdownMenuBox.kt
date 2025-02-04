@@ -66,12 +66,12 @@ fun <T> MyExposedDropdownMenuBox (
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
             modifier = Modifier.menuAnchor().fillMaxWidth(),
             textStyle = MaterialTheme.typography.bodyMedium,
-//            colors = TextFieldDefaults.textFieldColors(
-//                containerColor = Color.Transparent,
-//                focusedIndicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 1f),
-//                unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
-//                disabledIndicatorColor = MaterialTheme.colorScheme.outlineVariant
-//            ),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color.Transparent,
+                focusedContainerColor = Color.Transparent,
+                focusedIndicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 1f),
+                disabledIndicatorColor = MaterialTheme.colorScheme.outlineVariant
+            )
         )
         if (options.isNotEmpty()) {
             ExposedDropdownMenu(

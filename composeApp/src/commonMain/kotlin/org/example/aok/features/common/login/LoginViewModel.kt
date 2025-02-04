@@ -2,23 +2,17 @@ package org.example.aok.features.common.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import coil3.EventListener
 import dev.icerock.moko.biometry.BiometryAuthenticator
-import dev.icerock.moko.mvvm.dispatcher.EventsDispatcher
-import dev.icerock.moko.mvvm.dispatcher.EventsDispatcherOwner
 import dev.icerock.moko.resources.desc.desc
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-//import org.example.aok.core.BiometricAuth
 import org.example.aok.data.network.Login
 import org.example.aok.data.network.LoginResult
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
+import org.example.aok.data.database.AokRepository
 import org.example.aok.data.network.Response
 import org.example.aok.data.network.form.RequestPasswordRecoveryForm
 
@@ -86,7 +80,7 @@ class LoginViewModel(
                         _error.value = null
                     }
                     is LoginResult.Failure -> {
-                        _error.value = result.error.error ?: "An unknown error occurred"
+                        _error.value = result.error.error
                     }
                 }
             } catch (e: Exception) {
@@ -102,9 +96,6 @@ class LoginViewModel(
         viewModelScope.launch {
             _username.value = ""
             _password.value = ""
-//            _userData.value = null
-//            _error.value = null
-
             _isLoading.value = false
             _verPassword.value = false
 
@@ -167,21 +158,22 @@ class LoginViewModel(
     }
 
 //    Biometric Login
-    fun tryToAuth() = viewModelScope.launch {
+    fun tryToAuth(navHostController: NavHostController, aokRepository: AokRepository) = viewModelScope.launch {
         try {
-            logInfo("LoginViewModel", "Intentando autenticación biométrica...")
-
             val isSuccess = biometryAuthenticator.checkBiometryAuthentication(
                 requestTitle = "Iniciar sesión".desc(),
-                requestReason = "Just for test".desc(),
-                failureButtonText = "Oops".desc(),
-                allowDeviceCredentials = false // true - if biometric permission is not granted user can authorise by device creds
+                requestReason = "Coloque su dedo en el lector de huella dactilar".desc(),
+                failureButtonText = "Cancelar".desc(),
+                allowDeviceCredentials = false
             )
 
-            logInfo("Biometry", "Resultado autenticación: $isSuccess")
-
             if (isSuccess) {
-                logInfo("LoginViewModel", "Autenticación biométrica exitosa")
+                val user = aokRepository.userDao.getLastUser()
+                user?.let {
+                    onLoginChanged(it.username, it.password)
+                    onLoginSelector(navHostController)
+                }
+
             } else {
                 logInfo("LoginViewModel", "Autenticación fallida o cancelada")
             }

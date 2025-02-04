@@ -9,6 +9,8 @@ import org.example.aok.core.URLOpener
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
 import org.example.aok.core.requestPostDispatcher
+import org.example.aok.data.database.AokRepository
+import org.example.aok.data.entity.User
 import org.example.aok.data.network.Home
 import org.example.aok.data.network.HomeResult
 import org.example.aok.data.network.Periodo
@@ -19,6 +21,7 @@ import org.example.aok.data.network.form.UploadPhotoForm
 import org.example.aok.data.network.Error
 import org.example.aok.data.network.Response
 import org.example.aok.data.network.form.RequestPasswordChangeForm
+import org.example.aok.features.common.login.LoginViewModel
 
 class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
     val client = createHttpClient()
@@ -288,6 +291,36 @@ class HomeViewModel(private val pdfOpener: URLOpener) : ViewModel() {
 
     fun changeScreenSelect(value: String) {
         _screenSelect.value = value
+    }
+
+
+//    Biometric credentials
+    private val _saveCredentialsLogin = MutableStateFlow<Boolean>(false)
+    val saveCredentialsLogin: StateFlow<Boolean> = _saveCredentialsLogin
+
+    fun changeSaveCredentialsLogin(value: Boolean) {
+        _saveCredentialsLogin.value = value
+    }
+
+    suspend fun confirmCredentialsLogin(aokRepository: AokRepository, loginViewModel: LoginViewModel): Boolean {
+        val user = aokRepository.userDao.getLastUser()
+        val result: Boolean = user?.let {
+            it.username == loginViewModel.username.value && it.password == loginViewModel.password.value
+        } ?: true
+
+        changeSaveCredentialsLogin(!result)
+        return !result
+    }
+
+
+    fun saveCredentialsLogin(aokRepository: AokRepository, loginViewModel: LoginViewModel) {
+        viewModelScope.launch {
+            val user = User(
+                username = loginViewModel.username.value,
+                password = loginViewModel.password.value
+            )
+            aokRepository.userDao.upsert(user)
+        }
     }
 }
 

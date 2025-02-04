@@ -40,10 +40,9 @@ peekaboo = "0.5.2"
 
 composeMaterial3 = "1.2.1"
 
-#ksp = "2.0.0-1.0.21"
 ksp = "2.1.0-1.0.29"
-androix-room = "2.7.0-alpha13"
-androidx-sqliteBundled = "2.5.0-alpha13"
+androidx-room = "2.7.0-alpha13"
+sqlite = "2.5.0-alpha13"
 compiler = "3.2.0-alpha11"
 
 [libraries]
@@ -96,10 +95,15 @@ peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", ver
 
 #coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutinesVersion" }
 
-androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "androix-room" }
-androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "androix-room" }
-androidx-sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "androidx-sqliteBundled"}
-androidx-compiler = { group = "androidx.databinding", name = "compiler", version.ref = "compiler" }
+#androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "androix-room" }
+#androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "androix-room" }
+#androidx-sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "androidx-sqliteBundled"}
+#androidx-compiler = { group = "androidx.databinding", name = "compiler", version.ref = "compiler" }
+
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "androidx-room" }
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "androidx-room" }
+androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "androidx-room" }
+sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -110,4 +114,5 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-androidxRoom = { id = "androidx.room", version.ref = "androix-room"}
+#androidxRoom = { id = "androidx.room", version.ref = "androidx-room" }
+room = { id = "androidx.room", version.ref = "androidx-room" }

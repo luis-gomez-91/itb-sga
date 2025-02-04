@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,28 +32,33 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import org.example.aok.core.ROUTES
 import org.example.aok.core.capitalizeWords
+import org.example.aok.data.database.AokRepository
 import org.example.aok.data.network.GrupoModulo
 import org.example.aok.data.network.Modulo
 import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.ui.components.MyCircularProgressIndicator
+import org.example.aok.ui.components.alerts.MyConfirmAlert
 import org.example.aok.ui.components.alerts.MyErrorAlert
 import org.example.aok.ui.components.alerts.MySuccessAlert
 import org.example.aok.ui.components.dashboard.DashBoardScreen
+import org.example.aok.ui.components.shimmer.ShimmerFormLoadingAnimation
 
 
 @Composable
 fun HomeScreen(
+    aokRepository: AokRepository,
     navController: NavHostController,
     homeViewModel: HomeViewModel,
     loginViewModel: LoginViewModel
@@ -71,7 +75,9 @@ fun HomeScreen(
         content = {
             Screen(
                 navController,
-                homeViewModel
+                homeViewModel,
+                aokRepository,
+                loginViewModel
             )
         },
         homeViewModel = homeViewModel,
@@ -83,6 +89,8 @@ fun HomeScreen(
 fun Screen(
     navController: NavHostController,
     homeViewModel: HomeViewModel,
+    aokRepository: AokRepository,
+    loginViewModel: LoginViewModel
 ) {
     val homeData by homeViewModel.homeData.collectAsState()
     val isLoading by homeViewModel.isLoading.collectAsState(false)
@@ -91,7 +99,7 @@ fun Screen(
     homeViewModel.actualPageRestart()
 
     if (isLoading) {
-        MyCircularProgressIndicator()
+        ShimmerFormLoadingAnimation(20)
     } else {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -130,6 +138,26 @@ fun Screen(
             )
         }
     }
+
+    val scope = rememberCoroutineScope()
+    val confirmCredentialsLogin by homeViewModel.saveCredentialsLogin.collectAsState(false)
+
+    scope.launch{
+        homeViewModel.confirmCredentialsLogin(aokRepository, loginViewModel)
+    }
+
+    if (confirmCredentialsLogin) {
+        MyConfirmAlert(
+            titulo = "¿Desea continuar?",
+            mensaje = "Guardar credenciales de inicio de sesión para uso de biométrico",
+            onCancel = { homeViewModel.changeSaveCredentialsLogin(false) },
+            onConfirm = {
+                homeViewModel.changeSaveCredentialsLogin(false)
+                homeViewModel.saveCredentialsLogin(aokRepository, loginViewModel)
+            },
+            showAlert = true
+        )
+    }
 }
 
 @Composable
@@ -164,8 +192,7 @@ fun GrupoItem(
                 Text(
                     modifier = Modifier.padding(8.dp),
                     text = grupo.grupo.capitalizeWords(),
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 16.sp,
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.width(4.dp))
@@ -219,7 +246,6 @@ fun panelModulos(
     }
 }
 
-
 @Composable
 fun cardModulo(
     modulo: Modulo,
@@ -260,17 +286,13 @@ fun cardModulo(
             Column(modifier = Modifier.padding(horizontal = 8.dp)) {
                 Text(
                     text = modulo.nombre,
-//                        style = MaterialTheme.typography.titleSmall,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.padding(0.dp)
                 )
                 Text(
                     text = modulo.descripcion,
-                    fontSize = 12.sp,
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(0.dp)
                 )
             }
         }

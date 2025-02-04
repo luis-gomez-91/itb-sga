@@ -8,24 +8,27 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.VisualTransformation
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyOutlinedTextField(
     value: String,
-    placeholder: String,
+    placeholder: String = "",
     label: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier,
-//        placeholder = { Text(text = placeholder) },
+        placeholder = { Text(text = placeholder) },
         label = {
             Text(
                 text = label,
@@ -38,11 +41,15 @@ fun MyOutlinedTextField(
             color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outlineVariant,
             fontSize = MaterialTheme.typography.bodyMedium.fontSize
         ),
-//        colors = TextFieldDefaults.outlinedTextFieldColors(
-//            focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 1f),
-//            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-//            disabledBorderColor = MaterialTheme.colorScheme.outlineVariant
-//        ),
-        enabled = enabled
+        colors = TextFieldDefaults.colors(
+            focusedIndicatorColor = MaterialTheme.colorScheme.secondary.copy(alpha = 1f),
+            unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
+            disabledIndicatorColor = MaterialTheme.colorScheme.outlineVariant,
+            unfocusedContainerColor = Color.Transparent,
+            focusedContainerColor = Color.Transparent
+        ),
+        enabled = enabled,
+        trailingIcon = trailingIcon,
+        visualTransformation = visualTransformation
     )
 }

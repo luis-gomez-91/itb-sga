@@ -2,7 +2,6 @@ package org.example.aok.ui.components.dashboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,10 +24,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.example.aok.data.network.Periodo
 import org.example.aok.features.common.home.HomeViewModel
@@ -85,8 +82,7 @@ fun DashBoardScreen(
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         text = "Períodos Académicos",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
+                        style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -135,8 +131,7 @@ fun PeriodoItem(
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
                 text = periodo.nombre,
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = if (periodoSelect!!.id == periodo.id)
                     MaterialTheme.colorScheme.secondary

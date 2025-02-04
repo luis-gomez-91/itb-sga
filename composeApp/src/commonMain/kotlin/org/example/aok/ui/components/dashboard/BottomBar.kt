@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
@@ -66,6 +67,13 @@ fun MyBottomBar(
                     label = "Perfil",
                     onClick = {
                         navController.navigate("account")
+                    }
+                )
+                BottomBarItem(
+                    icon = Icons.Filled.Notifications,
+                    label = "Notificaciones",
+                    onClick = {
+
                     }
                 )
             }

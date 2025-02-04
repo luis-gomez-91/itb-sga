@@ -5,11 +5,11 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import io.ktor.util.reflect.instanceOf
 import platform.Foundation.NSHomeDirectory
 
-fun getAppDatabase(): AppDatabase {
-    val dbFile = NSHomeDirectory() + "/aok.db"
-    return Room.databaseBuilder<AppDatabase>(
+fun getAokDatabase(): AokDatabase {
+    val dbFile = NSHomeDirectory() + "/${DATABASE_NAME}"
+    return Room.databaseBuilder<AokDatabase>(
         name = dbFile,
-        factory = { AppDatabase::class.instantiateImlp() }
+        factory = { AokDatabase::class.instantiateImpl() }
     )
         .setDriver(BundledSQLiteDriver())
         .build()

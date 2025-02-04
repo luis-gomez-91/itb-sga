@@ -5,24 +5,22 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
 import org.example.aok.core.URLOpenerAndroid
 import org.example.aok.features.common.home.HomeViewModel
 import android.content.Intent
 import android.net.Uri
-import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import dev.icerock.moko.biometry.compose.BindBiometryAuthenticatorEffect
 import dev.icerock.moko.biometry.compose.BiometryAuthenticatorFactory
 import dev.icerock.moko.biometry.compose.rememberBiometryAuthenticatorFactory
 import dev.icerock.moko.mvvm.getViewModel
 import io.github.vinceglb.filekit.core.FileKit
-import org.example.aok.data.database.getAppDatabase
+import org.example.aok.data.database.AokRepository
+import org.example.aok.data.database.getAokDatabase
 import org.example.aok.features.common.login.LoginViewModel
 
 class MainActivity : AppCompatActivity() {
-//class MainActivity : ComponentActivity() {
 
     private lateinit var loginViewModel: LoginViewModel
 
@@ -32,10 +30,10 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        window.statusBarColor = Color.Transparent.toArgb()
-        window.navigationBarColor = Color.Transparent.toArgb()
         val insetsController = WindowCompat.getInsetsController(window, window.decorView)
-        val dao = getAppDatabase(context = applicationContext).userDao()
+
+        val dao = getAokDatabase(context = applicationContext).userDao()
+        val repository = AokRepository(getAokDatabase(context = applicationContext))
 
         setContent {
             Surface(color = Color.Transparent) {
@@ -58,7 +56,7 @@ class MainActivity : AppCompatActivity() {
                 App(
                     homeViewModel = homeViewModel,
                     loginViewModel = loginViewModel,
-                    userDao = dao
+                    aokRepository = repository
                 )
             }
         }

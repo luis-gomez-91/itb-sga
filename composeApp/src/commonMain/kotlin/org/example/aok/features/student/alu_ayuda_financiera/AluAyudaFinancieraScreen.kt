@@ -37,27 +37,6 @@ fun AluAyudaFinancieraScreen(
     )
 }
 
-
-@Composable
-fun Screen(
-    navController: NavHostController,
-    homeViewModel: HomeViewModel,
-    loginViewModel: LoginViewModel
-) {
-    DashBoardScreen(
-        title = "Ayuda Financiera",
-        navController = navController,
-        content = {
-            Screen(
-                homeViewModel = homeViewModel,
-                navController = navController
-            )
-        },
-        homeViewModel = homeViewModel,
-        loginViewModel = loginViewModel
-    )
-}
-
 @Composable
 fun Screen(
     homeViewModel: HomeViewModel,

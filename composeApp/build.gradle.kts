@@ -9,7 +9,8 @@ plugins {
     alias(libs.plugins.kotlinxSerialization)
 
     alias(libs.plugins.ksp)
-    alias(libs.plugins.androidxRoom)
+//    alias(libs.plugins.androidxRoom)
+    alias(libs.plugins.room)
 }
 
 kotlin {
@@ -40,12 +41,12 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
             implementation("dev.icerock.moko:biometry-compose:0.4.0")
+            implementation(libs.androidx.room.paging)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
-//            implementation(libs.androidx.compose.material3)
             implementation(compose.ui)
             implementation(libs.material.icons.extended)
             implementation(compose.components.resources)
@@ -78,8 +79,11 @@ kotlin {
             implementation("dev.icerock.moko:mvvm-core:0.16.1")
 
 //            room y sqlite
+//            implementation(libs.androidx.room.runtime)
+//            implementation(libs.androidx.sqlite.bundled)
+
             implementation(libs.androidx.room.runtime)
-            implementation(libs.androidx.sqlite.bundled)
+            implementation(libs.sqlite.bundled)
         }
 
         iosMain.dependencies {
@@ -149,16 +153,30 @@ dependencies {
 
     commonMainApi("dev.icerock.moko:biometry-compose:0.4.0")
     commonMainApi("dev.icerock.moko:biometry:0.4.0")
+
+
 }
+
+//dependencies {
+//    add("kspCommonMainMetadata", libs.androidx.room.compiler)
+//}
+//
+//tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().configureEach {
+//    if (name != "kspCommonMainKotlinMetadata") {
+//        dependsOn("kspCommonMainKotlinMetadata")
+//    }
+//}
+//
+//room {
+//    schemaDirectory("$projectDir/schemas")
+//}
+
 
 dependencies {
-    add("kspCommonMainMetadata", libs.androidx.room.compiler)
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().configureEach {
-    if (name != "kspCommonMainKotlinMetadata") {
-        dependsOn("kspCommonMainKotlinMetadata")
-    }
+    add("kspAndroid", libs.androidx.room.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
+    add("kspIosX64", libs.androidx.room.compiler)
+    add("kspIosArm64", libs.androidx.room.compiler)
 }
 
 room {

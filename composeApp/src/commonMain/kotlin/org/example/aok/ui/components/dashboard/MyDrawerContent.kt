@@ -19,11 +19,16 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.LockPerson
-import androidx.compose.material.icons.filled.LockReset
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Mode
+import androidx.compose.material.icons.filled.Pageview
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Preview
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.ViewList
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
@@ -48,18 +53,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import aok.composeapp.generated.resources.Res
 import aok.composeapp.generated.resources.logo
 import aok.composeapp.generated.resources.logo_dark
 import coil3.compose.AsyncImage
 import com.mohamedrejeb.calf.picker.toImageBitmap
-import com.preat.peekaboo.image.picker.ResizeOptions
 import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import kotlinx.coroutines.CoroutineScope
@@ -87,6 +89,8 @@ fun MyDrawerContent(
     val items = listOf(
         DrawerItem("Perfil", Icons.Filled.Person, { navHostController.navigate("account") }),
         DrawerItem("Cambiar contraseña", Icons.Filled.LockPerson, { homeViewModel.changeShowPasswordForm(true) }),
+        DrawerItem("Consulta general", Icons.Filled.Preview, {  }),
+        DrawerItem("Cambiar tema", if (isSystemInDarkTheme()) Icons.Filled.DarkMode else Icons.Filled.LightMode, {  }),
         DrawerItem("Cerrar sesión", Icons.Filled.Logout, { loginViewModel.onLogout(navHostController) })
     )
 
@@ -98,13 +102,13 @@ fun MyDrawerContent(
         }
 
     ModalDrawerSheet(
-
+        modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.surfaceBright)
     ){
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(vertical = 24.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceAround
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -113,57 +117,64 @@ fun MyDrawerContent(
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     text = "Sistema de Gestión Académica",
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 20.sp,
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    text = "INSTITUTO TECNOLÓGICO BOLIVARIANO DE TECNOLOGÍA",
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 10.sp,
-                    color = MaterialTheme.colorScheme.secondary
-                )
 
+                Spacer(Modifier.height(8.dp))
                 PhotoProfile(homeViewModel, scope)
 
                 Text(
                     text = homeViewModel.homeData.value?.persona?.nombre ?: "",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.secondary
                 )
                 Text(
                     text = "(${homeViewModel.homeData.value?.persona?.identificacion})" ?: "",
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 16.sp,
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.secondary
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
-                Divider()
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(24.dp))
+                Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
+//                Spacer(modifier = Modifier.height(8.dp))
 
                 items.forEach { item ->
-                    NavigationDrawerItem(
-                        label = { Text(text = item.label, fontSize = 16.sp) },
-                        selected = false,
-                        onClick = {
-                            scope.launch {
-                                drawerState.close()
-                            }
-                            item.onclick()
-                        },
-                        icon = {
-                            Icon(
-                                imageVector = item.icon,
-                                contentDescription = item.label,
-                                modifier = Modifier.size(24.dp),
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                    )
+                    Column {
+                        NavigationDrawerItem(
+                            label = {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = item.label,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Icon(
+                                        imageVector = item.icon,
+                                        contentDescription = item.label,
+                                        modifier = Modifier.size(24.dp),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            },
+                            selected = false,
+                            onClick = {
+                                scope.launch {
+                                    drawerState.close()
+                                }
+                                item.onclick()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        )
+                        Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
+                    }
                 }
             }
 
@@ -333,8 +344,7 @@ fun ChangePasswordForm(
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = "Cambiar contraseña",
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
+                style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.primary
             )
