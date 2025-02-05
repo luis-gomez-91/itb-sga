@@ -4,7 +4,6 @@ class AokRepository(
     private val database: AokDatabase
 ) {
     val userDao = database.userDao()
-//    val postDao = database.postDao()
+    val themePreferenceDao = database.themePreferenceDao()
 
-    fun getAllUsers() = userDao.getAllUsers()
 }

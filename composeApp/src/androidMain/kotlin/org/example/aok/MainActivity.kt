@@ -2,7 +2,6 @@ package org.example.aok
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
@@ -30,19 +29,14 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        val insetsController = WindowCompat.getInsetsController(window, window.decorView)
 
-        val dao = getAokDatabase(context = applicationContext).userDao()
         val repository = AokRepository(getAokDatabase(context = applicationContext))
 
         setContent {
             Surface(color = Color.Transparent) {
-                val darkTheme = isSystemInDarkTheme()
-                insetsController.isAppearanceLightStatusBars = !darkTheme
-                insetsController.isAppearanceLightNavigationBars = !darkTheme
 
                 val urlOpener = URLOpenerAndroid(this)
-                val homeViewModel = HomeViewModel(urlOpener)
+                val homeViewModel = HomeViewModel(urlOpener, repository)
                 val biometryFactory: BiometryAuthenticatorFactory = rememberBiometryAuthenticatorFactory()
 
 

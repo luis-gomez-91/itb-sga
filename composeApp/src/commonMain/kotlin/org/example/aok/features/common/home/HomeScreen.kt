@@ -139,20 +139,23 @@ fun Screen(
         }
     }
 
-    val scope = rememberCoroutineScope()
-    val confirmCredentialsLogin by homeViewModel.saveCredentialsLogin.collectAsState(false)
+    val saveCredentialsLogin by homeViewModel.saveCredentialsLogin.collectAsState(false)
 
-    scope.launch{
-        homeViewModel.confirmCredentialsLogin(aokRepository, loginViewModel)
+    LaunchedEffect(Unit) {
+        val result = homeViewModel.confirmCredentialsLogin(aokRepository, loginViewModel)
+        homeViewModel.changeSaveCredentialsLogin(result, loginViewModel, aokRepository)
+//        homeViewModel.confirmCredentialsLogin(aokRepository, loginViewModel)
     }
 
-    if (confirmCredentialsLogin) {
+    if (saveCredentialsLogin) {
         MyConfirmAlert(
             titulo = "¿Desea continuar?",
             mensaje = "Guardar credenciales de inicio de sesión para uso de biométrico",
-            onCancel = { homeViewModel.changeSaveCredentialsLogin(false) },
+            onCancel = {
+                homeViewModel.changeSaveCredentialsLogin(false, loginViewModel, aokRepository)
+            },
             onConfirm = {
-                homeViewModel.changeSaveCredentialsLogin(false)
+                homeViewModel.changeSaveCredentialsLogin(false, loginViewModel, aokRepository)
                 homeViewModel.saveCredentialsLogin(aokRepository, loginViewModel)
             },
             showAlert = true

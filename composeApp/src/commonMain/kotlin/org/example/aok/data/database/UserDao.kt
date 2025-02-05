@@ -33,7 +33,7 @@ interface UserDao {
     @Query("SELECT * FROM user")
     fun getAllUsers(): Flow<List<User>>
 
-    @Query("SELECT * FROM user ORDER by id desc LIMIT 1")
+    @Query("SELECT * FROM user ORDER BY id DESC LIMIT 1")
     suspend fun getLastUser(): User?
 
 //    @Insert(onConflict = OnConflictStrategy.REPLACE)

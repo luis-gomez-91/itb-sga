@@ -99,10 +99,9 @@ class LoginViewModel(
             _isLoading.value = false
             _verPassword.value = false
 
-            navController?.let {
-                it.navigate("login") {
-                    popUpTo("home") { inclusive = true }
-                }
+            navController.navigate("login") {
+                popUpTo(navController.graph.startDestinationRoute ?: "login") { inclusive = true }
+                launchSingleTop = true // Evita múltiples instancias de login
             }
         }
     }

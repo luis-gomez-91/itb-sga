@@ -50,7 +50,7 @@ private val client: HttpClient
                 Response(status = "error", message = "Unexpected response status: ${response.status}")
             }
         } catch (e: Exception) {
-            logInfo("prueba", "ERROR: ${e.message}")
+            logInfo("error", "ERROR: ${e.message}")
             e.printStackTrace()
             Response(status = "error", message = "Exception occurred: ${e.message}")
         }

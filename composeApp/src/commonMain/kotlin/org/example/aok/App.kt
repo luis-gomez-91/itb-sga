@@ -7,13 +7,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.ui.unit.dp
 import org.example.aok.core.MyNavigation
 import org.example.aok.data.database.AokRepository
-import org.example.aok.data.entity.User
 import org.example.aok.features.admin.docentes.DocentesViewModel
 import org.example.aok.features.admin.inscripciones.InscripcionesViewModel
 import org.example.aok.features.common.account.AccountViewModel
@@ -58,7 +58,9 @@ fun App(
     val docBibliotecaViewModel = remember { DocBibliotecaViewModel() }
     val aluSolicitudBecaViewModel = remember { AluSolicitudBecaViewModel() }
 
-    AppTheme {
+    AppTheme(
+        homeViewModel = homeViewModel
+    ) {
         if (true) {
             Surface(
                 modifier = Modifier.fillMaxSize(),
@@ -90,24 +92,24 @@ fun App(
             }
         } else {
             val users by aokRepository.userDao.getAllUsers().collectAsState(initial = emptyList())
-            val scope = rememberCoroutineScope()
+            val temas by aokRepository.themePreferenceDao.getAll().collectAsState(initial = emptyList())
 
-            LaunchedEffect(true) {
-                val list = listOf(
-                    User(username = "lagomez5", password = "Mariajose18"),
-                )
-
-                list.forEach {
-                    aokRepository.userDao.upsert(it)
-                }
-            }
+//            LaunchedEffect(true) {
+//                val list = listOf(
+//                    User(username = "lagomez5", password = "Mariajose18"),
+//                )
+//
+//                list.forEach {
+//                    aokRepository.userDao.upsert(it)
+//                }
+//            }
 
             LazyColumn (
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().padding(32.dp),
                 contentPadding = PaddingValues(16.dp)
             ) {
-                items(users) { user ->
-                    Text(user.username)
+                items(temas) {
+                    Text(it.theme)
                 }
             }
         }

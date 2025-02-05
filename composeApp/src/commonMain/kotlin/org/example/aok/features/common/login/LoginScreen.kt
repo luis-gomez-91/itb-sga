@@ -1,7 +1,6 @@
 package org.example.aok.features.common.login
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,6 +51,10 @@ import org.example.aok.ui.components.MyOutlinedTextField
 import org.example.aok.ui.components.alerts.MySuccessAlert
 
 import androidx.compose.material3.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import org.example.aok.data.database.AokRepository
 import org.example.aok.ui.components.SocialMedia
 
@@ -69,14 +72,20 @@ fun LoginScreen(
     val error: String? by loginViewModel.error.collectAsState(null)
     val showBottomSheet by homeViewModel.showBottomSheet.collectAsState(false)
     val showResponse by loginViewModel.showResponse.collectAsState()
+    val selectedTheme by homeViewModel.selectedTheme.collectAsState(null)
     val response by loginViewModel.response.collectAsState()
 
-    val imageLogo =
-        if (isSystemInDarkTheme()) {
-            Res.drawable.logo_dark
-        } else {
-            Res.drawable.logo
-        }
+    var imageLogo by remember { mutableStateOf(Res.drawable.logo) }
+
+    LaunchedEffect(selectedTheme) {
+        imageLogo =
+            if (selectedTheme?.dark == true) {
+                Res.drawable.logo_dark
+            } else {
+                Res.drawable.logo
+            }
+    }
+
 
     Box(
         modifier = Modifier
@@ -196,7 +205,8 @@ fun LoginScreen(
                 ) {
                     SocialMedia(
                         modifier = Modifier,
-                        homeViewModel = homeViewModel
+                        homeViewModel = homeViewModel,
+                        size = 48.dp
                     )
                 }
             }

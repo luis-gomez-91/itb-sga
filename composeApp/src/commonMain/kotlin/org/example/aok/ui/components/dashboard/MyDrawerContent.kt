@@ -6,6 +6,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -14,6 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -23,12 +26,11 @@ import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.LockPerson
 import androidx.compose.material.icons.filled.Logout
-import androidx.compose.material.icons.filled.Mode
-import androidx.compose.material.icons.filled.Pageview
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Preview
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.ViewList
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
@@ -67,13 +69,14 @@ import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.example.aok.core.SERVER_URL
-import org.example.aok.core.logInfo
 import org.example.aok.core.resizeOptions
 import org.example.aok.data.domain.DrawerItem
+import org.example.aok.data.network.Home
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.ui.components.MyFilledTonalButton
 import org.example.aok.ui.components.MyOutlinedTextField
+import org.example.aok.ui.components.MySwitch
 import org.example.aok.ui.components.SocialMedia
 
 @Composable
@@ -85,21 +88,22 @@ fun MyDrawerContent(
 ) {
     val scope = rememberCoroutineScope()
     val showPasswordForm by homeViewModel.showPasswordForm.collectAsState(false)
+    val homeData by homeViewModel.homeData.collectAsState(null)
+    val selectedTheme by homeViewModel.selectedTheme.collectAsState(null)
+
+    var themeIcon by remember { mutableStateOf(Icons.Filled.LightMode) }
+
+    LaunchedEffect(selectedTheme) {
+        themeIcon = if (selectedTheme?.dark == true) Icons.Filled.DarkMode else Icons.Filled.LightMode
+    }
 
     val items = listOf(
         DrawerItem("Perfil", Icons.Filled.Person, { navHostController.navigate("account") }),
         DrawerItem("Cambiar contraseña", Icons.Filled.LockPerson, { homeViewModel.changeShowPasswordForm(true) }),
         DrawerItem("Consulta general", Icons.Filled.Preview, {  }),
-        DrawerItem("Cambiar tema", if (isSystemInDarkTheme()) Icons.Filled.DarkMode else Icons.Filled.LightMode, {  }),
+        DrawerItem("Cambiar tema", themeIcon, { homeViewModel.changeshowThemeSetting(true) }),
         DrawerItem("Cerrar sesión", Icons.Filled.Logout, { loginViewModel.onLogout(navHostController) })
     )
-
-    val imageLogo =
-        if (isSystemInDarkTheme()) {
-            Res.drawable.logo_dark
-        } else {
-            Res.drawable.logo
-        }
 
     ModalDrawerSheet(
         modifier = Modifier
@@ -122,15 +126,15 @@ fun MyDrawerContent(
                 )
 
                 Spacer(Modifier.height(8.dp))
-                PhotoProfile(homeViewModel, scope)
+                PhotoProfile(homeViewModel, scope, homeData)
 
                 Text(
-                    text = homeViewModel.homeData.value?.persona?.nombre ?: "",
+                    text = homeData?.persona?.nombre ?: "",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.secondary
                 )
                 Text(
-                    text = "(${homeViewModel.homeData.value?.persona?.identificacion})" ?: "",
+                    text = "(${homeData?.persona?.identificacion})" ?: "",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.secondary
                 )
@@ -180,7 +184,8 @@ fun MyDrawerContent(
 
             SocialMedia(
                 modifier = Modifier,
-                homeViewModel = homeViewModel
+                homeViewModel = homeViewModel,
+                size = 40.dp
             )
         }
     }
@@ -188,18 +193,20 @@ fun MyDrawerContent(
     if (showPasswordForm) {
         ChangePasswordForm(homeViewModel)
     }
+
+    ThemeSettings(homeViewModel)
 }
 
 @Composable
 fun PhotoProfile(
     homeViewModel: HomeViewModel,
-    scope: CoroutineScope
+    scope: CoroutineScope,
+    homeData: Home?
 ) {
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     var imageByteArray by remember { mutableStateOf<ByteArray?>(null) }
     val imageLoading by homeViewModel.imageLoading.collectAsState(false)
     val photoUploaded by homeViewModel.photoUploaded.collectAsState()
-
 
     LaunchedEffect(photoUploaded) {
         if (photoUploaded) {
@@ -289,9 +296,8 @@ fun PhotoProfile(
                         )
                     }
                 } else {
-                    logInfo("prueba", "${SERVER_URL}${homeViewModel.homeData.value?.persona?.foto}")
                     AsyncImage(
-                        model = "${SERVER_URL}${homeViewModel.homeData.value?.persona?.foto}",
+                        model = "${SERVER_URL}${homeData?.persona?.foto}",
                         contentDescription = "Foto perfil",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -391,5 +397,64 @@ fun ChangePasswordForm(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun ThemeSettings(
+    homeViewModel: HomeViewModel
+) {
+    val themeOptions by homeViewModel.requestThemeOptions().collectAsState(emptyList())
+    val showThemeSetting by homeViewModel.showThemeSetting.collectAsState(false)
+    val selectedTheme by homeViewModel.selectedTheme.collectAsState()
+    var currentSelectedTheme by remember { mutableStateOf(selectedTheme?.id ?: 1) }
+
+    val isDarkSystem = isSystemInDarkTheme()
+
+    if (showThemeSetting) {
+        AlertDialog(
+            modifier = Modifier,
+            title = {
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = "Configurar tema",
+                        modifier = Modifier.align(Alignment.Center),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            },
+            text = {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(16.dp)
+                ) {
+                    items(themeOptions) { theme ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = theme.theme,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.weight(1f)
+                            )
+                            MySwitch(
+                                checked = theme.active,
+                                onCheckedChange = {
+                                    currentSelectedTheme = theme.id
+                                    homeViewModel.updateThemePreference(theme, isDarkSystem)
+                                }
+                            )
+                        }
+                    }
+                }
+            },
+            onDismissRequest = { homeViewModel.changeshowThemeSetting(false) },
+            confirmButton = {},
+            shape = MaterialTheme.shapes.medium,
+            tonalElevation = AlertDialogDefaults.TonalElevation
+        )
     }
 }
