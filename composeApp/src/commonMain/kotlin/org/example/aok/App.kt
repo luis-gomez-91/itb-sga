@@ -20,6 +20,7 @@ import org.example.aok.features.common.account.AccountViewModel
 import org.example.aok.features.common.docBiblioteca.DocBibliotecaViewModel
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
+import org.example.aok.features.student.alu_consulta_general.AluConsultaGeneralViewModel
 import org.example.aok.features.student.alu_cronograma.AluCronogramaViewModel
 import org.example.aok.features.student.alu_documentos.AluDocumentosViewModel
 import org.example.aok.features.student.alu_finanzas.AluFinanzasViewModel
@@ -57,6 +58,7 @@ fun App(
     val aluDocumentosViewModel = remember { AluDocumentosViewModel() }
     val docBibliotecaViewModel = remember { DocBibliotecaViewModel() }
     val aluSolicitudBecaViewModel = remember { AluSolicitudBecaViewModel() }
+    val aluConsultaGeneralViewModel = remember { AluConsultaGeneralViewModel() }
 
     AppTheme(
         homeViewModel = homeViewModel
@@ -86,8 +88,8 @@ fun App(
                     aluSolicitudesViewModel = aluSolicitudesViewModel,
                     aluDocumentosViewModel = aluDocumentosViewModel,
                     docBibliotecaViewModel = docBibliotecaViewModel,
-                    aluSolicitudBecaViewModel = aluSolicitudBecaViewModel
-
+                    aluSolicitudBecaViewModel = aluSolicitudBecaViewModel,
+                    aluConsultaGeneralViewModel = aluConsultaGeneralViewModel
                 )
             }
         } else {

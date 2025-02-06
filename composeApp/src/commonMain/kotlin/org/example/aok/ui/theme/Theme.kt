@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import org.example.aok.core.SetStatusBarColors
+//import org.example.aok.core.SetStatusBarColors
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.ui.theme.darkColorScheme
 import org.example.aok.ui.theme.lightColorScheme
@@ -32,7 +32,7 @@ fun AppTheme(
 
     val colorScheme = if (isDark) darkColorScheme() else lightColorScheme()
 
-    SetStatusBarColors(isDarkTheme = isDark)
+//    SetStatusBarColors(isDarkTheme = isDark)
 
     MaterialTheme(
         colorScheme = colorScheme,

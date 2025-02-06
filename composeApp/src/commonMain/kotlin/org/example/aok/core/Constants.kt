@@ -11,7 +11,7 @@ val ROUTES = setOf(
     "alu_materias", "alu_facturacion_electronica", "alu_notas",
     "docentes", "pro_clases", "pro_horarios", "solicitudonline", "addSolicitud",
     "admin_ayudafinanciera", "documentos_alu", "documentos", "beca_solicitud",
-    "alumnos_cab"
+    "alumnos_cab", "consultaalumno"
 )
 
 val resizeOptions = ResizeOptions(

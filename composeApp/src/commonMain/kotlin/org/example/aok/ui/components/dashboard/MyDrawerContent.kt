@@ -100,7 +100,7 @@ fun MyDrawerContent(
                 true
             )
         },
-        DrawerItem("Consulta general", Icons.Filled.Preview) { },
+        DrawerItem("Consulta general", Icons.Filled.Preview) { navHostController.navigate("consultaalumno") },
         DrawerItem("Cambiar tema", themeIcon) { homeViewModel.changeshowThemeSetting(true) },
         DrawerItem("Cerrar sesión", Icons.Filled.Logout) { loginViewModel.onLogout(navHostController) }
     )
