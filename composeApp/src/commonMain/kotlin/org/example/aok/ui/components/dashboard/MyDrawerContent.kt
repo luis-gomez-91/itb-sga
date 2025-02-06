@@ -29,12 +29,10 @@ import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Preview
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,9 +57,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import aok.composeapp.generated.resources.Res
-import aok.composeapp.generated.resources.logo
-import aok.composeapp.generated.resources.logo_dark
 import coil3.compose.AsyncImage
 import com.mohamedrejeb.calf.picker.toImageBitmap
 import com.preat.peekaboo.image.picker.SelectionMode
@@ -78,6 +73,7 @@ import org.example.aok.ui.components.MyFilledTonalButton
 import org.example.aok.ui.components.MyOutlinedTextField
 import org.example.aok.ui.components.MySwitch
 import org.example.aok.ui.components.SocialMedia
+import org.example.aok.ui.components.alerts.MyAlert
 
 @Composable
 fun MyDrawerContent(
@@ -98,11 +94,15 @@ fun MyDrawerContent(
     }
 
     val items = listOf(
-        DrawerItem("Perfil", Icons.Filled.Person, { navHostController.navigate("account") }),
-        DrawerItem("Cambiar contraseña", Icons.Filled.LockPerson, { homeViewModel.changeShowPasswordForm(true) }),
-        DrawerItem("Consulta general", Icons.Filled.Preview, {  }),
-        DrawerItem("Cambiar tema", themeIcon, { homeViewModel.changeshowThemeSetting(true) }),
-        DrawerItem("Cerrar sesión", Icons.Filled.Logout, { loginViewModel.onLogout(navHostController) })
+        DrawerItem("Perfil", Icons.Filled.Person) { navHostController.navigate("account") },
+        DrawerItem("Cambiar contraseña", Icons.Filled.LockPerson) {
+            homeViewModel.changeShowPasswordForm(
+                true
+            )
+        },
+        DrawerItem("Consulta general", Icons.Filled.Preview) { },
+        DrawerItem("Cambiar tema", themeIcon) { homeViewModel.changeshowThemeSetting(true) },
+        DrawerItem("Cerrar sesión", Icons.Filled.Logout) { loginViewModel.onLogout(navHostController) }
     )
 
     ModalDrawerSheet(
@@ -134,13 +134,13 @@ fun MyDrawerContent(
                     color = MaterialTheme.colorScheme.secondary
                 )
                 Text(
-                    text = "(${homeData?.persona?.identificacion})" ?: "",
+                    text = "(${homeData?.persona?.identificacion})",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.secondary
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
-                Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
+                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
 //                Spacer(modifier = Modifier.height(8.dp))
 
                 items.forEach { item ->
@@ -177,7 +177,7 @@ fun MyDrawerContent(
                             modifier = Modifier
                                 .fillMaxWidth()
                         )
-                        Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
                     }
                 }
             }
@@ -185,7 +185,7 @@ fun MyDrawerContent(
             SocialMedia(
                 modifier = Modifier,
                 homeViewModel = homeViewModel,
-                size = 40.dp
+                size = 36.dp
             )
         }
     }
@@ -313,14 +313,14 @@ fun PhotoProfile(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .size(48.dp)
-                            .background(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f), shape = CircleShape)
+                            .background(color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f), shape = CircleShape)
                             .clip(CircleShape)
                     ) {
                         Icon(
                             modifier = Modifier.size(40.dp).padding(4.dp),
                             imageVector = Icons.Filled.Camera,
                             contentDescription = "Actualizar foto",
-                            tint = MaterialTheme.colorScheme.surface
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -412,18 +412,10 @@ fun ThemeSettings(
     val isDarkSystem = isSystemInDarkTheme()
 
     if (showThemeSetting) {
-        AlertDialog(
-            modifier = Modifier,
-            title = {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = "Configurar tema",
-                        modifier = Modifier.align(Alignment.Center),
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            },
+        MyAlert(
+            title = "Configurar tema",
+            onDismiss = { homeViewModel.changeshowThemeSetting(false) },
+            showAlert = showThemeSetting,
             text = {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
@@ -450,11 +442,8 @@ fun ThemeSettings(
                         }
                     }
                 }
-            },
-            onDismissRequest = { homeViewModel.changeshowThemeSetting(false) },
-            confirmButton = {},
-            shape = MaterialTheme.shapes.medium,
-            tonalElevation = AlertDialogDefaults.TonalElevation
+            }
         )
+
     }
 }

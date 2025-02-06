@@ -206,7 +206,7 @@ fun LoginScreen(
                     SocialMedia(
                         modifier = Modifier,
                         homeViewModel = homeViewModel,
-                        size = 48.dp
+                        size = 40.dp
                     )
                 }
             }

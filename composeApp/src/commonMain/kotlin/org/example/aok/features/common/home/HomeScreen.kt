@@ -32,7 +32,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,8 +39,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 import org.example.aok.core.ROUTES
 import org.example.aok.core.capitalizeWords
 import org.example.aok.data.database.AokRepository
@@ -54,7 +51,6 @@ import org.example.aok.ui.components.alerts.MyErrorAlert
 import org.example.aok.ui.components.alerts.MySuccessAlert
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 import org.example.aok.ui.components.shimmer.ShimmerFormLoadingAnimation
-
 
 @Composable
 fun HomeScreen(
@@ -104,7 +100,6 @@ fun Screen(
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
-
         ) {
             homeData?.grupoModulos?.let { grupoModulos ->
                 grupoModulos.forEach { item ->
@@ -115,6 +110,19 @@ fun Screen(
                 MyCircularProgressIndicator()
             }
         }
+
+//        LazyColumn(
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//            items(homeData!!.grupoModulos) { grupoModulo ->
+//                GrupoItem(
+//                    grupo = grupoModulo,
+//                    navController = navController,
+//                    homeViewModel = homeViewModel
+//                )
+//                Spacer(modifier = Modifier.height(16.dp))
+//            }
+//        }
     }
 
     if (response != null) {

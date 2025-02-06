@@ -11,12 +11,12 @@ import org.example.aok.features.common.login.LoginViewModel
 
 fun MainViewController() = ComposeUIViewController {
     val pdfOpener = PDFOpenerIOS()
-    val homeViewModel = HomeViewModel(pdfOpener)
     val biometricAuth = BiometryAuthenticator()
     val loginViewModel = LoginViewModel(biometricAuth)
     val aokRepository = remember {
         AokRepository(getAokDatabase())
     }
+    val homeViewModel = HomeViewModel(pdfOpener, aokRepository)
 
     App(
         homeViewModel = homeViewModel,

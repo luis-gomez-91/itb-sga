@@ -8,9 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import org.example.aok.core.SetStatusBarColors
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.ui.theme.darkColorScheme
@@ -24,25 +21,18 @@ fun AppTheme(
 ) {
 
     val selectedTheme by homeViewModel.selectedTheme.collectAsState(null)
-    homeViewModel.reloadTheme()
-    var isDark by remember { mutableStateOf(darkTheme) }
 
-    LaunchedEffect(selectedTheme) {
-        selectedTheme?.let {
-            if (it.system) {
-                isDark = darkTheme
-            } else {
-                isDark = it.dark
-            }
-        }
+    LaunchedEffect(Unit) {
+        homeViewModel.reloadTheme()
     }
+
+    val isDark = selectedTheme?.let {
+        if (it.system) isSystemInDarkTheme() else it.dark
+    } ?: darkTheme
 
     val colorScheme = if (isDark) darkColorScheme() else lightColorScheme()
 
-    SetStatusBarColors(
-//        statusBarColor = colorScheme.primary,
-        isDarkTheme = isDark
-    )
+    SetStatusBarColors(isDarkTheme = isDark)
 
     MaterialTheme(
         colorScheme = colorScheme,
