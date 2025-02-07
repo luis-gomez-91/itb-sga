@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Person2
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -135,10 +136,8 @@ fun AluCronogramaItem(
     MyCard(
         modifier = Modifier.padding(bottom = 4.dp),
         onClick = { },
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-            contentColor = MaterialTheme.colorScheme.primary
-        ),
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        contentColor = MaterialTheme.colorScheme.primary,
         borderColor = MaterialTheme.colorScheme.surfaceContainer,
     ) {
         Column(
@@ -193,12 +192,12 @@ fun AluCronogramaItem(
             ) {
                 Column {
                     Spacer(modifier = Modifier.height(8.dp))
-                    Divider()
+                    HorizontalDivider()
                     Spacer(modifier = Modifier.height(8.dp))
                     Profesores(data.profesores)
 
                     Spacer(modifier = Modifier.height(8.dp))
-                    Divider()
+                    HorizontalDivider()
                     Spacer(modifier = Modifier.height(8.dp))
                     Horarios(data.horarios)
                 }
