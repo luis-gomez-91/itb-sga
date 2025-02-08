@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.example.aok.core.ContextProvider
 import org.example.aok.core.URLOpener
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
@@ -25,7 +26,11 @@ import org.example.aok.data.network.Response
 import org.example.aok.data.network.form.RequestPasswordChangeForm
 import org.example.aok.features.common.login.LoginViewModel
 
-class HomeViewModel(private val pdfOpener: URLOpener, private val aokRepository: AokRepository) : ViewModel() {
+class HomeViewModel(
+    private val pdfOpener: URLOpener,
+    private val aokRepository: AokRepository,
+    val contextProvider: ContextProvider
+) : ViewModel() {
     val client = createHttpClient()
     val service = HomeService(client)
 

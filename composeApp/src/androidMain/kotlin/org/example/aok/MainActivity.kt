@@ -1,5 +1,6 @@
 package org.example.aok
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -14,6 +15,7 @@ import dev.icerock.moko.biometry.compose.BiometryAuthenticatorFactory
 import dev.icerock.moko.biometry.compose.rememberBiometryAuthenticatorFactory
 import dev.icerock.moko.mvvm.getViewModel
 import io.github.vinceglb.filekit.core.FileKit
+import org.example.aok.core.AndroidContextProvider
 import org.example.aok.core.URLOpenerAndroid
 import org.example.aok.data.database.AokRepository
 import org.example.aok.data.database.getAokDatabase
@@ -25,7 +27,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var loginViewModel: LoginViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         Paymentez.setEnvironment(
             true,
 //            "ITB-EC-CLIENT",
@@ -42,12 +43,13 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         val repository = AokRepository(getAokDatabase(context = applicationContext))
+        val contextProvider = AndroidContextProvider(applicationContext)
 
         setContent {
             Surface(color = Color.Transparent) {
 
                 val urlOpener = URLOpenerAndroid(this)
-                val homeViewModel = HomeViewModel(urlOpener, repository)
+                val homeViewModel = HomeViewModel(urlOpener, repository, contextProvider)
                 val biometryFactory: BiometryAuthenticatorFactory = rememberBiometryAuthenticatorFactory()
 
 

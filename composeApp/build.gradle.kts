@@ -42,6 +42,9 @@ kotlin {
             implementation("dev.icerock.moko:biometry-compose:0.4.0")
             implementation(libs.androidx.room.paging)
             implementation(libs.paymentez.android)
+            implementation("com.squareup.retrofit2:retrofit:2.9.0")
+            implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+            implementation("com.squareup.okhttp3:okhttp:4.x.x")
         }
         commonMain.dependencies {
             implementation(compose.runtime)

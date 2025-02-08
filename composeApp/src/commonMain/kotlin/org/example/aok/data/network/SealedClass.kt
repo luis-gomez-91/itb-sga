@@ -113,3 +113,10 @@ sealed class AluConsultaGeneralResult {
     data class Success(val data: AluConsultaGeneral) : AluConsultaGeneralResult()
     data class Failure(val error: Error) : AluConsultaGeneralResult()
 }
+
+sealed class PaymentResult {
+    object Idle : PaymentResult() // Estado inicial
+    object Processing : PaymentResult() // El pago se está procesando
+    data class Success(val transactionId: String) : PaymentResult() // Pago exitoso
+    data class Failure(val message: String) : PaymentResult() // Fallo en el pago
+}

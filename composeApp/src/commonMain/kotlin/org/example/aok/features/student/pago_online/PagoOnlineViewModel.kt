@@ -4,17 +4,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.example.aok.core.PaymentezSDK
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
 import org.example.aok.core.requestPostDispatcher
 import org.example.aok.data.network.DatosFacturacion
-import org.example.aok.data.network.PagoOnline
-import org.example.aok.data.network.form.PagoOnlineForm
-import org.example.aok.data.network.PagoOnlineResult
 import org.example.aok.data.network.Error
+import org.example.aok.data.network.PagoOnline
+import org.example.aok.data.network.PagoOnlineResult
+import org.example.aok.data.network.PaymentResult
 import org.example.aok.data.network.Response
 import org.example.aok.data.network.RubroX
+import org.example.aok.data.network.form.PagoOnlineForm
 import org.example.aok.features.common.home.HomeViewModel
 
 class PagoOnlineViewModel : ViewModel() {
@@ -123,7 +126,75 @@ class PagoOnlineViewModel : ViewModel() {
         _terminosCondiciones.value = value
     }
 
+//    Pago online
+    private val _paymentState = MutableStateFlow<PaymentResult>(PaymentResult.Idle)
+    val paymentState: StateFlow<PaymentResult> = _paymentState.asStateFlow()
+
+//    fun processPayment(uid: String, email: String, amount: Double) {
+//        viewModelScope.launch {
+//            logInfo("prueba", "Procesando pago... POSII")
+////            PaymentezSDK.processPayment(uid, email, amount)
+//        }
+//    }
+
+    fun updatePaymentState(result: PaymentResult) {
+        _paymentState.value = result
+        logInfo("prueba", "ENTRO A updatePaymentState")
+        when (result) {
+            is PaymentResult.Success -> {
+                logInfo("prueba", "Pago exitoso. ID Transacción: ${result.transactionId}")
+                _selectedRubros.value = emptyList()
+                _switchStates.value = emptyMap()
+                _total.value = 0.00
+            }
+            is PaymentResult.Failure -> {
+                logInfo("prueba", "Error en el pago: ${result.message}")
+            }
+            PaymentResult.Processing -> {
+                logInfo("prueba", "Procesando pago...")
+            }
+            PaymentResult.Idle -> { /* No hacer nada */ }
+        }
+    }
+
+    fun iniciarPago(homeViewModel: HomeViewModel) {
+        viewModelScope.launch {
+            val totalPagar = _total.value
+            if (totalPagar <= 0) {
+                logInfo("prueba", "No hay rubros seleccionados para pagar")
+            } else {
+                _paymentState.value = PaymentResult.Processing
+                _data.value?.datosFacturacion?.let {
+                    _response.value?.let { it1 ->
+                        PaymentezSDK.processPayment(homeViewModel.contextProvider.getContext(), it1.message, it.correo, totalPagar)
+                    }
+                }
+            }
+        }
+    }
+
+    private val _cardsState = MutableStateFlow<Result<String>>(Result.Loading)
+    val cardsState: StateFlow<Result<String>> = _cardsState
+
+    fun getCards(uid: String) {
+        // Usando un coroutine scope para realizar la operación en un hilo de fondo
+        viewModelScope.launch {
+            try {
+                // Realizar la solicitud
+                val response = PaymentezSDK.doGetRequest("https://ccapi.paymentez.com/v2/card/list?uid=$uid")
+                val jsonResponse = response["RESPONSE_JSON"] ?: "{}"
+                // Emitir el resultado exitoso con el JSON de la respuesta
+                _cardsState.value = Result.Success(jsonResponse)
+            } catch (e: Exception) {
+                // En caso de error, emitir el error
+                _cardsState.value = Result.Error(e)
+            }
+        }
+    }
 
 }
 
-
+//static var PAYMENTEZ_DEV_URL = "https://ccapi-stg.paymentez.com"
+//static var PAYMENTEZ_PROD_URL = "https://ccapi.paymentez.com"
+//static const val RESPONSE_HTTP_CODE = "RESPONSE_HTTP_CODE"
+//static const val RESPONSE_JSON = "RESPONSE_JSON"

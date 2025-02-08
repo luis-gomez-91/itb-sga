@@ -314,6 +314,7 @@ fun CardRubros(
             },
             onConfirm = {
                 pagoOnlineViewModel.updateShowTerminosCondiciones(false)
+                pagoOnlineViewModel.iniciarPago(homeViewModel)
             },
             showAlert = true,
             extra = {
@@ -340,6 +341,16 @@ fun CardRubros(
         )
     }
 
+    if (terminosCondiciones) {
+        TerminosCondicionesDetail(pagoOnlineViewModel)
+    }
+
+}
+
+@Composable
+fun TerminosCondicionesDetail(
+    pagoOnlineViewModel: PagoOnlineViewModel
+) {
     val terms = listOf(
         "I. CONDICIONES GENERALES APLICABLES AL PAGO EN LÍNEA.",
         "1. El I.S.T Bolivariano de Tecnología con domicilio en Pedro Carbo y Víctor M. Rendón, Guayaquil-Ecuador (en adelante también como 'ITB'), ofrece servicios académicos:",
@@ -356,41 +367,32 @@ fun CardRubros(
         "El ITB no está obligado a realizar devoluciones una vez efectuado el pago."
     )
 
-    if (terminosCondiciones) {
-        MyInfoAlert(
-            titulo = "Términos y condiciones",
-            mensaje = "Términos y condiciones de compra y políticas de devolución del Instituto Tecnológico Bolivariano.",
-            onDismiss = { pagoOnlineViewModel.updateTerminosCondiciones(false) },
-            showAlert = true,
-            extra = {
-                Box (
+    MyInfoAlert(
+        titulo = "Términos y condiciones",
+        mensaje = "Términos y condiciones de compra y políticas de devolución del Instituto Tecnológico Bolivariano.",
+        onDismiss = { pagoOnlineViewModel.updateTerminosCondiciones(false) },
+        showAlert = true,
+        extra = {
+            Box (
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                LazyColumn(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
                 ) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                    ) {
-                        items(terms) { term ->
-                            Text(
-                                text = term,
-                                style = if (term.startsWith("I.") || term.startsWith("II.")) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyMedium,
-                                color = if (term.startsWith("I.") || term.startsWith("II.")) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outline
-                            )
-                            Spacer(Modifier.height(8.dp))
-                        }
+                    items(terms) { term ->
+                        Text(
+                            text = term,
+                            style = if (term.startsWith("I.") || term.startsWith("II.")) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyMedium,
+                            color = if (term.startsWith("I.") || term.startsWith("II.")) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outline
+                        )
+                        Spacer(Modifier.height(8.dp))
                     }
                 }
             }
-        )
-    }
-}
-
-@Composable
-fun TextBodyFormat(
-    text: String
-) {
-
+        }
+    )
 }
 
 @Composable

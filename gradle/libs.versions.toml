@@ -1,7 +1,7 @@
 [versions]
 agp = "8.3.2"
 android-compileSdk = "35"
-android-minSdk = "25"
+android-minSdk = "26"
 android-targetSdk = "35"
 androidx-activityCompose = "1.10.0"
 androidx-appcompat = "1.7.0"
@@ -45,6 +45,7 @@ ksp = "2.1.0-1.0.29"
 androidx-room = "2.7.0-alpha13"
 sqlite = "2.5.0-alpha13"
 compiler = "3.2.0-alpha11"
+compilerVersion = "3.2.0-alpha11"
 
 [libraries]
 calf-file-picker = { module = "com.mohamedrejeb.calf:calf-file-picker", version.ref = "calfFilePicker" }
@@ -100,6 +101,7 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "androidx-room" }
 androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "androidx-room" }
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
+androidx-compiler = { group = "androidx.databinding", name = "compiler", version.ref = "compilerVersion" }
 
 
 [plugins]
