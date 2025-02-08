@@ -3,8 +3,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ConsultaGeneralCronograma(
-    val docente: String?,
-    val fechaFin: String?,
-    val fechaInicio: String?,
-    val materia: String
+    val modulo: ConsultaGeneralModulo,
+    val data: List<DataConsultaGeneralMateria>
 )

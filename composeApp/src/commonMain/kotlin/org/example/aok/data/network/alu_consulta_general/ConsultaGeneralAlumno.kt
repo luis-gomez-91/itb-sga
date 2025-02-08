@@ -7,6 +7,6 @@ data class ConsultaGeneralAlumno(
     val celular: String?,
     val dicapacitado: Boolean,
     val email: String,
-    val modulos: List<ConsultaGeneralModulo>,
+    val modulo: ConsultaGeneralModulo,
     val nombre: String
 )

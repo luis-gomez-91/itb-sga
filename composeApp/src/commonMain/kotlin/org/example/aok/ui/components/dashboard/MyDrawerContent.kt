@@ -93,17 +93,18 @@ fun MyDrawerContent(
         themeIcon = if (selectedTheme?.dark == true) Icons.Filled.DarkMode else Icons.Filled.LightMode
     }
 
-    val items = listOf(
-        DrawerItem("Perfil", Icons.Filled.Person) { navHostController.navigate("account") },
-        DrawerItem("Cambiar contraseña", Icons.Filled.LockPerson) {
-            homeViewModel.changeShowPasswordForm(
-                true
-            )
-        },
-        DrawerItem("Consulta general", Icons.Filled.Preview) { navHostController.navigate("consultaalumno") },
-        DrawerItem("Cambiar tema", themeIcon) { homeViewModel.changeshowThemeSetting(true) },
-        DrawerItem("Cerrar sesión", Icons.Filled.Logout) { loginViewModel.onLogout(navHostController) }
-    )
+    val items = buildList {
+        add(DrawerItem("Perfil", Icons.Filled.Person) { navHostController.navigate("account") })
+        add(DrawerItem("Cambiar contraseña", Icons.Filled.LockPerson) {
+            homeViewModel.changeShowPasswordForm(true)
+        })
+        if (homeData?.persona?.idInscripcion != null) {
+            add(DrawerItem("Consulta general", Icons.Filled.Preview) { navHostController.navigate("consultaalumno") })
+        }
+        add(DrawerItem("Cambiar tema", themeIcon) { homeViewModel.changeshowThemeSetting(true) })
+        add(DrawerItem("Cerrar sesión", Icons.Filled.Logout) { loginViewModel.onLogout(navHostController) })
+    }
+
 
     ModalDrawerSheet(
         modifier = Modifier

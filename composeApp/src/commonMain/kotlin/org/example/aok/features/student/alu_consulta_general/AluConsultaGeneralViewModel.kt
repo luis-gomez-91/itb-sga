@@ -21,7 +21,6 @@ class AluConsultaGeneralViewModel: ViewModel() {
 
 
     fun onloadAluConsultaGeneral(id: Int, homeViewModel: HomeViewModel) {
-        logInfo("prueba", "POOOSI")
         homeViewModel.changeLoading(true)
         viewModelScope.launch {
             try {

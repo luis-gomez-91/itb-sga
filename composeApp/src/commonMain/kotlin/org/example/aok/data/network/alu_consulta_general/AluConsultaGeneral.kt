@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AluConsultaGeneral(
     val alumno: ConsultaGeneralAlumno,
-    val cronograma: List<ConsultaGeneralCronograma>?,
-    val finanzas: List<ConsultaGeneralFinanza>?,
+    val cronogramas: ConsultaGeneralCronograma?,
+    val finanzas: ConsultaGeneralFinanza,
     val matricula: ConsultaGeneralMatricula?
 )

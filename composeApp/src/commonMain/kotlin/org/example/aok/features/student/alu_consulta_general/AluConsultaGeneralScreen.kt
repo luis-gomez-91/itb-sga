@@ -1,28 +1,37 @@
 package org.example.aok.features.student.alu_consulta_general
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import org.example.aok.core.logInfo
 import org.example.aok.data.network.alu_consulta_general.ConsultaGeneralAlumno
 import org.example.aok.data.network.alu_consulta_general.ConsultaGeneralCronograma
 import org.example.aok.data.network.alu_consulta_general.ConsultaGeneralFinanza
 import org.example.aok.data.network.alu_consulta_general.ConsultaGeneralMatricula
+import org.example.aok.data.network.alu_consulta_general.ConsultaGeneralModulo
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.ui.components.MyCard
@@ -30,6 +39,7 @@ import org.example.aok.ui.components.MyCircularProgressIndicator
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 import org.example.aok.ui.components.text.MyMediumParagraphFormat
 import org.example.aok.ui.components.text.MyMediumTitle
+import org.example.aok.ui.components.text.MySmallParagraph
 import org.example.aok.ui.components.text.MySmallParagraphFormat
 import org.example.aok.ui.components.text.MySmallTitle
 
@@ -64,7 +74,6 @@ fun Screen(
     val data by aluConsultaGeneralViewModel.data.collectAsState(null)
     val error by homeViewModel.error.collectAsState(null)
     val isLoading by homeViewModel.isLoading.collectAsState(false)
-    logInfo("prueba", "data: ${homeViewModel.homeData.value}")
 
     LaunchedEffect(Unit) {
         homeViewModel.clearError()
@@ -81,17 +90,18 @@ fun Screen(
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(horizontal =  16.dp)
         ) {
-            item { data?.let { dataAlumno(it.alumno) } }
-            item { data?.let { it.finanzas?.let { finanzas -> dataFinanzas(finanzas) } } }
-            item { data?.let { it.matricula?.let { matricula -> dataMatricula(matricula) } } }
-            item { data?.let { it.cronograma?.let { cronograma -> dataCronograma(cronograma) } } }
+            item { data?.let { dataAlumno(it.alumno, navController) } }
+            item { data?.let { dataFinanzas(it.finanzas, navController) } }
+            item { data?.let { it.matricula?.let { matricula -> dataMatricula(matricula, navController) } } }
+            item { data?.let { it.cronogramas?.let { cronograma -> dataCronograma(cronograma, navController) } } }
         }
     }
 }
 
 @Composable
 fun dataCronograma(
-    data: List<ConsultaGeneralCronograma>
+    data: ConsultaGeneralCronograma,
+    navHostController: NavHostController
 ) {
     MyCard {
         Column(
@@ -102,7 +112,7 @@ fun dataCronograma(
             LazyRow(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                items(data) { materia ->
+                items(data.data) { materia ->
                     MyCard (
                         containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
                     ){
@@ -120,6 +130,7 @@ fun dataCronograma(
                     Spacer(Modifier.width(8.dp))
                 }
             }
+            openFeature(data.modulo, navHostController)
         }
     }
     Spacer(Modifier.height(8.dp))
@@ -127,7 +138,8 @@ fun dataCronograma(
 
 @Composable
 fun dataFinanzas(
-    data: List<ConsultaGeneralFinanza>
+    data: ConsultaGeneralFinanza,
+    navHostController: NavHostController
 ) {
     MyCard {
         Column(
@@ -141,28 +153,35 @@ fun dataFinanzas(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                items(data) { rubro ->
-                    MyCard (
-                        modifier = Modifier.fillMaxWidth(),
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
-                    ){
-                        Column(
-                            modifier = Modifier.fillMaxWidth().padding(8.dp)
-                        ) {
-                            MySmallTitle(rubro.nombre)
-                            Spacer(Modifier.height(8.dp))
-                            MySmallParagraphFormat("Fecha Vencimiento: ", "${rubro.fechaVence}")
-                            Spacer(Modifier.height(4.dp))
-                            MySmallParagraphFormat("Valor: ", "$${rubro.valor}")
-                            Spacer(Modifier.height(4.dp))
-                            MySmallParagraphFormat("Abono: ", "$${rubro.abono}")
-                            Spacer(Modifier.height(4.dp))
-                            MySmallParagraphFormat("Saldo: ", "$${rubro.saldo}")
-                        }
+                if (data.data.isEmpty()) {
+                    item {
+                        MySmallParagraph("No tiene deudas pendientes")
                     }
-                    Spacer(Modifier.width(8.dp))
+                } else {
+                    items(data.data) { rubro ->
+                        MyCard (
+                            modifier = Modifier.fillMaxWidth(),
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
+                        ){
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(8.dp)
+                            ) {
+                                MySmallTitle(rubro.nombre)
+                                Spacer(Modifier.height(8.dp))
+                                MySmallParagraphFormat("Fecha Vencimiento: ", "${rubro.fechaVence}")
+                                Spacer(Modifier.height(4.dp))
+                                MySmallParagraphFormat("Valor: ", "$${rubro.valor}")
+                                Spacer(Modifier.height(4.dp))
+                                MySmallParagraphFormat("Abono: ", "$${rubro.abono}")
+                                Spacer(Modifier.height(4.dp))
+                                MySmallParagraphFormat("Saldo: ", "$${rubro.saldo}")
+                            }
+                        }
+                        Spacer(Modifier.width(8.dp))
+                    }
                 }
             }
+            openFeature(data.modulo, navHostController)
         }
     }
     Spacer(Modifier.height(8.dp))
@@ -170,14 +189,14 @@ fun dataFinanzas(
 
 @Composable
 fun dataAlumno(
-    data: ConsultaGeneralAlumno
+    data: ConsultaGeneralAlumno,
+    navHostController: NavHostController
 ) {
     MyCard {
         Column(
             modifier = Modifier.padding(8.dp)
         ) {
             MyMediumTitle("Datos del alumno")
-
             Spacer(Modifier.height(8.dp))
             MyMediumParagraphFormat("Nombre: ", data.nombre)
 
@@ -192,6 +211,8 @@ fun dataAlumno(
 
             Spacer(Modifier.height(4.dp))
             MyMediumParagraphFormat("Carrera: ", data.carrera)
+
+            openFeature(data.modulo, navHostController)
         }
     }
     Spacer(Modifier.height(8.dp))
@@ -199,14 +220,14 @@ fun dataAlumno(
 
 @Composable
 fun dataMatricula(
-    data: ConsultaGeneralMatricula
+    data: ConsultaGeneralMatricula,
+    navHostController: NavHostController
 ) {
     MyCard {
         Column(
             modifier = Modifier.padding(8.dp)
         ) {
             MyMediumTitle("Matrícula")
-
             Spacer(Modifier.height(8.dp))
             MyMediumParagraphFormat("Grupo: ", data.grupo)
 
@@ -215,7 +236,43 @@ fun dataMatricula(
 
             Spacer(Modifier.height(4.dp))
             MyMediumParagraphFormat("Jornada: ", "${data.sesion} (${data.horaInicio} a ${data.horaFin})")
+            openFeature(data.modulo, navHostController)
         }
     }
     Spacer(Modifier.height(8.dp))
+}
+
+@Composable
+fun openFeature(
+    modulo: ConsultaGeneralModulo,
+    navHostController: NavHostController
+) {
+    Spacer(Modifier.height(4.dp))
+    Row (
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.End
+    ){
+        TextButton(
+            onClick = {
+                navHostController.navigate(modulo.url)
+            }
+        ) {
+            Row (
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(
+                    text = modulo.descripcion,
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelMedium
+                )
+                Spacer(Modifier.width(4.dp))
+                Icon(
+                    imageVector = Icons.Filled.OpenInNew,
+                    contentDescription = modulo.descripcion,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+    }
 }

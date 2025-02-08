@@ -3,17 +3,21 @@ package org.example.aok.features.student.pago_online
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
@@ -21,13 +25,12 @@ import androidx.compose.material.icons.filled.MoneyOff
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -38,8 +41,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -51,11 +57,13 @@ import org.example.aok.features.common.login.LoginViewModel
 import org.example.aok.ui.components.MyAssistChip
 import org.example.aok.ui.components.MyCard
 import org.example.aok.ui.components.MyCircularProgressIndicator
-import org.example.aok.ui.components.alerts.MyErrorAlert
 import org.example.aok.ui.components.MyFilledTonalButton
 import org.example.aok.ui.components.MyOutlinedTextField
+import org.example.aok.ui.components.MySwitch
+import org.example.aok.ui.components.alerts.MyConfirmAlert
 import org.example.aok.ui.components.alerts.MyInfoAlert
 import org.example.aok.ui.components.dashboard.DashBoardScreen
+import org.example.aok.ui.components.text.MyMediumTitle
 
 @Composable
 fun PagoOnlineScreen(
@@ -135,8 +143,8 @@ fun Screen(
                     .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp)
             ) { page ->
                 when(page) {
-                    0 -> data?.let { CardDatosFacturacion(it.datosFacturacion, pagoOnlineViewModel) }
-                    1 -> data?.let { CardRubros(it.rubros, pagoOnlineViewModel, homeViewModel) }
+                    0 -> data?.let { CardRubros(it.rubros, pagoOnlineViewModel, homeViewModel) }
+                    1 -> data?.let { CardDatosFacturacion(it.datosFacturacion, pagoOnlineViewModel) }
                 }
             }
         }
@@ -182,7 +190,7 @@ fun TabRowPagoOnline(
             },
             text = {
                 Text(
-                    text = "Datos facturación",
+                    text = "Rubros",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (selectedTabIndex == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
@@ -191,8 +199,8 @@ fun TabRowPagoOnline(
             },
             icon = {
                 Icon(
-                    imageVector = Icons.Filled.Person,
-                    contentDescription = "Datos facturación",
+                    imageVector = Icons.Filled.MoneyOff,
+                    contentDescription = "Rubros",
                     tint = if (selectedTabIndex == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
                 )
             }
@@ -205,7 +213,7 @@ fun TabRowPagoOnline(
             },
             text = {
                 Text(
-                    text = "Rubros",
+                    text = "Datos facturación",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (selectedTabIndex == 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
@@ -214,8 +222,8 @@ fun TabRowPagoOnline(
             },
             icon = {
                 Icon(
-                    imageVector = Icons.Filled.MoneyOff,
-                    contentDescription = "Rubros",
+                    imageVector = Icons.Filled.Person,
+                    contentDescription = "Datos facturación",
                     tint = if (selectedTabIndex == 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
                 )
             }
@@ -229,12 +237,7 @@ fun CardRubros(
     pagoOnlineViewModel: PagoOnlineViewModel,
     homeViewModel: HomeViewModel
 ) {
-    LaunchedEffect(Unit) {
-        pagoOnlineViewModel.initializeSwitchStates(rubros.size)
-    }
-//    val switchStates = remember { mutableStateListOf(*Array(rubros.size) { index -> index == 0 }) }
     val switchStates by pagoOnlineViewModel.switchStates.collectAsState()
-    val checkedStates = remember { mutableStateListOf(*Array(rubros.size) { false }) }
     val total by pagoOnlineViewModel.total.collectAsState(0.0)
 
     Column(
@@ -244,59 +247,14 @@ fun CardRubros(
         LazyColumn(
             modifier = Modifier.fillMaxWidth().weight(1f)
         ) {
-            items(rubros.size) { index ->
+            items(rubros) { rubro ->
+                val isChecked = switchStates[rubro.id] ?: false
                 RubroItem(
-                    rubro = rubros[index],
-                    isChecked = checkedStates[index],
-                    isEnabled = switchStates.getOrElse(index) { false },
-                    onCheckedChange = { isChecked ->
-                        val updatedSwitchStates = switchStates.toMutableList()
-                        val updatedCheckedStates = checkedStates.toMutableList()
-
-                        // Actualizar el estado del switch actual
-                        updatedCheckedStates[index] = isChecked
-
-                        if (isChecked) {
-                            try {
-                                pagoOnlineViewModel.updateSwitchState(index + 1, true)
-                            } catch (e: Exception) {
-                                logInfo("pago_online", e.toString())
-                            }
-                            try {
-                                pagoOnlineViewModel.updateSwitchState(index - 1, false)
-                            } catch (e: Exception) {
-                                logInfo("pago_online", e.toString())
-                            }
-                            pagoOnlineViewModel.addRubro(rubros[index].valor)
-                        } else {
-                            try {
-                                pagoOnlineViewModel.updateSwitchState(index + 1, false)
-                            } catch (e: Exception) {
-                                logInfo("pago_online", e.toString())
-                            }
-                            try {
-                                pagoOnlineViewModel.updateSwitchState(index - 1, true)
-                            } catch (e: Exception) {
-                                logInfo("pago_online", e.toString())
-                            }
-                            pagoOnlineViewModel.removeRubro(index)
-
-                            // Deshabilitar y deseleccionar todos los switches siguientes
-//                            for (i in index  until rubros.size) {
-//                                if (i != index) {
-//                                    updatedSwitchStates[i] = false
-//                                }
-//                                updatedCheckedStates[i] = false
-//                                pagoOnlineViewModel.removeRubro(i)
-//                            }
-                        }
-
-                        logInfo("pago_online", updatedSwitchStates.toString())
-                        logInfo("pago_online", updatedCheckedStates.toString())
-                        logInfo("pago_online", "TOTAL: ${total}")
-
-                        checkedStates.clear()
-                        checkedStates.addAll(updatedCheckedStates)
+                    rubro = rubro,
+                    isChecked = isChecked,
+                    isEnabled = true,
+                    onCheckedChange = { checked ->
+                        pagoOnlineViewModel.updateSwitchState(rubro, checked)
                     }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -311,22 +269,129 @@ fun CardRubros(
                 text = "PAGAR: ${total}",
                 enabled = true,
                 onClickAction = {
-                    homeViewModel.homeData.value!!.persona.idInscripcion?.let {
-                        pagoOnlineViewModel.sendPagoOnline(
-                            idInscripcion = it,
-                            valor = total,
-                            datosFacturacion = pagoOnlineViewModel.data.value!!.datosFacturacion,
-                            homeViewModel = homeViewModel
-                        )
-                    }
+                    pagoOnlineViewModel.updateShowDiferirPago(true)
                 }
             )
         }
+    }
 
+    val showDiferirPago by pagoOnlineViewModel.showDiferirPago.collectAsState(false)
+    val showTerminosCondiciones by pagoOnlineViewModel.showTerminosCondiciones.collectAsState(false)
+    val terminosCondiciones by pagoOnlineViewModel.terminosCondiciones.collectAsState(false)
+
+    if (showDiferirPago) {
+        MyConfirmAlert(
+            titulo = "¿Desea diferir pago?",
+            mensaje = "",
+            confirmText = "No",
+            cancelText = "Si",
+            onCancel = {
+                pagoOnlineViewModel.updateShowDiferirPago(false)
+            },
+            onConfirm = {
+                homeViewModel.homeData.value!!.persona.idInscripcion?.let {
+                    pagoOnlineViewModel.sendTerminos(
+                        idInscripcion = it,
+                        valor = total,
+                        datosFacturacion = pagoOnlineViewModel.data.value!!.datosFacturacion,
+                        homeViewModel = homeViewModel
+                    )
+                }
+                pagoOnlineViewModel.updateShowDiferirPago(false)
+                pagoOnlineViewModel.updateShowTerminosCondiciones(true)
+            },
+            showAlert = true
+        )
+    }
+
+    if (showTerminosCondiciones) {
+        MyConfirmAlert(
+            titulo = "Términos y condiciones",
+            mensaje = "",
+            cancelText = "Salir",
+            onCancel = {
+                pagoOnlineViewModel.updateShowTerminosCondiciones(false)
+            },
+            onConfirm = {
+                pagoOnlineViewModel.updateShowTerminosCondiciones(false)
+            },
+            showAlert = true,
+            extra = {
+                val annotatedString = buildAnnotatedString {
+                    append("Acepto ")
+                    pushStringAnnotation(tag = "terms", annotation = "terms_and_conditions")
+                    withStyle(style = MaterialTheme.typography.bodyMedium.toSpanStyle().copy(color = MaterialTheme.colorScheme.primary)) {
+                        append("términos y condiciones")
+                    }
+                    pop()
+                    append(" de la compra.")
+                }
+
+                ClickableText(
+                    text = annotatedString,
+                    onClick = { offset ->
+                        annotatedString.getStringAnnotations(offset, offset)
+                            .firstOrNull { it.tag == "terms" }?.let {
+                                pagoOnlineViewModel.updateTerminosCondiciones(true)
+                            }
+                    }
+                )
+            }
+        )
+    }
+
+    val terms = listOf(
+        "I. CONDICIONES GENERALES APLICABLES AL PAGO EN LÍNEA.",
+        "1. El I.S.T Bolivariano de Tecnología con domicilio en Pedro Carbo y Víctor M. Rendón, Guayaquil-Ecuador (en adelante también como 'ITB'), ofrece servicios académicos:",
+        "(i) En las instalaciones del ITB, ubicadas en: Pedro Carbo y Víctor M. Rendón, Guayaquil-Ecuador, horario de atención: lunes a viernes de 8:30 a 17:00 hrs.",
+        "(ii) A través de Internet, en sga.itb.edu.ec",
+        "2. Al pagar directamente en ITB, las transacciones y sus efectos jurídicos se regirán por estos términos y condiciones y la legislación vigente en Ecuador.",
+        "3. Al pagar por Internet en sga.itb.edu.ec, se aplicarán los términos y condiciones publicados en los Sitios Electrónicos.",
+        "4. ITB puede solicitar información personal a sus clientes, quienes deben garantizar la autenticidad y actualización de los datos proporcionados.",
+        "II. TÉRMINOS GENERALES APLICABLES A LOS PAGOS EN LÍNEA Y POLÍTICAS DE DEVOLUCIÓN.",
+        "• Primero: El CLIENTE es responsable por la veracidad de la información ingresada en sga.itb.edu.ec.",
+        "• Segundo: La organización y condiciones de los servicios académicos son responsabilidad del ITB.",
+        "• Tercero: Los pagos en línea están sujetos a la verificación de la entidad bancaria en un plazo de 24 horas.",
+        "• Cuarto: No hay reembolsos por errores de fechas, valores incorrectos u otras causas ajenas al ITB.",
+        "El ITB no está obligado a realizar devoluciones una vez efectuado el pago."
+    )
+
+    if (terminosCondiciones) {
+        MyInfoAlert(
+            titulo = "Términos y condiciones",
+            mensaje = "Términos y condiciones de compra y políticas de devolución del Instituto Tecnológico Bolivariano.",
+            onDismiss = { pagoOnlineViewModel.updateTerminosCondiciones(false) },
+            showAlert = true,
+            extra = {
+                Box (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        items(terms) { term ->
+                            Text(
+                                text = term,
+                                style = if (term.startsWith("I.") || term.startsWith("II.")) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyMedium,
+                                color = if (term.startsWith("I.") || term.startsWith("II.")) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outline
+                            )
+                            Spacer(Modifier.height(8.dp))
+                        }
+                    }
+                }
+            }
+        )
     }
 }
 
+@Composable
+fun TextBodyFormat(
+    text: String
+) {
 
+}
 
 @Composable
 fun RubroItem(
@@ -372,19 +437,11 @@ fun RubroItem(
                 }
             }
 
-            Switch(
+            MySwitch(
                 checked = isChecked,
-                onCheckedChange = {
-                    onCheckedChange(it)
-                },
-                enabled = isEnabled,
                 modifier = Modifier.align(Alignment.CenterVertically),
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = MaterialTheme.colorScheme.primary,
-                    checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
-                    uncheckedThumbColor = MaterialTheme.colorScheme.outline,
-                    uncheckedTrackColor = MaterialTheme.colorScheme.outlineVariant,
-                )
+                onCheckedChange = { onCheckedChange(it) },
+                enabled = isEnabled
             )
         }
     }
@@ -398,49 +455,46 @@ fun CardDatosFacturacion(
 ) {
     val datos = remember { mutableStateOf(datosFacturacion) }
 
-    MyCard {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 8.dp)
-        ) {
-            MyOutlinedTextField(
-                value = datos.value.nombre,
-                onValueChange = { datos.value = datos.value.copy(nombre = it) },
-                placeholder = "Nombre",
-                label = "Nombre",
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            MyOutlinedTextField(
-                value = datos.value.cedula,
-                onValueChange = { datos.value = datos.value.copy(cedula = it) },
-                placeholder = "RUC",
-                label = "RUC",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            MyOutlinedTextField(
-                value = datos.value.correo,
-                onValueChange = { datos.value = datos.value.copy(correo = it) },
-                placeholder = "Correo electrónico",
-                label = "Correo electrónico",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            MyOutlinedTextField(
-                value = datos.value.telefono,
-                onValueChange = { datos.value = datos.value.copy(telefono = it) },
-                placeholder = "Teléfono celular",
-                label = "Teléfono celular",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                modifier = Modifier.fillMaxWidth()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 8.dp)
+    ) {
+        MyOutlinedTextField(
+            value = datos.value.nombre,
+            onValueChange = { datos.value = datos.value.copy(nombre = it) },
+            placeholder = "Nombre",
+            label = "Nombre",
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        MyOutlinedTextField(
+            value = datos.value.cedula,
+            onValueChange = { datos.value = datos.value.copy(cedula = it) },
+            placeholder = "RUC",
+            label = "RUC",
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        MyOutlinedTextField(
+            value = datos.value.correo,
+            onValueChange = { datos.value = datos.value.copy(correo = it) },
+            placeholder = "Correo electrónico",
+            label = "Correo electrónico",
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        MyOutlinedTextField(
+            value = datos.value.telefono,
+            onValueChange = { datos.value = datos.value.copy(telefono = it) },
+            placeholder = "Teléfono celular",
+            label = "Teléfono celular",
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            modifier = Modifier.fillMaxWidth()
 
-            )
-        }
+        )
     }
-
 }
 

@@ -3,13 +3,17 @@ package org.example.aok.ui.components.alerts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,7 +28,8 @@ fun MyInfoAlert(
     titulo: String,
     mensaje: String,
     onDismiss: () -> Unit,
-    showAlert: Boolean
+    showAlert: Boolean,
+    extra: @Composable (() -> Unit)? = null
 ) {
     AnimatedVisibility(
         visible = showAlert,
@@ -48,13 +53,18 @@ fun MyInfoAlert(
                 )
             },
             text = {
-                Text(
-                    text = mensaje,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurface
-
-                )
+                Column {
+                    Text(
+                        text = mensaje,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    HorizontalDivider()
+                    Spacer(Modifier.height(8.dp))
+                    extra?.invoke()
+                }
             },
             onDismissRequest = { onDismiss() },
             confirmButton = {
@@ -69,7 +79,6 @@ fun MyInfoAlert(
                     )
                 }
             },
-//            containerColor = MaterialTheme.colorScheme.errorContainer,
             shape = AlertDialogDefaults.shape,
             tonalElevation = AlertDialogDefaults.TonalElevation,
         )

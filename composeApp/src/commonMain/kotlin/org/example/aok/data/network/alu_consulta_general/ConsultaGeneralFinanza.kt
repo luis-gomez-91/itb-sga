@@ -3,9 +3,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ConsultaGeneralFinanza(
-    val abono: Int,
-    val fechaVence: String,
-    val nombre: String,
-    val saldo: Double,
-    val valor: Double
+    val modulo: ConsultaGeneralModulo,
+    val data: List<DataConsultaGeneralRubro>
 )

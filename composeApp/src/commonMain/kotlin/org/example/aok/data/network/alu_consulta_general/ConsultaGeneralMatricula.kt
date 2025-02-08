@@ -7,5 +7,6 @@ data class ConsultaGeneralMatricula(
     val horaFin: String,
     val horaInicio: String,
     val nivel: String,
-    val sesion: String
+    val sesion: String,
+    val modulo: ConsultaGeneralModulo
 )

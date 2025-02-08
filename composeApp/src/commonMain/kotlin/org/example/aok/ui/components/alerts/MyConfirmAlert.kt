@@ -34,7 +34,10 @@ fun MyConfirmAlert(
     mensaje: String,
     onCancel: () -> Unit,
     onConfirm: () -> Unit,
-    showAlert: Boolean
+    showAlert: Boolean,
+    confirmText: String = "Aceptar",
+    cancelText: String = "Cancelar",
+    extra: @Composable (() -> Unit)? = null
 ) {
     AnimatedVisibility(
         visible = showAlert,
@@ -72,6 +75,7 @@ fun MyConfirmAlert(
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center
                     )
+                    extra?.invoke()
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -81,10 +85,10 @@ fun MyConfirmAlert(
                             modifier = Modifier.fillMaxWidth().weight(1f),
                             onClick = { onCancel() }
                         ) {
-                            Text("Cancelar", style = MaterialTheme.typography.labelMedium)
+                            Text(cancelText, style = MaterialTheme.typography.labelMedium)
                         }
                         MyFilledTonalButton(
-                            text = "Aceptar",
+                            text = confirmText,
                             enabled = true,
                             onClickAction = { onConfirm() },
                             buttonColor = MaterialTheme.colorScheme.primary,

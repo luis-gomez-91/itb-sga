@@ -41,6 +41,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation("dev.icerock.moko:biometry-compose:0.4.0")
             implementation(libs.androidx.room.paging)
+            implementation(libs.paymentez.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -128,7 +129,9 @@ android {
 repositories {
     google()
     mavenCentral()
-    maven { url = uri("https://jitpack.io") }
+    maven {
+        url = uri("https://jitpack.io")
+    }
 }
 
 dependencies {

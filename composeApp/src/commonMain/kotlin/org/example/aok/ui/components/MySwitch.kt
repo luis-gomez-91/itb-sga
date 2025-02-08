@@ -11,7 +11,8 @@ import androidx.compose.ui.graphics.Color
 fun MySwitch(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     Switch(
         checked = checked,
@@ -22,6 +23,7 @@ fun MySwitch(
             checkedTrackColor = MaterialTheme.colorScheme.outline,
             uncheckedTrackColor = Color.Transparent,
         ),
-        modifier = modifier
+        modifier = modifier,
+        enabled = enabled
     )
 }

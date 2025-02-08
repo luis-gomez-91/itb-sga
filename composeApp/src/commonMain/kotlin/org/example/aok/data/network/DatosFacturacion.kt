@@ -7,5 +7,6 @@ data class DatosFacturacion(
     var cedula: String,
     var correo: String,
     var nombre: String,
-    var telefono: String
+    var telefono: String,
+    var direccion: String
 )

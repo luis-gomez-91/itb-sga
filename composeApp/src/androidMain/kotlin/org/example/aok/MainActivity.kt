@@ -1,22 +1,23 @@
 package org.example.aok
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
-import org.example.aok.core.URLOpenerAndroid
-import org.example.aok.features.common.home.HomeViewModel
-import android.content.Intent
-import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
+import com.paymentez.android.Paymentez
 import dev.icerock.moko.biometry.compose.BindBiometryAuthenticatorEffect
 import dev.icerock.moko.biometry.compose.BiometryAuthenticatorFactory
 import dev.icerock.moko.biometry.compose.rememberBiometryAuthenticatorFactory
 import dev.icerock.moko.mvvm.getViewModel
 import io.github.vinceglb.filekit.core.FileKit
+import org.example.aok.core.URLOpenerAndroid
 import org.example.aok.data.database.AokRepository
 import org.example.aok.data.database.getAokDatabase
+import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
 
 class MainActivity : AppCompatActivity() {
@@ -24,6 +25,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var loginViewModel: LoginViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        Paymentez.setEnvironment(
+            true,
+//            "ITB-EC-CLIENT",
+//            "YBXZU0UAcW6PcRhiqqdss3NequjylE"
+            "KRISTY-EC-CLIENT",
+            "8UlxeLTIS3PMHICYqr5zaKdhRliEgZ"
+        )
+
+
         super.onCreate(savedInstanceState)
         FileKit.init(this)
         supportActionBar?.hide()
