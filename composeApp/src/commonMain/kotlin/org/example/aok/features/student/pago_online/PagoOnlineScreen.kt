@@ -278,6 +278,8 @@ fun CardRubros(
     val showDiferirPago by pagoOnlineViewModel.showDiferirPago.collectAsState(false)
     val showTerminosCondiciones by pagoOnlineViewModel.showTerminosCondiciones.collectAsState(false)
     val terminosCondiciones by pagoOnlineViewModel.terminosCondiciones.collectAsState(false)
+    val showPayAlert by pagoOnlineViewModel.showPayAlert.collectAsState(false)
+    val payData by pagoOnlineViewModel.payData.collectAsState()
 
     if (showDiferirPago) {
         MyConfirmAlert(
@@ -289,14 +291,14 @@ fun CardRubros(
                 pagoOnlineViewModel.updateShowDiferirPago(false)
             },
             onConfirm = {
-                homeViewModel.homeData.value!!.persona.idInscripcion?.let {
-                    pagoOnlineViewModel.sendTerminos(
-                        idInscripcion = it,
-                        valor = total,
-                        datosFacturacion = pagoOnlineViewModel.data.value!!.datosFacturacion,
-                        homeViewModel = homeViewModel
-                    )
-                }
+//                homeViewModel.homeData.value!!.persona.idInscripcion?.let {
+//                    pagoOnlineViewModel.sendTerminos(
+//                        idInscripcion = it,
+//                        valor = total,
+//                        datosFacturacion = pagoOnlineViewModel.data.value!!.datosFacturacion,
+//                        homeViewModel = homeViewModel
+//                    )
+//                }
                 pagoOnlineViewModel.updateShowDiferirPago(false)
                 pagoOnlineViewModel.updateShowTerminosCondiciones(true)
             },
@@ -314,7 +316,7 @@ fun CardRubros(
             },
             onConfirm = {
                 pagoOnlineViewModel.updateShowTerminosCondiciones(false)
-                pagoOnlineViewModel.iniciarPago(homeViewModel)
+                pagoOnlineViewModel.updateShowPayAlert(true)
             },
             showAlert = true,
             extra = {
@@ -337,6 +339,88 @@ fun CardRubros(
                             }
                     }
                 )
+            }
+        )
+    }
+
+    if (showPayAlert) {
+        MyConfirmAlert(
+            titulo = "Pago con tarjeta",
+            icon = null,
+            mensaje = null,
+            confirmText = "Pagar $${total}",
+            cancelText = "Cancelar",
+            onCancel = {
+                pagoOnlineViewModel.updateShowPayAlert(false)
+            },
+            onConfirm = {
+                pagoOnlineViewModel.updateShowPayAlert(false)
+                pagoOnlineViewModel.pay(homeViewModel.contextProvider)
+            },
+            showAlert = true,
+            extra = {
+                Column (
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    MyOutlinedTextField(
+                        value = "${payData.email}",
+                        onValueChange = { pagoOnlineViewModel.updatePayData { copy(email = it) } },
+                        label = "E-mail",
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    MyOutlinedTextField(
+                        value = "${payData.phone}",
+                        onValueChange = { pagoOnlineViewModel.updatePayData { copy(phone = it) } },
+                        label = "Celular",
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    MyOutlinedTextField(
+                        value = "${payData.cardHolderName}",
+                        onValueChange = { pagoOnlineViewModel.updatePayData { copy(cardHolderName = it) } },
+                        label = "Nombre del titular",
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    MyOutlinedTextField(
+                        value = "${payData.cardNumber}",
+                        onValueChange = { pagoOnlineViewModel.updatePayData { copy(cardNumber = it) } },
+                        label = "Número de tarjeta",
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Row (
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        MyOutlinedTextField(
+                            value = "${payData.expiryMonth}",
+                            onValueChange = { pagoOnlineViewModel.updatePayData { copy(expiryMonth = it) } },
+                            label = "MM",
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier.weight(1f)
+                        )
+                        MyOutlinedTextField(
+                            value = "${payData.expiryYear}",
+                            onValueChange = { pagoOnlineViewModel.updatePayData { copy(expiryYear = it) } },
+                            label = "YY",
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier.weight(1f)
+                        )
+                        MyOutlinedTextField(
+                            value = "${payData.cvc}",
+                            onValueChange = { pagoOnlineViewModel.updatePayData { copy(cvc = it) } },
+                            label = "CVC",
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
             }
         )
     }

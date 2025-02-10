@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.example.aok.core.ContextProvider
 import org.example.aok.core.PaymentezSDK
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
@@ -98,10 +99,15 @@ class PagoOnlineViewModel : ViewModel() {
             )
             logInfo("prueba", "FORM: $form")
 
-            _response.value = requestPostDispatcher(client, form)
+            val result = requestPostDispatcher(client, form)
+            _response.value = result
+            if (result.status == "success") {
+                _payData.value.userId = result.message
+                _payData.value.phone = _data.value?.datosFacturacion?.telefono ?: ""
+                _payData.value.email = _data.value?.datosFacturacion?.correo ?: ""
+            }
             logInfo("prueba", "RESPUESTA: ${_response.value}")
         }
-
     }
 
 //    Diferir pago
@@ -124,6 +130,13 @@ class PagoOnlineViewModel : ViewModel() {
 
     fun updateTerminosCondiciones(value: Boolean) {
         _terminosCondiciones.value = value
+    }
+
+    private val _showPayAlert = MutableStateFlow<Boolean>(false)
+    val showPayAlert: StateFlow<Boolean> = _showPayAlert
+
+    fun updateShowPayAlert(value: Boolean) {
+        _showPayAlert.value = value
     }
 
 //    Pago online
@@ -157,42 +170,68 @@ class PagoOnlineViewModel : ViewModel() {
         }
     }
 
-    fun iniciarPago(homeViewModel: HomeViewModel) {
-        viewModelScope.launch {
-            val totalPagar = _total.value
-            if (totalPagar <= 0) {
-                logInfo("prueba", "No hay rubros seleccionados para pagar")
-            } else {
-                _paymentState.value = PaymentResult.Processing
-                _data.value?.datosFacturacion?.let {
-                    _response.value?.let { it1 ->
-                        PaymentezSDK.processPayment(homeViewModel.contextProvider.getContext(), it1.message, it.correo, totalPagar)
-                    }
-                }
-            }
-        }
+
+
+
+//    fun iniciarPago(homeViewModel: HomeViewModel) {
+//        viewModelScope.launch {
+//            val totalPagar = _total.value
+//            if (totalPagar <= 0) {
+//                logInfo("prueba", "No hay rubros seleccionados para pagar")
+//            } else {
+//                _paymentState.value = PaymentResult.Processing
+//                _data.value?.datosFacturacion?.let {
+//                    _response.value?.let { it1 ->
+//                        PaymentezSDK.processPayment(homeViewModel.contextProvider.getContext(), it1.message, it.correo, totalPagar)
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+
+    private val _payData = MutableStateFlow<PayData>(
+        PayData(
+            "34789",
+            "4111111111111111",
+            "Luis Gomez",
+            "12",
+            "25",
+            "123",
+            "luis.gomez.veloz@gmail.com",
+            "0991718739"
+        )
+    )
+    val payData: StateFlow<PayData> = _payData
+
+    fun updatePayData(update: PayData.() -> PayData) {
+        _payData.value = _payData.value.update()
     }
 
-    private val _cardsState = MutableStateFlow<Result<String>>(Result.Loading)
-    val cardsState: StateFlow<Result<String>> = _cardsState
+    fun pay(contextProvider: ContextProvider) {
+        try {
+            logInfo("prueba", "POOOSI")
 
-    fun getCards(uid: String) {
-        // Usando un coroutine scope para realizar la operación en un hilo de fondo
-        viewModelScope.launch {
-            try {
-                // Realizar la solicitud
-                val response = PaymentezSDK.doGetRequest("https://ccapi.paymentez.com/v2/card/list?uid=$uid")
-                val jsonResponse = response["RESPONSE_JSON"] ?: "{}"
-                // Emitir el resultado exitoso con el JSON de la respuesta
-                _cardsState.value = Result.Success(jsonResponse)
-            } catch (e: Exception) {
-                // En caso de error, emitir el error
-                _cardsState.value = Result.Error(e)
+            viewModelScope.launch {
+                    val token = PaymentezSDK.createCardToken(_payData.value, contextProvider)
+                    logInfo("prueba", "TOKEN: $token")
             }
+        } catch (e: Exception) {
+            logInfo("prueba", "$e")
         }
     }
-
 }
+
+data class PayData (
+    var userId: String,
+    var cardNumber: String,
+    var cardHolderName: String,
+    var expiryMonth: String,
+    var expiryYear: String,
+    var cvc: String,
+    var email: String,
+    var phone: String
+)
 
 //static var PAYMENTEZ_DEV_URL = "https://ccapi-stg.paymentez.com"
 //static var PAYMENTEZ_PROD_URL = "https://ccapi.paymentez.com"

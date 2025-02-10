@@ -23,6 +23,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.example.aok.ui.components.MyFilledTonalButton
@@ -31,13 +32,14 @@ import org.example.aok.ui.components.MyFilledTonalButton
 @Composable
 fun MyConfirmAlert(
     titulo: String,
-    mensaje: String,
+    mensaje: String?,
     onCancel: () -> Unit,
     onConfirm: () -> Unit,
     showAlert: Boolean,
     confirmText: String = "Aceptar",
     cancelText: String = "Cancelar",
-    extra: @Composable (() -> Unit)? = null
+    extra: @Composable (() -> Unit)? = null,
+    icon: ImageVector? = Icons.Filled.QuestionMark
 ) {
     AnimatedVisibility(
         visible = showAlert,
@@ -59,22 +61,28 @@ fun MyConfirmAlert(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.QuestionMark,
-                        contentDescription = "",
-                        modifier = Modifier.size(36.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                    if (icon != null) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = "",
+                            modifier = Modifier.size(36.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
                     Text(
                         text = titulo,
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center
                     )
-                    Text(
-                        text = mensaje,
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
-                    )
+                    if (mensaje != null) {
+                        Text(
+                            text = mensaje,
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
                     extra?.invoke()
                     Row(
                         modifier = Modifier.fillMaxWidth(),

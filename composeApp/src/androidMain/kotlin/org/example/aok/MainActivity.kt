@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         val repository = AokRepository(getAokDatabase(context = applicationContext))
-        val contextProvider = AndroidContextProvider(applicationContext)
+        val contextProvider = AndroidContextProvider(this)
 
         setContent {
             Surface(color = Color.Transparent) {
