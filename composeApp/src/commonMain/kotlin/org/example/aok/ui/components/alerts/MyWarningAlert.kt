@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.PriorityHigh
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
@@ -35,7 +36,7 @@ fun MyWarningAlert(
             modifier = Modifier,
             icon = {
                 Icon(
-                    imageVector = Icons.Filled.Warning,
+                    imageVector = Icons.Filled.PriorityHigh,
                     contentDescription = "",
                     modifier = Modifier.size(48.dp),
                     tint = MaterialTheme.colorScheme.tertiary

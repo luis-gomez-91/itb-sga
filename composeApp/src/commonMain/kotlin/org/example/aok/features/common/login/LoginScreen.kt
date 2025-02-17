@@ -38,7 +38,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-
 import org.jetbrains.compose.resources.painterResource
 import aok.composeapp.generated.resources.Res
 import aok.composeapp.generated.resources.logo
@@ -49,18 +48,15 @@ import org.example.aok.ui.components.MyCircularProgressIndicator
 import org.example.aok.ui.components.MyFilledTonalButton
 import org.example.aok.ui.components.MyOutlinedTextField
 import org.example.aok.ui.components.alerts.MySuccessAlert
-
 import androidx.compose.material3.*
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import org.example.aok.data.database.AokRepository
 import org.example.aok.ui.components.SocialMedia
 
 @Composable
 fun LoginScreen(
-    aokRepository: AokRepository,
     navController: NavHostController,
     loginViewModel: LoginViewModel,
     homeViewModel: HomeViewModel
@@ -69,7 +65,7 @@ fun LoginScreen(
     val password by loginViewModel.password.collectAsState()
     val isLoading by loginViewModel.isLoading.collectAsState()
     val verPassword: Boolean by loginViewModel.verPassword.collectAsState(false)
-    val error: String? by loginViewModel.error.collectAsState(null)
+    val error by loginViewModel.error.collectAsState(null)
     val showBottomSheet by homeViewModel.showBottomSheet.collectAsState(false)
     val showResponse by loginViewModel.showResponse.collectAsState()
     val selectedTheme by homeViewModel.selectedTheme.collectAsState(null)
@@ -78,14 +74,12 @@ fun LoginScreen(
     var imageLogo by remember { mutableStateOf(Res.drawable.logo) }
 
     LaunchedEffect(selectedTheme) {
-        imageLogo =
-            if (selectedTheme?.dark == true) {
-                Res.drawable.logo_dark
-            } else {
-                Res.drawable.logo
-            }
+        imageLogo = if (selectedTheme?.dark == true) {
+            Res.drawable.logo_dark
+        } else {
+            Res.drawable.logo
+        }
     }
-
 
     Box(
         modifier = Modifier
@@ -154,6 +148,7 @@ fun LoginScreen(
                         ) {
                             Text(
                                 text = "Recuperar contraseña",
+                                style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary
                             )
                             Spacer(Modifier.width(4.dp))
@@ -166,11 +161,12 @@ fun LoginScreen(
 
                         TextButton(
                             onClick = {
-                                loginViewModel.tryToAuth(navController, aokRepository)
+                                loginViewModel.tryToAuth(navController, homeViewModel.aokDatabase)
                             }
                         ) {
                             Text(
                                 text = "Ingresar con huella o Face ID",
+                                style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary
                             )
                             Spacer(Modifier.width(4.dp))
@@ -214,8 +210,8 @@ fun LoginScreen(
 
         if (error != null) {
             MyErrorAlert(
-                titulo = "Error",
-                mensaje = error!!,
+                titulo = error!!.title,
+                mensaje = error!!.error,
                 onDismiss = { loginViewModel.clearError() },
                 showAlert = true
             )

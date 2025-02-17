@@ -7,12 +7,16 @@ import dev.icerock.moko.biometry.BiometryAuthenticator
 import dev.icerock.moko.resources.desc.desc
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import org.example.aok.data.network.Error
 import kotlinx.coroutines.launch
+import org.example.aok.core.PasswordHasher
+import org.example.aok.core.PasswordHasher.verifyPassword
 import org.example.aok.data.network.Login
 import org.example.aok.data.network.LoginResult
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
-import org.example.aok.data.database.AokRepository
+import org.example.aok.data.database.AokDatabase
 import org.example.aok.data.network.Response
 import org.example.aok.data.network.form.RequestPasswordRecoveryForm
 
@@ -38,8 +42,8 @@ class LoginViewModel(
     private val _userData = MutableStateFlow<Login?>(null)
     val userData: StateFlow<Login?> = _userData
 
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error
+    private val _error = MutableStateFlow<Error?>(null)
+    val error: StateFlow<Error?> = _error
 
     fun onLoginChanged(user: String, pass: String) {
         _username.value = user
@@ -63,12 +67,12 @@ class LoginViewModel(
         _userData.value!!.nombre = nombre
     }
 
-    fun onLoginSelector(navController: NavHostController) {
+    fun onLoginSelector(navController: NavHostController, userId: Int? = null) {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
 
-                val result = loginService.fetchLogin(_username.value, _password.value)
+                val result = loginService.fetchLogin(_username.value, _password.value, userId)
                 logInfo("LoginViewModel", "$result")
 
                 when (result) {
@@ -80,12 +84,12 @@ class LoginViewModel(
                         _error.value = null
                     }
                     is LoginResult.Failure -> {
-                        _error.value = result.error.error
+                        _error.value = result.error
                     }
                 }
             } catch (e: Exception) {
                 logInfo("LoginViewModel", "Exception: ${e.message}")
-                _error.value = "Login failed: ${e.message}"
+                _error.value = Error(title = "Error", error = "${e.message}")
             } finally {
                 _isLoading.value = false
             }
@@ -149,7 +153,7 @@ class LoginViewModel(
 
             } catch (e: Exception) {
                 logInfo("LoginViewModel", "Exception: ${e.message}")
-                _error.value = "Password recovery failed: ${e.message}"
+                _error.value = Error(title = "Error", error = "${e.message}")
             } finally {
                 _isLoading.value = false
             }
@@ -157,24 +161,32 @@ class LoginViewModel(
     }
 
 //    Biometric Login
-    fun tryToAuth(navHostController: NavHostController, aokRepository: AokRepository) = viewModelScope.launch {
+    fun tryToAuth(navHostController: NavHostController, aokDatabase: AokDatabase) = viewModelScope.launch {
         try {
-            val isSuccess = biometryAuthenticator.checkBiometryAuthentication(
-                requestTitle = "Iniciar sesión".desc(),
-                requestReason = "Coloque su dedo en el lector de huella dactilar".desc(),
-                failureButtonText = "Cancelar".desc(),
-                allowDeviceCredentials = false
-            )
+            val users = aokDatabase.userDao().getAllUsers()
+            if (users.first().isNotEmpty()) {
+                val isSuccess = biometryAuthenticator.checkBiometryAuthentication(
+                    requestTitle = "Iniciar sesión".desc(),
+                    requestReason = "Coloque su dedo en el lector de huella dactilar".desc(),
+                    failureButtonText = "Cancelar".desc(),
+                    allowDeviceCredentials = false
+                )
 
-            if (isSuccess) {
-                val user = aokRepository.userDao.getLastUser()
-                user?.let {
-                    onLoginChanged(it.username, it.password)
-                    onLoginSelector(navHostController)
+                if (isSuccess) {
+                    val user = aokDatabase.userDao().getLastUser()
+                    user?.let {
+                        onLoginChanged(it.username, it.password)
+                        onLoginSelector(navHostController)
+//                        if (verifyPassword(it.password, "hashedPassword")) {
+//                            onLoginSelector(navHostController, it.userId)
+//                        }
+                    }
+
+                } else {
+                    logInfo("LoginViewModel", "Autenticación fallida o cancelada")
                 }
-
             } else {
-                logInfo("LoginViewModel", "Autenticación fallida o cancelada")
+                _error.value = Error(title = "Error", error = "No se encontraron credenciales biométricas registradas en este dispositivo. Por favor, configúralas en los ajustes del sistema.")
             }
 
         } catch (throwable: Throwable) {

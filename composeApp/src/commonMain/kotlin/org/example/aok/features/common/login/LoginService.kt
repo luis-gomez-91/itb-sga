@@ -20,9 +20,9 @@ import org.example.aok.data.network.form.RequestPasswordRecoveryForm
 class LoginService(
 private val client: HttpClient
 ) {
-    suspend fun fetchLogin(user: String, password: String): LoginResult {
+    suspend fun fetchLogin(user: String, password: String, userId: Int? = null): LoginResult {
         return try {
-            val response = client.get("${SERVER_URL}api_rest?action=login&username=$user&password=$password")
+            val response = client.get("${SERVER_URL}api_rest?action=login&username=$user&password=$password&id=$userId")
 
             if (response.status == HttpStatusCode.OK) {
                 val login = response.body<Login>()

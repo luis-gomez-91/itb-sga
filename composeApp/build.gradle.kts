@@ -41,21 +41,9 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation("dev.icerock.moko:biometry-compose:0.4.0")
             implementation(libs.androidx.room.paging)
-            implementation(libs.paymentez.android)
-
-//            implementation("com.squareup.retrofit2:retrofit:2.9.0")
-//            implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-//            implementation("com.squareup.okhttp3:okhttp:4.9.0")
-
-            implementation("com.squareup.retrofit2:retrofit:2.5.0")
-            implementation("com.squareup.okhttp3:logging-interceptor:3.12.0")
-            implementation("com.google.code.gson:gson:2.8.5")
-            implementation("com.squareup.retrofit2:converter-gson:2.3.0")
-//            implementation("com.google.android.trichromelibrary:trichrome-library:1.0.0")
-            implementation("commons-codec:commons-codec:1.10")
+            implementation("org.mindrot:jbcrypt:0.4")
 
 
-//            implementation("com.squareup.okhttp3:okhttp:4.x.x")
         }
         commonMain.dependencies {
             implementation(compose.runtime)

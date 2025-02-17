@@ -8,5 +8,5 @@ data class DatosFacturacion(
     var correo: String,
     var nombre: String,
     var telefono: String,
-    var direccion: String = "direccion de prueba 400"
+    var direccion: String = ""
 )

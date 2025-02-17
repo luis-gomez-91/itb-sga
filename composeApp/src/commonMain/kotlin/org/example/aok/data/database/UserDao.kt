@@ -13,17 +13,6 @@ import org.example.aok.data.entity.User
 
 @Dao
 interface UserDao {
-//    @Insert(onConflict = OnConflictStrategy.REPLACE)
-//    suspend fun insert(userPreferences: User)
-//
-
-//
-//    @Query("SELECT * FROM user_preferences")
-//    fun getUserPreferencesAll(): Flow<List<User>>?
-//
-//    @Update
-//    suspend fun update(userPreferences: User)
-
     @Upsert
     suspend fun upsert(user: User)
 

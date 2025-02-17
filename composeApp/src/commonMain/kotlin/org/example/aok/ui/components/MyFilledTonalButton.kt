@@ -3,6 +3,7 @@ package org.example.aok.ui.components
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -26,7 +27,8 @@ fun MyFilledTonalButton(
     textColor: Color = MaterialTheme.colorScheme.primary,
     iconSize: Dp = 24.dp,
     textStyle: TextStyle = MaterialTheme.typography.labelMedium,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    shape: RoundedCornerShape = RoundedCornerShape(24.dp)
 ) {
     FilledTonalButton(
         onClick = onClickAction,
@@ -35,7 +37,8 @@ fun MyFilledTonalButton(
             containerColor = buttonColor,
             contentColor = if (enabled) textColor else MaterialTheme.colorScheme.outline
         ),
-        modifier = modifier
+        modifier = modifier,
+        shape = shape
     ) {
         if (icon != null) {
             Icon(

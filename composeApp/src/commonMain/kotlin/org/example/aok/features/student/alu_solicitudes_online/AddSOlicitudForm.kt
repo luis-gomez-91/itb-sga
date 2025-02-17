@@ -1,6 +1,8 @@
 package org.example.aok.features.student.alu_solicitudes_online
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,15 +14,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -30,8 +27,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -45,6 +42,8 @@ import io.github.vinceglb.filekit.core.pickFile
 import org.example.aok.data.network.TipoEspecieAsignatura
 import org.example.aok.data.network.TipoEspecieDocente
 import org.example.aok.ui.components.MyCircularProgressIndicator
+import org.example.aok.ui.components.MyExposedDropdownMenuBox
+import org.example.aok.ui.components.MyOutlinedTextFieldArea
 import org.example.aok.ui.components.form.FormContainer
 import org.example.aok.ui.components.shimmer.ShimmerFormLoadingAnimation
 
@@ -128,7 +127,6 @@ fun FormScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Departamentos(
     aluSolicitudesViewModel: AluSolicitudesViewModel,
@@ -137,56 +135,22 @@ fun Departamentos(
 ) {
     var expandedDepartamento by remember { mutableStateOf(false) }
 
-    ExposedDropdownMenuBox(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.Transparent),
+    MyExposedDropdownMenuBox(
         expanded = expandedDepartamento,
         onExpandedChange = { expandedDepartamento = it },
-    ) {
-        TextField(
-            value = selectedDepartamento?.nombre ?: "",
-            onValueChange = { },
-            readOnly = true,
-            label = { Text(text = "Departamento") },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandedDepartamento) },
-            modifier = Modifier.menuAnchor().fillMaxWidth(),
-            textStyle = TextStyle(fontSize = 10.sp),
-//            colors = TextFieldDefaults.textFieldColors(
-//                containerColor = MaterialTheme.colorScheme.surfaceContainer
-//            )
-
-        )
-
-        ExposedDropdownMenu(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceContainer),
-            expanded = expandedDepartamento,
-            onDismissRequest = { expandedDepartamento = false }
-        ) {
-            departamentos.forEach { departamento ->
-                DropdownMenuItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = {
-                        Text(
-                            departamento.nombre,
-                            fontSize = 10.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    },
-                    onClick = {
-                        aluSolicitudesViewModel.changeSelectedDepartamento(departamento)
-                        expandedDepartamento = false
-                    }
-                )
-            }
-        }
-    }
-    Spacer(Modifier.height(8.dp))
+        label = "Departamento",
+        selectedOption = selectedDepartamento,
+        options = departamentos,
+        onOptionSelected = { selectedOption ->
+            aluSolicitudesViewModel.changeSelectedDepartamento(selectedOption)
+            expandedDepartamento = false
+        },
+        getOptionDescription = { it.nombre },
+        enabled = true
+    )
+    Spacer(modifier = Modifier.height(16.dp))
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Especies(
     aluSolicitudesViewModel: AluSolicitudesViewModel,
@@ -198,51 +162,23 @@ fun Especies(
     val fileName by aluSolicitudesViewModel.fileName.collectAsState(null)
     val bytes by aluSolicitudesViewModel.byteArray.collectAsState(null)
 
-    ExposedDropdownMenuBox(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.Transparent),
-        expanded = expandedTipoSolicitud,
-        onExpandedChange = { if (selectedDepartamento != null) expandedTipoSolicitud = it },
-    ) {
-        TextField(
-            value = selectedDepartamento?.especies?.find { it == selectedTipoSolicitud }?.nombre ?: "",
-            onValueChange = { },
-            readOnly = true,
-            enabled = selectedDepartamento != null,
-            label = { Text(text = "Tipo solicitud") },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandedTipoSolicitud) },
-            modifier = Modifier.menuAnchor().fillMaxWidth(),
-            textStyle = TextStyle(fontSize = 10.sp),
-//            colors = TextFieldDefaults.textFieldColors(
-//                containerColor = MaterialTheme.colorScheme.surfaceContainer
-//            )
-        )
-
-        ExposedDropdownMenu(
-            modifier = Modifier.fillMaxWidth(),
+    selectedDepartamento?.let { departamento ->
+        MyExposedDropdownMenuBox(
             expanded = expandedTipoSolicitud,
-            onDismissRequest = { expandedTipoSolicitud = false }
-        ) {
-            selectedDepartamento?.especies?.forEach { tipoSolicitud ->
-                DropdownMenuItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = {
-                        Text(
-                            tipoSolicitud.nombre,
-                            fontSize = 10.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    },
-                    onClick = {
-                        aluSolicitudesViewModel.changeSelectedTipoEspecie(tipoSolicitud)
-                        expandedTipoSolicitud = false
-                    }
-                )
-            }
-        }
+            onExpandedChange = { expandedTipoSolicitud = it },
+            label = "Tipo de solicitud",
+            selectedOption = selectedTipoSolicitud,
+            options = departamento.especies,
+            onOptionSelected = { selectedOption ->
+                aluSolicitudesViewModel.changeSelectedTipoEspecie(selectedOption)
+                expandedTipoSolicitud = false
+            },
+            getOptionDescription = { it.nombre },
+            enabled = true
+        )
+        Spacer(modifier = Modifier.height(16.dp))
     }
-    Spacer(Modifier.height(8.dp))
+
 
     if (if (!solicitudes?.asignaturas.isNullOrEmpty() && selectedTipoSolicitud?.relacionaDocente ?: false) {
             true
@@ -267,17 +203,21 @@ fun Especies(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceContainer),
-            verticalAlignment = Alignment.CenterVertically
+                .background(color = Color.Transparent)
+                .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), shape = RoundedCornerShape(4.dp))
+                .clip(RoundedCornerShape(4.dp)),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             MyFilledTonalButton(
                 text = "Seleccionar archivo",
                 enabled = true,
-                icon = Icons.Filled.FileUpload,
+                icon = Icons.Filled.UploadFile,
+                shape = RoundedCornerShape(4.dp),
+                modifier = Modifier.padding(start = 4.dp),
                 onClickAction = {
                     coroutineScope.launch() {
                         val file = FileKit.pickFile()
-                        aluSolicitudesViewModel.changeFileName(file?.name ?: "file")
+                        aluSolicitudesViewModel.changeFileName(file?.name ?: "Archivo no seleccionado")
                         file?.readBytes()?.let { aluSolicitudesViewModel.changeByteArray(it) }
                     }
                 }
@@ -296,31 +236,20 @@ fun Especies(
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Observaciones(
     aluSolicitudesViewModel: AluSolicitudesViewModel,
     observacion: String
 ) {
-    TextField(
+    MyOutlinedTextFieldArea(
         value = observacion,
         onValueChange = { aluSolicitudesViewModel.onObservacionChanged(it) },
-        label = { Text("Observaciones") },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(150.dp),
-        textStyle = TextStyle(fontSize = 14.sp),
-        maxLines = 5,
-        singleLine = false,
-        shape = RoundedCornerShape(8.dp),
-//        colors = TextFieldDefaults.textFieldColors(
-//            containerColor = MaterialTheme.colorScheme.surfaceContainer
-//        )
+        label = "Observaciones",
+        modifier = Modifier.fillMaxWidth()
     )
     Spacer(Modifier.height(8.dp))
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Materias(
     aluSolicitudesViewModel: AluSolicitudesViewModel,
@@ -329,52 +258,22 @@ fun Materias(
     var expanded by remember { mutableStateOf(false) }
     val selectedMateria by aluSolicitudesViewModel.selectedMateria.collectAsState(null)
 
-    ExposedDropdownMenuBox(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.Transparent),
+
+    MyExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = it },
-    ) {
-        TextField(
-            value = selectedMateria?.nombre ?: "",
-            onValueChange = { },
-            readOnly = true,
-            label = { Text(text = "Asignatura") },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.menuAnchor().fillMaxWidth(),
-            textStyle = TextStyle(fontSize = 10.sp),
-//            colors = TextFieldDefaults.textFieldColors(
-//                containerColor = MaterialTheme.colorScheme.surfaceContainer
-//            )
-        )
+        label = "Asignatura",
+        selectedOption = selectedMateria,
+        options = materias!!,
+        onOptionSelected = { selectedOption ->
+            aluSolicitudesViewModel.changeSelectedMateria(selectedOption)
+            expanded = false
+        },
+        getOptionDescription = { it.nombre },
+        enabled = true
+    )
 
-        ExposedDropdownMenu(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceContainer),
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            materias!!.forEach { materia ->
-                DropdownMenuItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = {
-                        Text(
-                            materia.nombre,
-                            fontSize = 10.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    },
-                    onClick = {
-                        aluSolicitudesViewModel.changeSelectedMateria(materia)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
-    Spacer(Modifier.height(8.dp))
+    Spacer(Modifier.height(16.dp))
 
     selectedMateria?.docentes?.let {
         Docentes(
@@ -384,7 +283,6 @@ fun Materias(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Docentes(
     docentes: List<TipoEspecieDocente>,
@@ -393,50 +291,19 @@ fun Docentes(
     var expanded by remember { mutableStateOf(false) }
     val selectedDocente by aluSolicitudesViewModel.selectedDocente.collectAsState(null)
 
-    ExposedDropdownMenuBox(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.Transparent),
+    MyExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = it },
-    ) {
-        TextField(
-            value = selectedDocente?.nombre ?: "",
-            onValueChange = { },
-            readOnly = true,
-            label = { Text(text = "Docente") },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.menuAnchor().fillMaxWidth(),
-            textStyle = TextStyle(fontSize = 10.sp),
-//            colors = TextFieldDefaults.Container(
-//                colors = contentColorFor(MaterialTheme.colorScheme.surfaceContainer)
-//            )
-        )
+        label = "Docente",
+        selectedOption = selectedDocente,
+        options = docentes,
+        onOptionSelected = { selectedOption ->
+            aluSolicitudesViewModel.changeSelectedDocente(selectedOption)
+            expanded = false
+        },
+        getOptionDescription = { it.nombre },
+        enabled = true
+    )
 
-        ExposedDropdownMenu(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceContainer),
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            docentes!!.forEach { docente ->
-                DropdownMenuItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = {
-                        Text(
-                            docente.nombre,
-                            fontSize = 10.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    },
-                    onClick = {
-                        aluSolicitudesViewModel.changeSelectedDocente(docente)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
-    Spacer(Modifier.height(8.dp))
+    Spacer(Modifier.height(16.dp))
 }

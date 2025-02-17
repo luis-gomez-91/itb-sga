@@ -41,7 +41,6 @@ import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import org.example.aok.core.ROUTES
 import org.example.aok.core.capitalizeWords
-import org.example.aok.data.database.AokRepository
 import org.example.aok.data.network.GrupoModulo
 import org.example.aok.data.network.Modulo
 import org.example.aok.features.common.login.LoginViewModel
@@ -54,7 +53,6 @@ import org.example.aok.ui.components.shimmer.ShimmerFormLoadingAnimation
 
 @Composable
 fun HomeScreen(
-    aokRepository: AokRepository,
     navController: NavHostController,
     homeViewModel: HomeViewModel,
     loginViewModel: LoginViewModel
@@ -72,7 +70,6 @@ fun HomeScreen(
             Screen(
                 navController,
                 homeViewModel,
-                aokRepository,
                 loginViewModel
             )
         },
@@ -85,7 +82,6 @@ fun HomeScreen(
 fun Screen(
     navController: NavHostController,
     homeViewModel: HomeViewModel,
-    aokRepository: AokRepository,
     loginViewModel: LoginViewModel
 ) {
     val homeData by homeViewModel.homeData.collectAsState()
@@ -110,19 +106,6 @@ fun Screen(
                 MyCircularProgressIndicator()
             }
         }
-
-//        LazyColumn(
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//            items(homeData!!.grupoModulos) { grupoModulo ->
-//                GrupoItem(
-//                    grupo = grupoModulo,
-//                    navController = navController,
-//                    homeViewModel = homeViewModel
-//                )
-//                Spacer(modifier = Modifier.height(16.dp))
-//            }
-//        }
     }
 
     if (response != null) {
@@ -147,24 +130,22 @@ fun Screen(
         }
     }
 
-    val saveCredentialsLogin by homeViewModel.saveCredentialsLogin.collectAsState(false)
+    val showSaveCredentials by homeViewModel.showSaveCredentials.collectAsState(false)
 
     LaunchedEffect(Unit) {
-        val result = homeViewModel.confirmCredentialsLogin(aokRepository, loginViewModel)
-        homeViewModel.changeSaveCredentialsLogin(result, loginViewModel, aokRepository)
-//        homeViewModel.confirmCredentialsLogin(aokRepository, loginViewModel)
+        homeViewModel.confirmCredentialsLogin(loginViewModel)
     }
 
-    if (saveCredentialsLogin) {
+    if (showSaveCredentials) {
         MyConfirmAlert(
             titulo = "¿Desea continuar?",
             mensaje = "Guardar credenciales de inicio de sesión para uso de biométrico",
             onCancel = {
-                homeViewModel.changeSaveCredentialsLogin(false, loginViewModel, aokRepository)
+                homeViewModel.updateShowSaveCredentials(false)
             },
             onConfirm = {
-                homeViewModel.changeSaveCredentialsLogin(false, loginViewModel, aokRepository)
-                homeViewModel.saveCredentialsLogin(aokRepository, loginViewModel)
+                homeViewModel.updateShowSaveCredentials(false)
+                homeViewModel.saveCredentialsLogin(loginViewModel)
             },
             showAlert = true
         )

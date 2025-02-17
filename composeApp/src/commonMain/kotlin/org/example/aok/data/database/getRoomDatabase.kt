@@ -9,8 +9,9 @@ fun getRoomDatabase(
     builder: RoomDatabase.Builder<AokDatabase>
 ): AokDatabase {
     return builder
-        .addMigrations()
-        .fallbackToDestructiveMigrationOnDowngrade(false)
+        .fallbackToDestructiveMigration(true)
+//        .addMigrations()
+//        .fallbackToDestructiveMigrationOnDowngrade(false)
         .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)
         .build()

@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import org.example.aok.data.database.AokRepository
 import org.example.aok.features.admin.docentes.DocentesScreen
 import org.example.aok.features.admin.docentes.DocentesViewModel
 import org.example.aok.features.admin.inscripciones.InscripcionesScreen
@@ -33,6 +32,8 @@ import org.example.aok.features.student.alu_malla.AluMallaScreen
 import org.example.aok.features.student.alu_malla.AluMallaViewModel
 import org.example.aok.features.student.alu_materias.AluMateriasScreen
 import org.example.aok.features.student.alu_materias.AluMateriasViewModel
+import org.example.aok.features.student.alu_matricula.AluMatriculaScreen
+import org.example.aok.features.student.alu_matricula.AluMatriculaViewModel
 import org.example.aok.features.student.alu_notas.AluNotasScreen
 import org.example.aok.features.student.alu_notas.AluNotasViewModel
 import org.example.aok.features.student.alu_solicitud_beca.AluSolicitudBecaScreen
@@ -51,7 +52,6 @@ import org.example.aok.features.teacher.pro_horarios.ProHorariosViewModel
 
 @Composable
 fun MyNavigation(
-    aokRepository: AokRepository,
     loginViewModel: LoginViewModel,
     homeViewModel: HomeViewModel,
     inscripcionesViewModel: InscripcionesViewModel,
@@ -71,7 +71,8 @@ fun MyNavigation(
     aluDocumentosViewModel: AluDocumentosViewModel,
     docBibliotecaViewModel: DocBibliotecaViewModel,
     aluSolicitudBecaViewModel: AluSolicitudBecaViewModel,
-    aluConsultaGeneralViewModel: AluConsultaGeneralViewModel
+    aluConsultaGeneralViewModel: AluConsultaGeneralViewModel,
+    aluMatriculaViewModel: AluMatriculaViewModel
 ) {
     val navController = rememberNavController()
     NavHost(
@@ -79,8 +80,8 @@ fun MyNavigation(
         startDestination = "login"
     ) {
         composable("404") {NotFoundScreen(onNavigateBack = { navController.popBackStack() }) }
-        composable("login") { LoginScreen(aokRepository, navController, loginViewModel, homeViewModel) }
-        composable("home") { HomeScreen(aokRepository, navController, homeViewModel, loginViewModel) }
+        composable("login") { LoginScreen(navController, loginViewModel, homeViewModel) }
+        composable("home") { HomeScreen(navController, homeViewModel, loginViewModel) }
         composable("inscripciones") { InscripcionesScreen(navController, homeViewModel, loginViewModel, inscripcionesViewModel) }
         composable("account") { AccountScreen(navController, homeViewModel, loginViewModel, accountViewModel) }
         composable("alu_finanzas") { AluFinannzasScreen(navController, homeViewModel, loginViewModel, aluFinanzasViewModel) }
@@ -102,6 +103,7 @@ fun MyNavigation(
         composable("documentos") { DocBibliotecaScreen(navController, homeViewModel, loginViewModel, docBibliotecaViewModel) }
         composable("beca_solicitud") { AluSolicitudBecaScreen(navController, homeViewModel, loginViewModel, aluSolicitudBecaViewModel) }
         composable("consultaalumno") { AluConsultaGeneralScreen(navController, homeViewModel, loginViewModel, aluConsultaGeneralViewModel) }
+        composable("alu_matricula") { AluMatriculaScreen(navController, homeViewModel, loginViewModel, aluMatriculaViewModel) }
 
     }
 }

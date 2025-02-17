@@ -21,9 +21,6 @@ import org.example.aok.data.network.Report
 import org.example.aok.data.network.ReportForm
 import org.example.aok.data.network.ReportResult
 import org.example.aok.data.network.Response
-import org.example.aok.data.network.form.PagoOnlineForm
-import org.example.aok.data.network.form.RequestPasswordRecoveryForm
-import org.example.aok.data.network.form.UploadPhotoForm
 
 class HomeService(
     private val client: HttpClient

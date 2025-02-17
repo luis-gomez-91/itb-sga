@@ -6,12 +6,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.example.aok.core.ContextProvider
+import org.example.aok.core.PasswordHasher
 import org.example.aok.core.URLOpener
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
 import org.example.aok.core.requestPostDispatcher
-import org.example.aok.data.database.AokRepository
+import org.example.aok.data.database.AokDatabase
 import org.example.aok.data.entity.ThemePreference
 import org.example.aok.data.entity.User
 import org.example.aok.data.network.Home
@@ -25,11 +25,11 @@ import org.example.aok.data.network.Error
 import org.example.aok.data.network.Response
 import org.example.aok.data.network.form.RequestPasswordChangeForm
 import org.example.aok.features.common.login.LoginViewModel
+import kotlin.math.log
 
 class HomeViewModel(
     private val pdfOpener: URLOpener,
-    private val aokRepository: AokRepository,
-    val contextProvider: ContextProvider
+    val aokDatabase: AokDatabase
 ) : ViewModel() {
     val client = createHttpClient()
     val service = HomeService(client)
@@ -282,7 +282,6 @@ class HomeViewModel(
                 clearError()
                 logInfo("homeViewModel", "$result")
 
-
             } catch (e: Exception) {
                 logInfo("homeViewModel", "Exception: ${e.message}")
                 addError(Error(title = "Error", error = "${e.message}"))
@@ -299,24 +298,17 @@ class HomeViewModel(
         _screenSelect.value = value
     }
 
-
 //    Biometric credentials
-    private val _saveCredentialsLogin = MutableStateFlow<Boolean>(false)
-    val saveCredentialsLogin: StateFlow<Boolean> = _saveCredentialsLogin
+    private val _showSaveCredentials = MutableStateFlow<Boolean>(false)
+    val showSaveCredentials: StateFlow<Boolean> = _showSaveCredentials
 
-    fun changeSaveCredentialsLogin(value: Boolean, loginViewModel: LoginViewModel, aokRepository: AokRepository) {
-        viewModelScope.launch {
-            _saveCredentialsLogin.value = value
-            val user = aokRepository.userDao.getLastUser()
-            user?.let {
-                loginViewModel.onLoginChanged(it.username, it.password)
-            }
-        }
+    fun updateShowSaveCredentials(value: Boolean) {
+        _showSaveCredentials.value = value
     }
 
-    suspend fun confirmCredentialsLogin(aokRepository: AokRepository, loginViewModel: LoginViewModel): Boolean {
-        return try {
-            val user = aokRepository.userDao.getLastUser()
+    suspend fun confirmCredentialsLogin(loginViewModel: LoginViewModel) {
+        val value = try {
+            val user = aokDatabase.userDao().getLastUser()
             val result = user?.let {
                 it.username == loginViewModel.username.value && it.password == loginViewModel.password.value
             } ?: false
@@ -324,15 +316,19 @@ class HomeViewModel(
         } catch (e: Exception) {
             true
         }
+        _showSaveCredentials.value = value
     }
 
-    fun saveCredentialsLogin(aokRepository: AokRepository, loginViewModel: LoginViewModel) {
+    fun saveCredentialsLogin(loginViewModel: LoginViewModel) {
+        val pass = PasswordHasher.hashPassword(loginViewModel.password.value)
         viewModelScope.launch {
             val user = User(
                 username = loginViewModel.username.value,
-                password = loginViewModel.password.value
+                password = loginViewModel.password.value,
+                userId = loginViewModel.userData.value!!.idUsuario,
+                hashedPassword = null
             )
-            aokRepository.userDao.upsert(user)
+            aokDatabase.userDao().upsert(user)
         }
     }
 
@@ -349,30 +345,30 @@ class HomeViewModel(
 
     fun reloadTheme() {
         viewModelScope.launch {
-            val themeSelected = aokRepository.themePreferenceDao.getSelected()
+            val themeSelected = aokDatabase.themePreferenceDao().getSelected()
             _selectedTheme.value = themeSelected
         }
     }
 
     fun updateThemePreference(selectedTheme: ThemePreference, isDarkSystem: Boolean) {
         viewModelScope.launch {
-            aokRepository.themePreferenceDao.deactivateAll()
+            aokDatabase.themePreferenceDao().deactivateAll()
             selectedTheme.active = true
             _selectedTheme.value = selectedTheme
             if (selectedTheme.system) {
                 selectedTheme.dark = isDarkSystem
             }
-            aokRepository.themePreferenceDao.upsert(selectedTheme)
+            aokDatabase.themePreferenceDao().upsert(selectedTheme)
         }
     }
 
     fun requestThemeOptions(): Flow<List<ThemePreference>> {
-        return aokRepository.themePreferenceDao.getAll()
+        return aokDatabase.themePreferenceDao().getAll()
     }
 
     init {
         viewModelScope.launch {
-            aokRepository.themePreferenceDao.getAll().collect { themeList ->
+            aokDatabase.themePreferenceDao().getAll().collect { themeList ->
                 if (themeList.isEmpty()) {
                     val list = listOf(
                         ThemePreference(id = 1, theme = "Tema claro", active = true, dark = false, system = false),
@@ -381,11 +377,11 @@ class HomeViewModel(
                     )
 
                     list.forEach {
-                        aokRepository.themePreferenceDao.upsert(it)
+                        aokDatabase.themePreferenceDao().upsert(it)
                     }
                 }
             }
-            val themeSelected = aokRepository.themePreferenceDao.getSelected()
+            val themeSelected = aokDatabase.themePreferenceDao().getSelected()
             _selectedTheme.value = themeSelected
         }
     }

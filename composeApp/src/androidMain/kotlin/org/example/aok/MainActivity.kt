@@ -1,6 +1,5 @@
 package org.example.aok
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -9,47 +8,39 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
-import com.paymentez.android.Paymentez
 import dev.icerock.moko.biometry.compose.BindBiometryAuthenticatorEffect
 import dev.icerock.moko.biometry.compose.BiometryAuthenticatorFactory
 import dev.icerock.moko.biometry.compose.rememberBiometryAuthenticatorFactory
 import dev.icerock.moko.mvvm.getViewModel
 import io.github.vinceglb.filekit.core.FileKit
-import org.example.aok.core.AndroidContextProvider
 import org.example.aok.core.URLOpenerAndroid
-import org.example.aok.data.database.AokRepository
-import org.example.aok.data.database.getAokDatabase
+import org.example.aok.data.database.AokDatabase
+import org.example.aok.data.database.getDatabaseBuilder
+import org.example.aok.data.database.getRoomDatabase
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var loginViewModel: LoginViewModel
+    private lateinit var aokDatabase: AokDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Paymentez.setEnvironment(
-            true,
-//            "ITB-EC-CLIENT",
-//            "YBXZU0UAcW6PcRhiqqdss3NequjylE"
-            "KRISTY-EC-CLIENT",
-            "8UlxeLTIS3PMHICYqr5zaKdhRliEgZ"
-        )
-
-
         super.onCreate(savedInstanceState)
+
+        val builder = getDatabaseBuilder(this)
+        aokDatabase = getRoomDatabase(builder)
+
         FileKit.init(this)
         supportActionBar?.hide()
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        val repository = AokRepository(getAokDatabase(context = applicationContext))
-        val contextProvider = AndroidContextProvider(this)
-
         setContent {
             Surface(color = Color.Transparent) {
 
                 val urlOpener = URLOpenerAndroid(this)
-                val homeViewModel = HomeViewModel(urlOpener, repository, contextProvider)
+                val homeViewModel = HomeViewModel(urlOpener, aokDatabase)
                 val biometryFactory: BiometryAuthenticatorFactory = rememberBiometryAuthenticatorFactory()
 
 
@@ -62,8 +53,7 @@ class MainActivity : AppCompatActivity() {
 
                 App(
                     homeViewModel = homeViewModel,
-                    loginViewModel = loginViewModel,
-                    aokRepository = repository
+                    loginViewModel = loginViewModel
                 )
             }
         }

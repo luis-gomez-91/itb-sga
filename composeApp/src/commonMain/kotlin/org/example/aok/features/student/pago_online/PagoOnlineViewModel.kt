@@ -4,18 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.example.aok.core.ContextProvider
-import org.example.aok.core.PaymentezSDK
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
 import org.example.aok.core.requestPostDispatcher
-import org.example.aok.data.network.DatosFacturacion
+import org.example.aok.data.domain.PayData
 import org.example.aok.data.network.Error
 import org.example.aok.data.network.PagoOnline
 import org.example.aok.data.network.PagoOnlineResult
-import org.example.aok.data.network.PaymentResult
 import org.example.aok.data.network.Response
 import org.example.aok.data.network.RubroX
 import org.example.aok.data.network.form.PagoOnlineForm
@@ -34,28 +30,37 @@ class PagoOnlineViewModel : ViewModel() {
     private val _searchQuery = MutableStateFlow<String>("")
     val searchQuery: StateFlow<String> get() = _searchQuery
 
-    private val _selectedRubros = MutableStateFlow<List<RubroX>>(emptyList())
-    val selectedRubros: StateFlow<List<RubroX>> = _selectedRubros
-
     private val _total = MutableStateFlow<Double>(0.00)
     val total: StateFlow<Double> = _total
 
-    private val _switchStates = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
-    val switchStates: StateFlow<Map<Int, Boolean>> = _switchStates
+    private val _linkToPay = MutableStateFlow<String?>(null)
+    val linkToPay: StateFlow<String?> = _linkToPay
+
+    private val _selectedRubros = MutableStateFlow<List<RubroX>>(emptyList())
+    val selectedRubros: StateFlow<List<RubroX>> = _selectedRubros
+
+    private val _switchStates = MutableStateFlow<Map<RubroX, Boolean>>(emptyMap())
+    val switchStates: StateFlow<Map<RubroX, Boolean>> = _switchStates
 
     fun updateSwitchState(rubro: RubroX, isChecked: Boolean) {
-        _switchStates.value = _switchStates.value.toMutableMap().apply {
-            this[rubro.id] = isChecked
-        }
-
-        val updatedRubros = if (isChecked) {
-            _selectedRubros.value + rubro
+        if (isChecked) {
+            val rubrosAnteriores = _data.value?.rubros!!.filter { it.id < rubro.id }
+            if (rubrosAnteriores.any { !_switchStates.value[it]!! }) {
+                return
+            }
+            _switchStates.value = _switchStates.value.toMutableMap().apply {
+                this[rubro] = true
+            }
+            _selectedRubros.value = _selectedRubros.value + rubro
         } else {
-            _selectedRubros.value.filterNot { it.id == rubro.id }
+            if (_selectedRubros.value.lastOrNull()?.id == rubro.id) {
+                _switchStates.value = _switchStates.value.toMutableMap().apply {
+                    this[rubro] = false
+                }
+                _selectedRubros.value = _selectedRubros.value.filterNot { it.id == rubro.id }
+            }
         }
-
-        _selectedRubros.value = updatedRubros
-        _total.value = updatedRubros.sumOf { it.valor }
+        _total.value = _selectedRubros.value.sumOf { it.valor }
     }
 
     fun onloadPagoOnline(id: Int, homeViewModel: HomeViewModel) {
@@ -64,7 +69,15 @@ class PagoOnlineViewModel : ViewModel() {
             try {
                 when (val result = service.fetchPagoOnline(id)) {
                     is PagoOnlineResult.Success -> {
+                        _switchStates.value = result.pagoOnline.rubros.associate { rubro ->
+                            rubro to false
+                        }
                         _data.value = result.pagoOnline
+                        updatePayData { copy(email = result.pagoOnline.datosFacturacion.correo) }
+                        updatePayData { copy(name = result.pagoOnline.datosFacturacion.nombre) }
+                        updatePayData { copy(phone = result.pagoOnline.datosFacturacion.telefono) }
+                        updatePayData { copy(ruc = result.pagoOnline.datosFacturacion.cedula) }
+                        updatePayData { copy(address = result.pagoOnline.datosFacturacion.direccion) }
                         homeViewModel.clearError()
                     }
                     is PagoOnlineResult.Failure -> {
@@ -79,38 +92,34 @@ class PagoOnlineViewModel : ViewModel() {
         }
     }
 
-    fun sendTerminos(
+    fun onloadPaymentLink(
         idInscripcion: Int,
-        valor: Double,
-        datosFacturacion: DatosFacturacion,
         homeViewModel: HomeViewModel
     ) {
         viewModelScope.launch {
             val form = PagoOnlineForm(
-                action = "pagoOnlineTerminos",
+                action = "onloadPaymentLink",
                 inscripcion = idInscripcion,
-                valor = valor,
-                correo = datosFacturacion.correo,
-                nombre = datosFacturacion.nombre,
-                ruc = datosFacturacion.cedula,
-                telefono = datosFacturacion.telefono,
-                direccion = datosFacturacion.direccion,
+                valor = _total.value,
+                correo = _payData.value.email,
+                nombre = _payData.value.name,
+                ruc = _payData.value.ruc,
+                telefono = _payData.value.phone,
+                direccion = _payData.value.address,
                 rubros = _selectedRubros.value.map { it.id }
             )
             logInfo("prueba", "FORM: $form")
 
             val result = requestPostDispatcher(client, form)
+            logInfo("prueba", "RESULT: $result")
             _response.value = result
             if (result.status == "success") {
-                _payData.value.userId = result.message
-                _payData.value.phone = _data.value?.datosFacturacion?.telefono ?: ""
-                _payData.value.email = _data.value?.datosFacturacion?.correo ?: ""
+                homeViewModel.openURL(result.message)
             }
             logInfo("prueba", "RESPUESTA: ${_response.value}")
         }
     }
 
-//    Diferir pago
     private val _showDiferirPago = MutableStateFlow<Boolean>(false)
     val showDiferirPago: StateFlow<Boolean> = _showDiferirPago
 
@@ -139,67 +148,13 @@ class PagoOnlineViewModel : ViewModel() {
         _showPayAlert.value = value
     }
 
-//    Pago online
-    private val _paymentState = MutableStateFlow<PaymentResult>(PaymentResult.Idle)
-    val paymentState: StateFlow<PaymentResult> = _paymentState.asStateFlow()
-
-//    fun processPayment(uid: String, email: String, amount: Double) {
-//        viewModelScope.launch {
-//            logInfo("prueba", "Procesando pago... POSII")
-////            PaymentezSDK.processPayment(uid, email, amount)
-//        }
-//    }
-
-    fun updatePaymentState(result: PaymentResult) {
-        _paymentState.value = result
-        logInfo("prueba", "ENTRO A updatePaymentState")
-        when (result) {
-            is PaymentResult.Success -> {
-                logInfo("prueba", "Pago exitoso. ID Transacción: ${result.transactionId}")
-                _selectedRubros.value = emptyList()
-                _switchStates.value = emptyMap()
-                _total.value = 0.00
-            }
-            is PaymentResult.Failure -> {
-                logInfo("prueba", "Error en el pago: ${result.message}")
-            }
-            PaymentResult.Processing -> {
-                logInfo("prueba", "Procesando pago...")
-            }
-            PaymentResult.Idle -> { /* No hacer nada */ }
-        }
-    }
-
-
-
-
-//    fun iniciarPago(homeViewModel: HomeViewModel) {
-//        viewModelScope.launch {
-//            val totalPagar = _total.value
-//            if (totalPagar <= 0) {
-//                logInfo("prueba", "No hay rubros seleccionados para pagar")
-//            } else {
-//                _paymentState.value = PaymentResult.Processing
-//                _data.value?.datosFacturacion?.let {
-//                    _response.value?.let { it1 ->
-//                        PaymentezSDK.processPayment(homeViewModel.contextProvider.getContext(), it1.message, it.correo, totalPagar)
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-
     private val _payData = MutableStateFlow<PayData>(
         PayData(
-            "34789",
-            "4111111111111111",
-            "Luis Gomez",
-            "12",
-            "25",
-            "123",
-            "luis.gomez.veloz@gmail.com",
-            "0991718739"
+            "",
+            "",
+            "",
+            "",
+            ""
         )
     )
     val payData: StateFlow<PayData> = _payData
@@ -207,33 +162,4 @@ class PagoOnlineViewModel : ViewModel() {
     fun updatePayData(update: PayData.() -> PayData) {
         _payData.value = _payData.value.update()
     }
-
-    fun pay(contextProvider: ContextProvider) {
-        try {
-            logInfo("prueba", "POOOSI")
-
-            viewModelScope.launch {
-                    val token = PaymentezSDK.createCardToken(_payData.value, contextProvider)
-                    logInfo("prueba", "TOKEN: $token")
-            }
-        } catch (e: Exception) {
-            logInfo("prueba", "$e")
-        }
-    }
 }
-
-data class PayData (
-    var userId: String,
-    var cardNumber: String,
-    var cardHolderName: String,
-    var expiryMonth: String,
-    var expiryYear: String,
-    var cvc: String,
-    var email: String,
-    var phone: String
-)
-
-//static var PAYMENTEZ_DEV_URL = "https://ccapi-stg.paymentez.com"
-//static var PAYMENTEZ_PROD_URL = "https://ccapi.paymentez.com"
-//static const val RESPONSE_HTTP_CODE = "RESPONSE_HTTP_CODE"
-//static const val RESPONSE_JSON = "RESPONSE_JSON"

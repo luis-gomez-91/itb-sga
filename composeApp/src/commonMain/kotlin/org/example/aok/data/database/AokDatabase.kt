@@ -8,7 +8,7 @@ import org.example.aok.data.entity.User
 const val DATABASE_NAME = "aok.db"
 
 @Database(
-    version = 3,
+    version = 2,
     entities = [
         User::class,
         ThemePreference::class

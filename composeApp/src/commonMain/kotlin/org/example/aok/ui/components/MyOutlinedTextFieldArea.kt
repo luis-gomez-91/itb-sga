@@ -1,7 +1,7 @@
 package org.example.aok.ui.components
 
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -11,9 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
 
 @Composable
-fun MyOutlinedTextField(
+fun MyOutlinedTextFieldArea(
     value: String,
     placeholder: String = "",
     label: String,
@@ -27,7 +28,7 @@ fun MyOutlinedTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = modifier,
+        modifier = modifier.height(150.dp),
         placeholder = { Text(text = placeholder) },
         label = {
             Text(
@@ -50,6 +51,8 @@ fun MyOutlinedTextField(
         ),
         enabled = enabled,
         trailingIcon = trailingIcon,
-        visualTransformation = visualTransformation
+        visualTransformation = visualTransformation,
+        maxLines = 5,
+        singleLine = false,
     )
 }

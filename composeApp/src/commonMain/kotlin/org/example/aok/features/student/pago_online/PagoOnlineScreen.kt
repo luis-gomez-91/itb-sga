@@ -1,5 +1,10 @@
 package org.example.aok.features.student.pago_online
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -10,7 +15,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,6 +26,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.MoneyOff
+import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,12 +35,10 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,13 +47,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import org.example.aok.core.logInfo
-import org.example.aok.data.network.DatosFacturacion
 import org.example.aok.data.network.RubroX
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
@@ -63,7 +63,6 @@ import org.example.aok.ui.components.MySwitch
 import org.example.aok.ui.components.alerts.MyConfirmAlert
 import org.example.aok.ui.components.alerts.MyInfoAlert
 import org.example.aok.ui.components.dashboard.DashBoardScreen
-import org.example.aok.ui.components.text.MyMediumTitle
 
 @Composable
 fun PagoOnlineScreen(
@@ -87,7 +86,6 @@ fun PagoOnlineScreen(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Screen(
     homeViewModel: HomeViewModel,
@@ -144,7 +142,7 @@ fun Screen(
             ) { page ->
                 when(page) {
                     0 -> data?.let { CardRubros(it.rubros, pagoOnlineViewModel, homeViewModel) }
-                    1 -> data?.let { CardDatosFacturacion(it.datosFacturacion, pagoOnlineViewModel) }
+                    1 -> data?.let { CardDatosFacturacion(pagoOnlineViewModel) }
                 }
             }
         }
@@ -238,40 +236,55 @@ fun CardRubros(
     homeViewModel: HomeViewModel
 ) {
     val switchStates by pagoOnlineViewModel.switchStates.collectAsState()
-    val total by pagoOnlineViewModel.total.collectAsState(0.0)
+    val total:Double by pagoOnlineViewModel.total.collectAsState(0.00)
+    val linkToPay by pagoOnlineViewModel.linkToPay.collectAsState(null)
 
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().weight(1f)
+            modifier = Modifier
+                .fillMaxWidth().weight(1f)
+                .padding(bottom = 8.dp)
         ) {
             items(rubros) { rubro ->
-                val isChecked = switchStates[rubro.id] ?: false
+                val isChecked = switchStates[rubro] ?: false
                 RubroItem(
                     rubro = rubro,
                     isChecked = isChecked,
                     isEnabled = true,
-                    onCheckedChange = { checked ->
-                        pagoOnlineViewModel.updateSwitchState(rubro, checked)
-                    }
+                    pagoOnlineViewModel = pagoOnlineViewModel
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
 
-        Column (
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.End
+        AnimatedVisibility(
+            visible = total > 0,
+            enter = slideInVertically(
+                initialOffsetY = { it }
+            ) + fadeIn(
+                initialAlpha = 0.3f,
+                animationSpec = tween(durationMillis = 500)
+            ),
+            exit = fadeOut()
         ) {
-            MyFilledTonalButton(
-                text = "PAGAR: ${total}",
-                enabled = true,
-                onClickAction = {
-                    pagoOnlineViewModel.updateShowDiferirPago(true)
-                }
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.End
+            ) {
+                MyFilledTonalButton(
+                    text = "PAGAR: $${total}",
+                    enabled = total > 0,
+                    onClickAction = {
+                        pagoOnlineViewModel.updateShowDiferirPago(true)
+                    },
+                    icon = Icons.Filled.Payment,
+                    iconSize = 36.dp,
+                    textStyle = MaterialTheme.typography.labelLarge
+                )
+            }
         }
     }
 
@@ -291,14 +304,6 @@ fun CardRubros(
                 pagoOnlineViewModel.updateShowDiferirPago(false)
             },
             onConfirm = {
-//                homeViewModel.homeData.value!!.persona.idInscripcion?.let {
-//                    pagoOnlineViewModel.sendTerminos(
-//                        idInscripcion = it,
-//                        valor = total,
-//                        datosFacturacion = pagoOnlineViewModel.data.value!!.datosFacturacion,
-//                        homeViewModel = homeViewModel
-//                    )
-//                }
                 pagoOnlineViewModel.updateShowDiferirPago(false)
                 pagoOnlineViewModel.updateShowTerminosCondiciones(true)
             },
@@ -316,7 +321,13 @@ fun CardRubros(
             },
             onConfirm = {
                 pagoOnlineViewModel.updateShowTerminosCondiciones(false)
-                pagoOnlineViewModel.updateShowPayAlert(true)
+//                pagoOnlineViewModel.updateShowPayAlert(true)
+                homeViewModel.homeData.value!!.persona.idInscripcion?.let {
+                    pagoOnlineViewModel.onloadPaymentLink(
+                        idInscripcion = it,
+                        homeViewModel = homeViewModel
+                    )
+                }
             },
             showAlert = true,
             extra = {
@@ -343,87 +354,86 @@ fun CardRubros(
         )
     }
 
-    if (showPayAlert) {
-        MyConfirmAlert(
-            titulo = "Pago con tarjeta",
-            icon = null,
-            mensaje = null,
-            confirmText = "Pagar $${total}",
-            cancelText = "Cancelar",
-            onCancel = {
-                pagoOnlineViewModel.updateShowPayAlert(false)
-            },
-            onConfirm = {
-                pagoOnlineViewModel.updateShowPayAlert(false)
-                pagoOnlineViewModel.pay(homeViewModel.contextProvider)
-            },
-            showAlert = true,
-            extra = {
-                Column (
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    MyOutlinedTextField(
-                        value = "${payData.email}",
-                        onValueChange = { pagoOnlineViewModel.updatePayData { copy(email = it) } },
-                        label = "E-mail",
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    MyOutlinedTextField(
-                        value = "${payData.phone}",
-                        onValueChange = { pagoOnlineViewModel.updatePayData { copy(phone = it) } },
-                        label = "Celular",
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    MyOutlinedTextField(
-                        value = "${payData.cardHolderName}",
-                        onValueChange = { pagoOnlineViewModel.updatePayData { copy(cardHolderName = it) } },
-                        label = "Nombre del titular",
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    MyOutlinedTextField(
-                        value = "${payData.cardNumber}",
-                        onValueChange = { pagoOnlineViewModel.updatePayData { copy(cardNumber = it) } },
-                        label = "Número de tarjeta",
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Row (
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        MyOutlinedTextField(
-                            value = "${payData.expiryMonth}",
-                            onValueChange = { pagoOnlineViewModel.updatePayData { copy(expiryMonth = it) } },
-                            label = "MM",
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.weight(1f)
-                        )
-                        MyOutlinedTextField(
-                            value = "${payData.expiryYear}",
-                            onValueChange = { pagoOnlineViewModel.updatePayData { copy(expiryYear = it) } },
-                            label = "YY",
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.weight(1f)
-                        )
-                        MyOutlinedTextField(
-                            value = "${payData.cvc}",
-                            onValueChange = { pagoOnlineViewModel.updatePayData { copy(cvc = it) } },
-                            label = "CVC",
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
-            }
-        )
-    }
+//    if (showPayAlert) {
+//        MyConfirmAlert(
+//            titulo = "Pago con tarjeta",
+//            icon = null,
+//            mensaje = null,
+//            confirmText = "Pagar $${total}",
+//            cancelText = "Cancelar",
+//            onCancel = {
+//                pagoOnlineViewModel.updateShowPayAlert(false)
+//            },
+//            onConfirm = {
+//                pagoOnlineViewModel.updateShowPayAlert(false)
+//            },
+//            showAlert = true,
+//            extra = {
+//                Column (
+//                    modifier = Modifier.fillMaxWidth()
+//                ) {
+//                    MyOutlinedTextField(
+//                        value = "${payData.email}",
+//                        onValueChange = { pagoOnlineViewModel.updatePayData { copy(email = it) } },
+//                        label = "E-mail",
+//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+//                        modifier = Modifier.fillMaxWidth()
+//                    )
+//                    Spacer(Modifier.height(8.dp))
+//                    MyOutlinedTextField(
+//                        value = "${payData.phone}",
+//                        onValueChange = { pagoOnlineViewModel.updatePayData { copy(phone = it) } },
+//                        label = "Celular",
+//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//                        modifier = Modifier.fillMaxWidth()
+//                    )
+//                    Spacer(Modifier.height(8.dp))
+//                    MyOutlinedTextField(
+//                        value = "${payData.cardHolderName}",
+//                        onValueChange = { pagoOnlineViewModel.updatePayData { copy(cardHolderName = it) } },
+//                        label = "Nombre del titular",
+//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+//                        modifier = Modifier.fillMaxWidth()
+//                    )
+//                    Spacer(Modifier.height(8.dp))
+//                    MyOutlinedTextField(
+//                        value = "${payData.cardNumber}",
+//                        onValueChange = { pagoOnlineViewModel.updatePayData { copy(cardNumber = it) } },
+//                        label = "Número de tarjeta",
+//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//                        modifier = Modifier.fillMaxWidth()
+//                    )
+//                    Spacer(Modifier.height(8.dp))
+//                    Row (
+//                        modifier = Modifier.fillMaxWidth(),
+//                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+//                    ) {
+//                        MyOutlinedTextField(
+//                            value = "${payData.expiryMonth}",
+//                            onValueChange = { pagoOnlineViewModel.updatePayData { copy(expiryMonth = it) } },
+//                            label = "MM",
+//                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//                            modifier = Modifier.weight(1f)
+//                        )
+//                        MyOutlinedTextField(
+//                            value = "${payData.expiryYear}",
+//                            onValueChange = { pagoOnlineViewModel.updatePayData { copy(expiryYear = it) } },
+//                            label = "YY",
+//                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//                            modifier = Modifier.weight(1f)
+//                        )
+//                        MyOutlinedTextField(
+//                            value = "${payData.cvc}",
+//                            onValueChange = { pagoOnlineViewModel.updatePayData { copy(cvc = it) } },
+//                            label = "CVC",
+//                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//                            modifier = Modifier.weight(1f)
+//                        )
+//                    }
+//                }
+//            }
+//        )
+//    }
 
     if (terminosCondiciones) {
         TerminosCondicionesDetail(pagoOnlineViewModel)
@@ -484,7 +494,7 @@ fun RubroItem(
     rubro: RubroX,
     isChecked: Boolean,
     isEnabled: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    pagoOnlineViewModel: PagoOnlineViewModel
 ) {
     MyCard {
         Row(
@@ -526,20 +536,20 @@ fun RubroItem(
             MySwitch(
                 checked = isChecked,
                 modifier = Modifier.align(Alignment.CenterVertically),
-                onCheckedChange = { onCheckedChange(it) },
+                onCheckedChange = { checked ->
+                    pagoOnlineViewModel.updateSwitchState(rubro, checked)
+                },
                 enabled = isEnabled
             )
         }
     }
 }
 
-
 @Composable
 fun CardDatosFacturacion(
-    datosFacturacion: DatosFacturacion,
     pagoOnlineViewModel: PagoOnlineViewModel
 ) {
-    val datos = remember { mutableStateOf(datosFacturacion) }
+    val payData by pagoOnlineViewModel.payData.collectAsState()
 
     Column(
         modifier = Modifier
@@ -547,39 +557,41 @@ fun CardDatosFacturacion(
             .padding(top = 8.dp)
     ) {
         MyOutlinedTextField(
-            value = datos.value.nombre,
-            onValueChange = { datos.value = datos.value.copy(nombre = it) },
-            placeholder = "Nombre",
+            value = payData.name,
+            onValueChange = { pagoOnlineViewModel.updatePayData { copy(name = it) } },
             label = "Nombre",
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
         MyOutlinedTextField(
-            value = datos.value.cedula,
-            onValueChange = { datos.value = datos.value.copy(cedula = it) },
-            placeholder = "RUC",
-            label = "RUC",
+            value = payData.ruc,
+            onValueChange = { pagoOnlineViewModel.updatePayData { copy(ruc = it) } },
+            label = "Cédula / RUC",
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
         MyOutlinedTextField(
-            value = datos.value.correo,
-            onValueChange = { datos.value = datos.value.copy(correo = it) },
-            placeholder = "Correo electrónico",
+            value = payData.email,
+            onValueChange = { pagoOnlineViewModel.updatePayData { copy(email = it) } },
             label = "Correo electrónico",
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
         MyOutlinedTextField(
-            value = datos.value.telefono,
-            onValueChange = { datos.value = datos.value.copy(telefono = it) },
-            placeholder = "Teléfono celular",
+            value = payData.phone,
+            onValueChange = { pagoOnlineViewModel.updatePayData { copy(phone = it) } },
             label = "Teléfono celular",
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             modifier = Modifier.fillMaxWidth()
-
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        MyOutlinedTextField(
+            value = payData.address,
+            onValueChange = { pagoOnlineViewModel.updatePayData { copy(address = it) } },
+            label = "Dirección",
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }

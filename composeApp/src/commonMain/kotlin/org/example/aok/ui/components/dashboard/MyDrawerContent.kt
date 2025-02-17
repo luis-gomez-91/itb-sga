@@ -135,7 +135,7 @@ fun MyDrawerContent(
                     color = MaterialTheme.colorScheme.secondary
                 )
                 Text(
-                    text = "(${homeData?.persona?.identificacion})",
+                    text = "(${homeData?.persona?.emailinst})",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.secondary
                 )

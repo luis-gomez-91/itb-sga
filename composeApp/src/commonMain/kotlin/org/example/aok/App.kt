@@ -1,19 +1,22 @@
 package org.example.aok
 
 import AppTheme
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.example.aok.core.MyNavigation
-import org.example.aok.data.database.AokRepository
+import org.example.aok.data.entity.User
 import org.example.aok.features.admin.docentes.DocentesViewModel
 import org.example.aok.features.admin.inscripciones.InscripcionesViewModel
 import org.example.aok.features.common.account.AccountViewModel
@@ -27,6 +30,7 @@ import org.example.aok.features.student.alu_finanzas.AluFinanzasViewModel
 import org.example.aok.features.student.alu_horario.AluHorarioViewModel
 import org.example.aok.features.student.alu_malla.AluMallaViewModel
 import org.example.aok.features.student.alu_materias.AluMateriasViewModel
+import org.example.aok.features.student.alu_matricula.AluMatriculaViewModel
 import org.example.aok.features.student.alu_notas.AluNotasViewModel
 import org.example.aok.features.student.alu_solicitud_beca.AluSolicitudBecaViewModel
 import org.example.aok.features.student.alu_solicitudes_online.AluSolicitudesViewModel
@@ -38,8 +42,7 @@ import org.example.aok.features.teacher.pro_horarios.ProHorariosViewModel
 @Composable
 fun App(
     homeViewModel : HomeViewModel,
-    loginViewModel: LoginViewModel,
-    aokRepository: AokRepository
+    loginViewModel: LoginViewModel
 ) {
     val accountViewModel = remember { AccountViewModel() }
     val inscripcionesViewModel = remember { InscripcionesViewModel() }
@@ -59,6 +62,7 @@ fun App(
     val docBibliotecaViewModel = remember { DocBibliotecaViewModel() }
     val aluSolicitudBecaViewModel = remember { AluSolicitudBecaViewModel() }
     val aluConsultaGeneralViewModel = remember { AluConsultaGeneralViewModel() }
+    val aluMatriculaViewModel = remember { AluMatriculaViewModel() }
 
     AppTheme(
         homeViewModel = homeViewModel
@@ -69,7 +73,6 @@ fun App(
                 color = MaterialTheme.colorScheme.background
             ) {
                 MyNavigation(
-                    aokRepository = aokRepository,
                     loginViewModel = loginViewModel,
                     homeViewModel = homeViewModel,
                     inscripcionesViewModel = inscripcionesViewModel,
@@ -89,31 +92,36 @@ fun App(
                     aluDocumentosViewModel = aluDocumentosViewModel,
                     docBibliotecaViewModel = docBibliotecaViewModel,
                     aluSolicitudBecaViewModel = aluSolicitudBecaViewModel,
-                    aluConsultaGeneralViewModel = aluConsultaGeneralViewModel
+                    aluConsultaGeneralViewModel = aluConsultaGeneralViewModel,
+                    aluMatriculaViewModel = aluMatriculaViewModel
                 )
             }
         } else {
-            val users by aokRepository.userDao.getAllUsers().collectAsState(initial = emptyList())
-            val temas by aokRepository.themePreferenceDao.getAll().collectAsState(initial = emptyList())
+            Box(
+                modifier = Modifier.padding(32.dp)
+            ) {
+                val users by homeViewModel.aokDatabase.userDao().getAllUsers().collectAsState(emptyList())
 
-//            LaunchedEffect(true) {
-//                val list = listOf(
-//                    User(username = "lagomez5", password = "Mariajose18"),
+//                val usuario = User(
+//                    username = "prueba",
+//                    password = "123"
 //                )
 //
-//                list.forEach {
-//                    aokRepository.userDao.upsert(it)
+//                val scope = rememberCoroutineScope()
+//
+//                scope.launch {
+//                    homeViewModel.aokDatabase.userDao().upsert(usuario)
 //                }
-//            }
 
-            LazyColumn (
-                modifier = Modifier.fillMaxSize().padding(32.dp),
-                contentPadding = PaddingValues(16.dp)
-            ) {
-                items(temas) {
-                    Text(it.theme)
+                LazyColumn {
+                    items(users) { user ->
+                        Text(user.username)
+                        Text(user.password)
+                        Spacer(Modifier.height(8.dp))
+                    }
                 }
             }
+
         }
 
     }
