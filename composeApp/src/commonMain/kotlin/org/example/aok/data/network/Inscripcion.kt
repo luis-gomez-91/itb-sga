@@ -13,6 +13,7 @@ data class Inscripcion(
     val grupo: String,
     val id: Int,
     val idPersona: Int,
+    val idUsuario: Int,
     val identificacion: String,
     val nombre: String,
     val password: String,

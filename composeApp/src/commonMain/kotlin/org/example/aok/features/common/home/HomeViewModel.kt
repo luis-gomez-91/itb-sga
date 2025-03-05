@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.example.aok.core.PasswordHasher
 import org.example.aok.core.URLOpener
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
@@ -22,10 +21,10 @@ import org.example.aok.data.network.ReportForm
 import org.example.aok.data.network.ReportResult
 import org.example.aok.data.network.form.UploadPhotoForm
 import org.example.aok.data.network.Error
+import org.example.aok.data.network.Notificacion
 import org.example.aok.data.network.Response
 import org.example.aok.data.network.form.RequestPasswordChangeForm
 import org.example.aok.features.common.login.LoginViewModel
-import kotlin.math.log
 
 class HomeViewModel(
     private val pdfOpener: URLOpener,
@@ -37,6 +36,16 @@ class HomeViewModel(
     private val _homeData = MutableStateFlow<Home?>(null)
     val homeData: StateFlow<Home?> = _homeData
 
+    private val _notificaciones = MutableStateFlow<List<Notificacion>>(emptyList())
+    val notificaciones: StateFlow<List<Notificacion>> = _notificaciones
+
+    private val _showNotifications = MutableStateFlow(false)
+    val showNotifications: StateFlow<Boolean> = _showNotifications
+
+    fun changeShowNotifications(value: Boolean) {
+        _showNotifications.value = value
+    }
+
     fun onloadHome(id: Int) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -47,6 +56,8 @@ class HomeViewModel(
                 when (result) {
                     is HomeResult.Success -> {
                         _homeData.value = result.home
+                        logInfo("prueba", "${result.home.notificaciones}")
+                        _notificaciones.value = result.home.notificaciones
                         clearError()
                         _periodoSelect.value = _periodoSelect.value ?: result.home.periodos.getOrNull(0)
                     }
@@ -320,7 +331,6 @@ class HomeViewModel(
     }
 
     fun saveCredentialsLogin(loginViewModel: LoginViewModel) {
-        val pass = PasswordHasher.hashPassword(loginViewModel.password.value)
         viewModelScope.launch {
             val user = User(
                 username = loginViewModel.username.value,

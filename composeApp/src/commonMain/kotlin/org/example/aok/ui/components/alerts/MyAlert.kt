@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 
 @Composable
@@ -18,7 +19,9 @@ fun MyAlert(
     title: String,
     text: @Composable () -> Unit,
     onDismiss: () -> Unit,
-    showAlert: Boolean
+    showAlert: Boolean,
+    modifier: Modifier = Modifier,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer
 ) {
     AnimatedVisibility(
         visible = showAlert,
@@ -26,7 +29,8 @@ fun MyAlert(
         exit = fadeOut()
     ) {
         AlertDialog(
-            modifier = Modifier,
+            modifier = modifier,
+            containerColor = containerColor,
             icon = {
 
             },
@@ -38,7 +42,7 @@ fun MyAlert(
                         text = title,
                         modifier = Modifier.align(androidx.compose.ui.Alignment.Center),
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             },
@@ -54,7 +58,7 @@ fun MyAlert(
                 ) {
                     Text(
                         text = "Aceptar",
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             },

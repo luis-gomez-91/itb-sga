@@ -7,8 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +33,9 @@ import androidx.navigation.NavHostController
 import org.example.aok.data.network.Periodo
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
+import org.example.aok.ui.components.MyCard
+import org.example.aok.ui.components.MyFilledTonalButton
+import org.example.aok.ui.components.alerts.MyAlert
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +48,8 @@ fun DashBoardScreen(
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val showBottomSheet by homeViewModel.showBottomSheet.collectAsState(false)
+    val notificaciones by homeViewModel.notificaciones.collectAsState(emptyList())
+    val showNotifications by homeViewModel.showNotifications.collectAsState(false)
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -99,6 +107,75 @@ fun DashBoardScreen(
                     }
                     Spacer(Modifier.height(16.dp))
                 }
+            }
+
+            if (notificaciones.isNotEmpty() && showNotifications) {
+                MyAlert(
+                    title = "Notificaciones ITB",
+                    onDismiss = {
+                        homeViewModel.changeShowNotifications(false)
+                    },
+                    showAlert = showNotifications,
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                    text = {
+                        LazyColumn {
+                            items(notificaciones) { notificacion ->
+                                MyCard(
+                                    onClick = { },
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(horizontal = 8.dp)
+                                    ) {
+                                        Text(
+                                            text = notificacion.notificacion_titulo,
+                                            style = MaterialTheme.typography.titleSmall
+                                        )
+                                        Spacer(Modifier.height(4.dp))
+                                        Text(
+                                            text = notificacion.notificacion_descripcion,
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                        if (notificacion.urls.isNotEmpty()) {
+                                            Spacer(Modifier.height(4.dp))
+                                            LazyRow(
+                                                modifier = Modifier.fillMaxWidth(),
+                                            ) {
+                                                items(notificacion.urls) { url ->
+                                                    MyFilledTonalButton(
+                                                        text = url.name,
+                                                        enabled = true,
+                                                        shape = RoundedCornerShape(8.dp),
+                                                        onClickAction = {
+                                                            navController.navigate(url.url)
+                                                        },
+                                                        buttonColor = when (url.tipo) {
+                                                            "info" -> MaterialTheme.colorScheme.primaryContainer
+                                                            "success" -> MaterialTheme.colorScheme.onPrimaryContainer
+                                                            "danger" -> MaterialTheme.colorScheme.errorContainer
+                                                            "warning" -> MaterialTheme.colorScheme.tertiaryContainer
+                                                            else -> MaterialTheme.colorScheme.surfaceContainerLowest
+                                                        },
+                                                        textColor = when (url.tipo) {
+                                                            "info" -> MaterialTheme.colorScheme.primary
+                                                            "success" -> MaterialTheme.colorScheme.onPrimary
+                                                            "danger" -> MaterialTheme.colorScheme.error
+                                                            "warning" -> MaterialTheme.colorScheme.tertiary
+                                                            else -> MaterialTheme.colorScheme.onSurface
+                                                        },
+                                                    )
+                                                    Spacer(Modifier.width(4.dp))
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                Spacer(Modifier.height(8.dp))
+                            }
+                        }
+                    }
+                )
             }
         }
     )

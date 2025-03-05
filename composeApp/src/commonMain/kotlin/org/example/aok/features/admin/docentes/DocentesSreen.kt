@@ -34,7 +34,7 @@ import androidx.compose.material.icons.filled.Notes
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -294,7 +294,10 @@ fun DocenteItem(
                 }
             }
         }
-        Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f), thickness = 1.dp)
+        HorizontalDivider(
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+        )
     }
     DetalleDocente(docente, expanded)
 }
@@ -355,7 +358,7 @@ fun DropdownDocente(
                 ) {
                     Row(
                         modifier = Modifier.clickable {
-                            loginViewModel.changeLogin(docente.idPersona, docente.nombre)
+                            loginViewModel.changeLogin(docente.idUsuario, navController)
                             homeViewModel.clearSearchQuery()
                             navController.navigate("home")
                         }

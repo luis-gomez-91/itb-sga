@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class Home(
     val grupoModulos: List<GrupoModulo>,
     val periodos: List<Periodo>,
-    val persona: Persona
+    val persona: Persona,
+    val notificaciones: List<Notificacion>
 )

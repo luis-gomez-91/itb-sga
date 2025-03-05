@@ -10,8 +10,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import org.example.aok.data.network.Error
 import kotlinx.coroutines.launch
-import org.example.aok.core.PasswordHasher
-import org.example.aok.core.PasswordHasher.verifyPassword
 import org.example.aok.data.network.Login
 import org.example.aok.data.network.LoginResult
 import org.example.aok.core.createHttpClient
@@ -51,7 +49,7 @@ class LoginViewModel(
     }
 
     fun habilitaBoton(): Boolean {
-        return !(_username.value.isNullOrBlank() || _password.value.isNullOrBlank())
+        return !(_username.value.isBlank() || _password.value.isBlank())
     }
 
     fun togglePasswordVisibility() {
@@ -62,9 +60,8 @@ class LoginViewModel(
         _error.value = null
     }
 
-    fun changeLogin(id: Int, nombre: String) {
-        _userData.value!!.idPersona = id
-        _userData.value!!.nombre = nombre
+    fun changeLogin(idUsuario: Int, navHostController: NavHostController) {
+        onLoginSelector(navHostController, idUsuario)
     }
 
     fun onLoginSelector(navController: NavHostController, userId: Int? = null) {
