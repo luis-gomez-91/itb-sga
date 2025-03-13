@@ -61,9 +61,9 @@ fun AluSolicitudBecaScreen(
         "ficha" to {
             DashboardScreen2(
                 content = { FichaSocioeconomicaScreen(aluSolicitudBecaViewModel, homeViewModel, scope) },
-                homeViewModel = homeViewModel,
-                backScreen = "screen",
-                title = "Ficha socioeconómica"
+                backScreen = "beca_solicitud",
+                title = "Ficha socioeconómica",
+                navHostController = navController
             )
         }
     )

@@ -6,7 +6,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,16 +23,14 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.GroupWork
 import androidx.compose.material.icons.filled.Start
-import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,10 +42,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -60,7 +55,6 @@ import org.example.aok.data.network.ProHorario
 import org.example.aok.data.network.ProHorarioClase
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
-import org.example.aok.ui.components.MyAssistChip
 import org.example.aok.ui.components.MyCard
 import org.example.aok.ui.components.MyCircularProgressIndicator
 import org.example.aok.ui.components.alerts.MyErrorAlert
@@ -89,7 +83,6 @@ fun ProHorariosScreen(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Screen(
     homeViewModel: HomeViewModel,
@@ -147,7 +140,7 @@ fun Screen(
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp)
                 ) { index ->
-                    Clases(data[selectedTabIndex])
+                    Clases(data[selectedTabIndex], proHorariosViewModel, homeViewModel)
                 }
             }
         }
@@ -182,15 +175,15 @@ fun emptyHorarios(error: Error?) {
             ) {
                 Text(
                     modifier = Modifier.fillMaxWidth(),
-                    text = "${error!!.title}",
-                    fontSize = 16.sp,
+                    text = error!!.title,
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "${error.error}",
-                    fontSize = 12.sp,
+                    text = error.error,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
                 )
@@ -211,7 +204,7 @@ fun ScrollableTabRowProHorarios(
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.surfaceContainer),
         indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
+            SecondaryIndicator(
                 Modifier
                     .tabIndicatorOffset(tabPositions[selectedTabIndex])
                     .height(3.dp),
@@ -228,8 +221,7 @@ fun ScrollableTabRowProHorarios(
                 text = {
                     Text(
                         text = proHorario.diaNombre,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium,
                         color = if (selectedTabIndex == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
@@ -241,14 +233,16 @@ fun ScrollableTabRowProHorarios(
 
 @Composable
 fun Clases(
-    proHorario: ProHorario
+    proHorario: ProHorario,
+    proHorariosViewModel: ProHorariosViewModel,
+    homeViewModel: HomeViewModel
 ) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
     ) {
         items(proHorario.clases) { clase ->
-            ClaseItem(clase)
+            ClaseItem(clase, proHorariosViewModel, homeViewModel)
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
@@ -256,7 +250,9 @@ fun Clases(
 
 @Composable
 fun ClaseItem(
-    clase: ProHorarioClase
+    clase: ProHorarioClase,
+    proHorariosViewModel: ProHorariosViewModel,
+    homeViewModel: HomeViewModel
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -275,27 +271,19 @@ fun ClaseItem(
                 ) {
                     Text(
                         text = clase.materia,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
-                    Row(
-//                        modifier = Modifier.weight(1f)
-                    ) {
-                        MyAssistChip(
-                            label = "${clase.turnoComienza} - ${clase.turnoTermina}",
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            labelColor = MaterialTheme.colorScheme.secondary,
-                            icon = Icons.Filled.Timer
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        MyAssistChip(
-                            label = "${clase.grupo} | ${clase.nivel}",
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            labelColor = MaterialTheme.colorScheme.secondary,
-                            icon = Icons.Filled.GroupWork
-                        )
-                    }
+                    Text(
+                        text = formatoText("Horario: ", "${clase.turnoComienza} - ${clase.turnoTermina}"),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = formatoText("Grupo: ", "${clase.grupo} (${clase.nivel})"),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
                 Spacer(Modifier.width(8.dp))
                 AnimatedContent(targetState = expanded) { isExpanded ->
@@ -314,14 +302,12 @@ fun ClaseItem(
                 exit = fadeOut() + shrinkVertically()
             ) {
                 Column {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Divider()
-                    Spacer(modifier = Modifier.height(8.dp))
                     ClaseMoreInfo(clase)
                 }
             }
 
             if (isShowButton(clase.turnoComienza)) {
+                Spacer(Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
@@ -331,10 +317,14 @@ fun ClaseItem(
                         enabled = true,
                         icon = Icons.Filled.Start,
                         onClickAction = {
-
+                            homeViewModel.homeData.value?.persona?.idDocente?.let {
+                                proHorariosViewModel.comenzarClase(clase,
+                                    it
+                                )
+                            }
                         },
-                        buttonColor = MaterialTheme.colorScheme.tertiaryContainer,
-                        textColor = MaterialTheme.colorScheme.tertiary
+                        buttonColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        textColor = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
@@ -347,26 +337,26 @@ fun ClaseMoreInfo(
     clase: ProHorarioClase
 ) {
     Text(
-        text = formatoText("Fecha inicio: ", "${clase.materiaDesde}"),
-        fontSize = 10.sp,
+        text = formatoText("Fecha inicio: ", clase.materiaDesde),
+        style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
 
     Text(
-        text = formatoText("Fecha fin: ", "${clase.materiaHasta}"),
-        fontSize = 10.sp,
+        text = formatoText("Fecha fin: ", clase.materiaHasta),
+        style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
 
     Text(
-        text = formatoText("Aula: ", "${clase.aula}"),
-        fontSize = 10.sp,
+        text = formatoText("Aula: ", clase.aula),
+        style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
 
     Text(
-        text = formatoText("Carrera: ", "${clase.carrera}"),
-        fontSize = 10.sp,
+        text = formatoText("Carrera: ", clase.carrera),
+        style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
 }

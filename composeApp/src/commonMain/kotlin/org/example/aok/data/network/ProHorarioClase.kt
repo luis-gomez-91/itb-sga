@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ProHorarioClase(
+    val idClase: Int,
     val aula: String,
     val carrera: String,
     val grupo: String,

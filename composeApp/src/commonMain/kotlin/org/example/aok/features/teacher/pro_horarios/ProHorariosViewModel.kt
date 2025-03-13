@@ -7,10 +7,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
+import org.example.aok.core.requestPostDispatcher
 import org.example.aok.data.network.Error
 import org.example.aok.data.network.Periodo
 import org.example.aok.data.network.ProHorario
+import org.example.aok.data.network.ProHorarioClase
 import org.example.aok.data.network.ProHorariosResult
+import org.example.aok.data.network.Response
+import org.example.aok.data.network.form.ComenzarClaseForm
 import org.example.aok.features.common.home.HomeViewModel
 
 class ProHorariosViewModel : ViewModel() {
@@ -19,6 +23,9 @@ class ProHorariosViewModel : ViewModel() {
 
     private val _data = MutableStateFlow<List<ProHorario>>(emptyList())
     val data: StateFlow<List<ProHorario>> = _data
+
+    private val _response = MutableStateFlow<Response?>(null)
+    val response: StateFlow<Response?> = _response
 
     fun onloadProHorarios(
         id: Int,
@@ -46,6 +53,22 @@ class ProHorariosViewModel : ViewModel() {
             } finally {
                 homeViewModel.changeLoading(false)
             }
+        }
+    }
+
+    fun comenzarClase(
+        clase: ProHorarioClase,
+        idDocente: Int
+    ) {
+        viewModelScope.launch {
+            val form = ComenzarClaseForm(
+                action = "comenzarClase",
+                idClase = clase.idClase,
+                idProfesor = idDocente
+            )
+            val response = requestPostDispatcher(client, form, "pro_horarios")
+            _response.value = response
+            logInfo("prueba", "${response}")
         }
     }
 

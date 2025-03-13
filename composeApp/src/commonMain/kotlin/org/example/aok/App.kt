@@ -14,15 +14,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import org.example.aok.core.MyNavigation
-import org.example.aok.data.entity.User
 import org.example.aok.features.admin.docentes.DocentesViewModel
 import org.example.aok.features.admin.inscripciones.InscripcionesViewModel
 import org.example.aok.features.common.account.AccountViewModel
 import org.example.aok.features.common.docBiblioteca.DocBibliotecaViewModel
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
+import org.example.aok.features.common.reportes.ReportesViewModel
 import org.example.aok.features.student.alu_consulta_general.AluConsultaGeneralViewModel
 import org.example.aok.features.student.alu_cronograma.AluCronogramaViewModel
 import org.example.aok.features.student.alu_documentos.AluDocumentosViewModel
@@ -37,6 +36,7 @@ import org.example.aok.features.student.alu_solicitudes_online.AluSolicitudesVie
 import org.example.aok.features.student.facturacion_electronica.AluFacturacionViewModel
 import org.example.aok.features.student.pago_online.PagoOnlineViewModel
 import org.example.aok.features.teacher.pro_clases.ProClasesViewModel
+import org.example.aok.features.teacher.pro_evaluaciones.ProEvaluacionesViewModel
 import org.example.aok.features.teacher.pro_horarios.ProHorariosViewModel
 
 @Composable
@@ -63,6 +63,8 @@ fun App(
     val aluSolicitudBecaViewModel = remember { AluSolicitudBecaViewModel() }
     val aluConsultaGeneralViewModel = remember { AluConsultaGeneralViewModel() }
     val aluMatriculaViewModel = remember { AluMatriculaViewModel() }
+    val reportesViewModel = remember { ReportesViewModel() }
+    val proEvaluacionesViewModel = remember { ProEvaluacionesViewModel() }
 
     AppTheme(
         homeViewModel = homeViewModel
@@ -93,7 +95,9 @@ fun App(
                     docBibliotecaViewModel = docBibliotecaViewModel,
                     aluSolicitudBecaViewModel = aluSolicitudBecaViewModel,
                     aluConsultaGeneralViewModel = aluConsultaGeneralViewModel,
-                    aluMatriculaViewModel = aluMatriculaViewModel
+                    aluMatriculaViewModel = aluMatriculaViewModel,
+                    reportesViewModel = reportesViewModel,
+                    proEvaluacionesViewModel = proEvaluacionesViewModel
                 )
             }
         } else {

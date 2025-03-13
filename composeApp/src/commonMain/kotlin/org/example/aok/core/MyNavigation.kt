@@ -17,6 +17,8 @@ import org.example.aok.features.common.home.HomeScreen
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginScreen
 import org.example.aok.features.common.login.LoginViewModel
+import org.example.aok.features.common.reportes.ReportesScreen
+import org.example.aok.features.common.reportes.ReportesViewModel
 import org.example.aok.features.student.alu_ayuda_financiera.AluAyudaFinancieraScreen
 import org.example.aok.features.student.alu_consulta_general.AluConsultaGeneralScreen
 import org.example.aok.features.student.alu_consulta_general.AluConsultaGeneralViewModel
@@ -47,6 +49,9 @@ import org.example.aok.features.student.pago_online.PagoOnlineScreen
 import org.example.aok.features.student.pago_online.PagoOnlineViewModel
 import org.example.aok.features.teacher.pro_clases.ProClasesScreen
 import org.example.aok.features.teacher.pro_clases.ProClasesViewModel
+import org.example.aok.features.teacher.pro_evaluaciones.ProCalificacionesScreen
+import org.example.aok.features.teacher.pro_evaluaciones.ProEvaluacionesScreen
+import org.example.aok.features.teacher.pro_evaluaciones.ProEvaluacionesViewModel
 import org.example.aok.features.teacher.pro_horarios.ProHorariosScreen
 import org.example.aok.features.teacher.pro_horarios.ProHorariosViewModel
 
@@ -72,7 +77,9 @@ fun MyNavigation(
     docBibliotecaViewModel: DocBibliotecaViewModel,
     aluSolicitudBecaViewModel: AluSolicitudBecaViewModel,
     aluConsultaGeneralViewModel: AluConsultaGeneralViewModel,
-    aluMatriculaViewModel: AluMatriculaViewModel
+    aluMatriculaViewModel: AluMatriculaViewModel,
+    reportesViewModel: ReportesViewModel,
+    proEvaluacionesViewModel: ProEvaluacionesViewModel
 ) {
     val navController = rememberNavController()
     NavHost(
@@ -104,6 +111,9 @@ fun MyNavigation(
         composable("beca_solicitud") { AluSolicitudBecaScreen(navController, homeViewModel, loginViewModel, aluSolicitudBecaViewModel) }
         composable("consultaalumno") { AluConsultaGeneralScreen(navController, homeViewModel, loginViewModel, aluConsultaGeneralViewModel) }
         composable("alu_matricula") { AluMatriculaScreen(navController, homeViewModel, loginViewModel, aluMatriculaViewModel) }
+        composable("reportes") { ReportesScreen(navController, homeViewModel, loginViewModel, reportesViewModel) }
+        composable("pro_evaluaciones") { ProEvaluacionesScreen(navController, homeViewModel, loginViewModel, proEvaluacionesViewModel) }
+        composable("pro_calificaciones") { ProCalificacionesScreen(navController, homeViewModel, proEvaluacionesViewModel) }
 
     }
 }

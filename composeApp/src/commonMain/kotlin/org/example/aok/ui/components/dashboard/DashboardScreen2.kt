@@ -11,20 +11,20 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.example.aok.features.common.home.HomeViewModel
+import androidx.navigation.NavHostController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen2(
     content: @Composable () -> Unit = {},
-    homeViewModel: HomeViewModel,
     backScreen: String,
-    title: String = ""
+    title: String = "",
+    navHostController: NavHostController
 ) {
     Scaffold(
         topBar = {
@@ -35,16 +35,16 @@ fun DashboardScreen2(
 //                ),
                 navigationIcon = {
                     IconButton(
-                        onClick = { homeViewModel.changeScreenSelect(backScreen) }
+                        onClick = { navHostController.navigate(backScreen) }
                     ) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBackIosNew,
-                            contentDescription = "Regresar",
+                            contentDescription = "Back",
                             tint = MaterialTheme.colorScheme.secondary
                         )
                     }
                 },
-                title = {},
+                title = { Text(title) },
                 modifier = Modifier,
                 actions = {}
 //                windowInsets = {},

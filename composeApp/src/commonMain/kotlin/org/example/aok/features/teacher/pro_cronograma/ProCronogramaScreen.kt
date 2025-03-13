@@ -1,0 +1,5 @@
+package org.example.aok.features.teacher.pro_cronograma
+
+class ProCronogramaScreen {
+
+}

@@ -1,6 +1,9 @@
 package org.example.aok.data.network
 
 import org.example.aok.data.network.alu_consulta_general.AluConsultaGeneral
+import org.example.aok.data.network.pro_cronograma.ProCronograma
+import org.example.aok.data.network.pro_evaluaciones.ProEvaluaciones
+import org.example.aok.data.network.reportes.ReporteCategoria
 import org.example.aok.data.network.solicitud_becas.FichaSocioeconomica
 import org.example.aok.data.network.solicitud_becas.SolicitudBeca
 
@@ -120,8 +123,21 @@ sealed class AluMatriculaResult {
 }
 
 sealed class PaymentResult {
-    object Idle : PaymentResult() // Estado inicial
-    object Processing : PaymentResult() // El pago se está procesando
     data class Success(val transactionId: String) : PaymentResult() // Pago exitoso
     data class Failure(val message: String) : PaymentResult() // Fallo en el pago
+}
+
+sealed class ProCronogramaResult {
+    data class Success(val data: List<ProCronograma>) : ProCronogramaResult()
+    data class Failure(val error: Error) : ProCronogramaResult()
+}
+
+sealed class ReportesResult {
+    data class Success(val data: List<ReporteCategoria>) : ReportesResult()
+    data class Failure(val error: Error) : ReportesResult()
+}
+
+sealed class ProEvaluacionesResult {
+    data class Success(val data: ProEvaluaciones) : ProEvaluacionesResult()
+    data class Failure(val error: Error) : ProEvaluacionesResult()
 }

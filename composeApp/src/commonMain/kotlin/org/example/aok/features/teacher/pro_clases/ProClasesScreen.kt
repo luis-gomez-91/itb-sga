@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.GroupWork
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -71,8 +72,7 @@ fun ProClasesScreen(
             Screen(
                 navController,
                 homeViewModel,
-                proClasesViewModel,
-                loginViewModel
+                proClasesViewModel
             )
         },
         homeViewModel = homeViewModel,
@@ -84,13 +84,12 @@ fun ProClasesScreen(
 fun Screen(
     navController: NavHostController,
     homeViewModel: HomeViewModel,
-    proClasesViewModel: ProClasesViewModel,
-    loginViewModel: LoginViewModel
+    proClasesViewModel: ProClasesViewModel
 ) {
     val data by proClasesViewModel.data.collectAsState()
     val isLoading by homeViewModel.isLoading.collectAsState(false)
     val query by homeViewModel.searchQuery.collectAsState("")
-    val actualPage by homeViewModel.actualPage.collectAsState(2)
+    val actualPage by homeViewModel.actualPage.collectAsState(1)
     val error by homeViewModel.error.collectAsState(null)
 
     LaunchedEffect(query) {
@@ -301,7 +300,7 @@ fun ClaseItem(
             ) {
                 Column {
                     Spacer(modifier = Modifier.height(8.dp))
-                    Divider()
+                    HorizontalDivider()
                     Spacer(modifier = Modifier.height(8.dp))
                     MoreInfo(clase)
                 }
@@ -318,17 +317,17 @@ fun MoreInfo(
     clase: ClaseX
 ) {
     Text(
-        text = formatoText("Aula: ", "${clase.aula}"),
+        text = formatoText("Aula: ", clase.aula),
         fontSize = 10.sp,
         color = MaterialTheme.colorScheme.onSurface
     )
     Text(
-        text = formatoText("Hora entrada: ", "${clase.horaEntrada}"),
+        text = formatoText("Hora entrada: ", clase.horaEntrada),
         fontSize = 10.sp,
         color = MaterialTheme.colorScheme.onSurface
     )
     Text(
-        text = formatoText("Hora salida: ", "${clase.horaSalida}"),
+        text = formatoText("Hora salida: ", clase.horaSalida),
         fontSize = 10.sp,
         color = MaterialTheme.colorScheme.onSurface
     )
