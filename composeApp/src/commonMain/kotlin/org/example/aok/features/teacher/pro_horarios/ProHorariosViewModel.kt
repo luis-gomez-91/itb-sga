@@ -7,14 +7,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
-import org.example.aok.core.requestPostDispatcher
 import org.example.aok.data.network.Error
+import org.example.aok.data.network.LeccionGrupoResult
 import org.example.aok.data.network.Periodo
 import org.example.aok.data.network.ProHorario
 import org.example.aok.data.network.ProHorarioClase
 import org.example.aok.data.network.ProHorariosResult
 import org.example.aok.data.network.Response
 import org.example.aok.data.network.form.ComenzarClaseForm
+import org.example.aok.data.network.pro_clases.LeccionGrupo
 import org.example.aok.features.common.home.HomeViewModel
 
 class ProHorariosViewModel : ViewModel() {
@@ -27,6 +28,20 @@ class ProHorariosViewModel : ViewModel() {
     private val _response = MutableStateFlow<Response?>(null)
     val response: StateFlow<Response?> = _response
 
+    private val _leccionAbierta = MutableStateFlow<LeccionGrupo?>(null)
+    val leccionAbierta: StateFlow<LeccionGrupo?> = _leccionAbierta
+
+    private val _error = MutableStateFlow<Error?>(null)
+    val error: StateFlow<Error?> = _error
+
+    fun clearResponse() {
+        _response.value = null
+    }
+
+    fun clearError() {
+        _error.value = null
+    }
+
     fun onloadProHorarios(
         id: Int,
         homeViewModel: HomeViewModel,
@@ -36,20 +51,19 @@ class ProHorariosViewModel : ViewModel() {
             homeViewModel.changeLoading(true)
             try {
                 val result = service.fetchProHorarios(periodo, id)
-                logInfo("pro_horarios", "$result")
 
                 when (result) {
                     is ProHorariosResult.Success -> {
                         _data.value = result.proHorarios
-                        homeViewModel.clearError()
+                        clearError()
                     }
                     is ProHorariosResult.Failure -> {
-                        homeViewModel.addError(result.error)
+                        _error.value = result.error
                     }
                 }
 
             } catch (e: Exception) {
-                homeViewModel.addError(Error(title = "Error", error = "${e.message}"))
+                _error.value = (Error(title = "Error", error = "${e.message}"))
             } finally {
                 homeViewModel.changeLoading(false)
             }
@@ -66,8 +80,17 @@ class ProHorariosViewModel : ViewModel() {
                 idClase = clase.idClase,
                 idProfesor = idDocente
             )
-            val response = requestPostDispatcher(client, form, "pro_horarios")
-            _response.value = response
+            val response = service.comenzarClase(client, form)
+
+            when (response) {
+                is LeccionGrupoResult.Success -> {
+                    _leccionAbierta.value = response.data
+                    clearError()
+                }
+                is LeccionGrupoResult.Failure -> {
+                    _error.value = response.error
+                }
+            }
             logInfo("prueba", "${response}")
         }
     }

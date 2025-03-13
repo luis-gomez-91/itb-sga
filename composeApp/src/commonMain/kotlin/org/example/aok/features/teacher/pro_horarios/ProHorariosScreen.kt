@@ -59,6 +59,7 @@ import org.example.aok.ui.components.MyCard
 import org.example.aok.ui.components.MyCircularProgressIndicator
 import org.example.aok.ui.components.alerts.MyErrorAlert
 import org.example.aok.ui.components.MyFilledTonalButton
+import org.example.aok.ui.components.alerts.MyInfoAlert
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 
 @Composable
@@ -91,12 +92,13 @@ fun Screen(
 ) {
 
     val data by proHorariosViewModel.data.collectAsState(emptyList())
+    val error by proHorariosViewModel.error.collectAsState(null)
+    val response by proHorariosViewModel.response.collectAsState(null)
     val isLoading by homeViewModel.isLoading.collectAsState(false)
     val searchQuery by homeViewModel.searchQuery.collectAsState("")
+    val periodoSelect by homeViewModel.periodoSelect.collectAsState()
     val pagerState = rememberPagerState { data.size }
     var selectedTabIndex by remember { mutableStateOf(0) }
-    val periodoSelect by homeViewModel.periodoSelect.collectAsState()
-    val error by homeViewModel.error.collectAsState(null)
 
     LaunchedEffect(periodoSelect) {
         selectedTabIndex = 0
@@ -145,13 +147,12 @@ fun Screen(
             }
         }
 
-        if (error != null) {
+        error?.let {
             MyErrorAlert(
-                titulo = error!!.title,
-                mensaje = error!!.error,
+                titulo = it.title,
+                mensaje = it.error,
                 onDismiss = {
-                    homeViewModel.clearError()
-                    navController.popBackStack()
+                    proHorariosViewModel.clearError()
                 },
                 showAlert = true
             )

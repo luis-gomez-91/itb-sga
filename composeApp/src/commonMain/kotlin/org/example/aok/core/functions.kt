@@ -72,7 +72,6 @@ suspend fun requestPostDispatcher(client: HttpClient, form: Any, action: String 
             Response(status = "error", message = "Unexpected response status: ${response.status}")
         }
     } catch (e: Exception) {
-        logInfo("posi", "ERROR POST DISPATCHER: ${e.message}")
         e.printStackTrace()
         Response(status = "error", message = "Exception occurred: ${e.message}")
     }

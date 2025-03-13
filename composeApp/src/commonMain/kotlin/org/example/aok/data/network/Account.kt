@@ -29,7 +29,7 @@ data class Account(
     val nombreProvinciaResidencia: String,
     var nombreTipoSangre: String? = null,
     var padre: String? = null,
-    val sector: String,
+    val sector: String?,
     var provinciaNacimiento: String? = null,
     val sexo: String,
     val username: String
