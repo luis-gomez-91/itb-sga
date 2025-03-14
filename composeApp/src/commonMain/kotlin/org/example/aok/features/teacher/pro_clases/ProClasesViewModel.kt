@@ -13,7 +13,10 @@ import org.example.aok.data.network.Error
 import org.example.aok.data.network.LeccionGrupoResult
 import org.example.aok.data.network.ProClases
 import org.example.aok.data.network.ProClasesResult
+import org.example.aok.data.network.UpdateAsistenciaResult
+import org.example.aok.data.network.form.UpdateAsistencia
 import org.example.aok.data.network.form.VerClase
+import org.example.aok.data.network.pro_clases.Asistencia
 import org.example.aok.data.network.pro_clases.LeccionGrupo
 import org.example.aok.features.common.home.HomeViewModel
 
@@ -37,7 +40,7 @@ class ProClasesViewModel: ViewModel() {
         _error.value = null
     }
 
-    fun updateClaseSelect(newValue: ClaseX) {
+    fun updateClaseSelect(newValue: ClaseX?) {
         _claseSelect.value = newValue
     }
 
@@ -46,9 +49,7 @@ class ProClasesViewModel: ViewModel() {
         viewModelScope.launch {
             try {
                 val result = homeViewModel.homeData.value?.persona?.idDocente?.let {
-                    service.fetchProClases(search, 2,
-                        it
-                    )
+                    service.fetchProClases(search, page, it)
                 }
                 when (result) {
                     is ProClasesResult.Success -> {
@@ -87,6 +88,42 @@ class ProClasesViewModel: ViewModel() {
                 is LeccionGrupoResult.Failure -> {
                     _error.value = response.error
                 }
+            }
+        }
+    }
+
+    fun updateAsistencia(
+        asistencia: Asistencia,
+        newValue: Boolean,
+        index: Int
+    ) {
+        viewModelScope.launch {
+            try {
+                val form = UpdateAsistencia(
+                    action = "updateAsistencia",
+                    idAsistencia = asistencia.asistenciaId,
+                    value = newValue
+                )
+                logInfo("prueba", "${form}")
+                val response = service.updateAsistencia(client, form)
+                logInfo("prueba", "${response}")
+
+                when (response) {
+                    is UpdateAsistenciaResult.Success -> {
+                        _leccionGrupoData.value?.let { leccionGrupo ->
+                            val updatedAsistencias = leccionGrupo.asistencias.toMutableList().apply {
+                                this[index] = response.data
+                            }
+                            _leccionGrupoData.value = leccionGrupo.copy(asistencias = updatedAsistencias)
+                        }
+                    }
+
+                    is UpdateAsistenciaResult.Failure -> {
+                        _error.value = response.error
+                    }
+                }
+            } catch (e: Exception) {
+                logInfo("prueba", "${e}")
             }
         }
     }

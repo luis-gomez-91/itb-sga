@@ -4,8 +4,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class LeccionGrupo(
-    val asistencias: List<Asistencia>,
+    var asistencias: MutableList<Asistencia>,
     val leccionGrupoContenido: String,
     val leccionGrupoId: Int,
-    val leccionGrupoObservaciones: String
+    val leccionGrupoObservaciones: String,
+    val totalLecciones: Int,
+    val minimoAsistencia: Int
 )

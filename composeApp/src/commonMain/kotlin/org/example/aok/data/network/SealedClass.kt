@@ -1,6 +1,8 @@
 package org.example.aok.data.network
 
 import org.example.aok.data.network.alu_consulta_general.AluConsultaGeneral
+import org.example.aok.data.network.pro_clases.Asistencia
+import org.example.aok.data.network.pro_clases.ComenzarClase
 import org.example.aok.data.network.pro_clases.LeccionGrupo
 import org.example.aok.data.network.pro_cronograma.ProCronograma
 import org.example.aok.data.network.pro_evaluaciones.ProEvaluaciones
@@ -146,4 +148,14 @@ sealed class ProEvaluacionesResult {
 sealed class LeccionGrupoResult {
     data class Success(val data: LeccionGrupo) : LeccionGrupoResult()
     data class Failure(val error: Error) : LeccionGrupoResult()
+}
+
+sealed class ComenzarClaseResult {
+    data class Success(val data: ComenzarClase) : ComenzarClaseResult()
+    data class Failure(val error: Error) : ComenzarClaseResult()
+}
+
+sealed class UpdateAsistenciaResult {
+    data class Success(val data: Asistencia) : UpdateAsistenciaResult()
+    data class Failure(val error: Error) : UpdateAsistenciaResult()
 }

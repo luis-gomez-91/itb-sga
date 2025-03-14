@@ -23,13 +23,8 @@ import androidx.compose.material.icons.filled.ArrowBackIos
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.GroupWork
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Divider
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -179,7 +174,7 @@ fun Paginado(
                 homeViewModel.pageLess()
                 proClasesViewModel.onloadProClases(
                     query,
-                    actualPage,
+                    actualPage - 1,
                     homeViewModel
                 )
             },
@@ -203,7 +198,7 @@ fun Paginado(
                 homeViewModel.pageMore()
                 proClasesViewModel.onloadProClases(
                     query,
-                    actualPage,
+                    actualPage + 1,
                     homeViewModel
                 )
             },
@@ -240,24 +235,40 @@ fun ClaseItem(
                 .fillMaxWidth()
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
                         text = clase.asignatura,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = clase.turno,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.secondary,
+                        text = formatoText("Grupo: ", clase.grupo),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.secondary
                     )
+                    Text(
+                        text = formatoText("Fecha y apertura: ", "${clase.fecha} (${clase.horaEntrada} a ${clase.horaSalida})"),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    AnimatedVisibility(
+                        visible = expanded,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        Column {
+                            MoreInfo(clase)
+                        }
+                    }
                 }
+
+
                 Spacer(Modifier.width(8.dp))
                 AnimatedContent(targetState = expanded) { isExpanded ->
                     IconButton(onClick = { expanded = !expanded }) {
@@ -268,54 +279,17 @@ fun ClaseItem(
                     }
                 }
             }
-
-            Row(
+            Spacer(Modifier.height(4.dp))
+            Row (
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.End
             ) {
-                Row {
-                    MyAssistChip(
-                        label = clase.fecha,
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        labelColor = MaterialTheme.colorScheme.primary,
-                        icon = Icons.Filled.DateRange
-                    )
-
-                    Spacer(modifier = Modifier.width(4.dp))
-                    MyAssistChip(
-                        label = clase.grupo,
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        labelColor = MaterialTheme.colorScheme.primary,
-                        icon = Icons.Filled.GroupWork
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    MyAssistChip(
-                        label = if (clase.abierta) "Abierta" else "Cerrada",
-                        containerColor = if (clase.abierta) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.errorContainer,
-                        labelColor = if (clase.abierta) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.error,
-                        icon = if (clase.abierta) Icons.Filled.Check else Icons.Filled.Cancel
-                    )
-                }
-                IconButton(onClick = {  }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Acciones"
-                    )
-                }
-            }
-
-
-            AnimatedVisibility(
-                visible = expanded,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
-            ) {
-                Column {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    HorizontalDivider()
-                    Spacer(modifier = Modifier.height(8.dp))
-                    MoreInfo(clase)
-                }
+                MyAssistChip(
+                    label = if (clase.abierta) "Abierta" else "Cerrada",
+                    containerColor = if (clase.abierta) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.errorContainer,
+                    labelColor = if (clase.abierta) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.error,
+                    icon = if (clase.abierta) Icons.Filled.Check else Icons.Filled.Cancel
+                )
             }
 
         }
@@ -323,29 +297,23 @@ fun ClaseItem(
     }
 }
 
-
 @Composable
 fun MoreInfo(
     clase: ClaseX
 ) {
     Text(
+        text = formatoText("Turno: ", clase.turno),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.secondary
+    )
+    Text(
         text = formatoText("Aula: ", clase.aula),
-        fontSize = 10.sp,
-        color = MaterialTheme.colorScheme.onSurface
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.secondary
     )
     Text(
-        text = formatoText("Hora entrada: ", clase.horaEntrada),
-        fontSize = 10.sp,
-        color = MaterialTheme.colorScheme.onSurface
-    )
-    Text(
-        text = formatoText("Hora salida: ", clase.horaSalida),
-        fontSize = 10.sp,
-        color = MaterialTheme.colorScheme.onSurface
-    )
-    Text(
-        text = formatoText("Asistencia: ", "${clase.asistenciaCantidad} (${clase.asistenciaProciento}%)"),
-        fontSize = 10.sp,
-        color = MaterialTheme.colorScheme.onSurface
+        text = formatoText("Asistencias: ", "${clase.asistenciaCantidad} (${clase.asistenciaProciento}%)"),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.secondary
     )
 }

@@ -29,7 +29,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
@@ -42,7 +41,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.datetime.Clock
@@ -50,16 +48,15 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.example.aok.core.formatoText
 import org.example.aok.core.parseTime
-import org.example.aok.data.network.Error
 import org.example.aok.data.network.ProHorario
 import org.example.aok.data.network.ProHorarioClase
 import org.example.aok.features.common.home.HomeViewModel
 import org.example.aok.features.common.login.LoginViewModel
+import org.example.aok.features.teacher.pro_clases.ProClasesViewModel
 import org.example.aok.ui.components.MyCard
 import org.example.aok.ui.components.MyCircularProgressIndicator
 import org.example.aok.ui.components.alerts.MyErrorAlert
 import org.example.aok.ui.components.MyFilledTonalButton
-import org.example.aok.ui.components.alerts.MyInfoAlert
 import org.example.aok.ui.components.dashboard.DashBoardScreen
 
 @Composable
@@ -67,7 +64,8 @@ fun ProHorariosScreen(
     navController: NavHostController,
     homeViewModel: HomeViewModel,
     loginViewModel: LoginViewModel,
-    proHorariosViewModel: ProHorariosViewModel
+    proHorariosViewModel: ProHorariosViewModel,
+    proClasesViewModel: ProClasesViewModel
 ) {
     DashBoardScreen(
         title = "Mis Horarios",
@@ -76,7 +74,8 @@ fun ProHorariosScreen(
             Screen(
                 homeViewModel,
                 proHorariosViewModel,
-                navController
+                navController,
+                proClasesViewModel
             )
         },
         homeViewModel = homeViewModel,
@@ -88,12 +87,12 @@ fun ProHorariosScreen(
 fun Screen(
     homeViewModel: HomeViewModel,
     proHorariosViewModel: ProHorariosViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    proClasesViewModel: ProClasesViewModel
 ) {
 
     val data by proHorariosViewModel.data.collectAsState(emptyList())
     val error by proHorariosViewModel.error.collectAsState(null)
-    val response by proHorariosViewModel.response.collectAsState(null)
     val isLoading by homeViewModel.isLoading.collectAsState(false)
     val searchQuery by homeViewModel.searchQuery.collectAsState("")
     val periodoSelect by homeViewModel.periodoSelect.collectAsState()
@@ -142,7 +141,7 @@ fun Screen(
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp)
                 ) { index ->
-                    Clases(data[selectedTabIndex], proHorariosViewModel, homeViewModel)
+                    Clases(data[selectedTabIndex], proHorariosViewModel, homeViewModel, navController, proClasesViewModel)
                 }
             }
         }
@@ -156,39 +155,6 @@ fun Screen(
                 },
                 showAlert = true
             )
-        }
-    }
-}
-
-@Composable
-fun emptyHorarios(error: Error?) {
-    Column(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-//        verticalArrangement = Arrangement.Center
-    ) {
-        MyCard (
-            modifier = Modifier.padding(16.dp),
-            onClick = { }
-        ) {
-            Column(
-                Modifier.fillMaxWidth().padding(32.dp)
-            ) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = error!!.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = error.error,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center
-                )
-            }
         }
     }
 }
@@ -236,14 +202,16 @@ fun ScrollableTabRowProHorarios(
 fun Clases(
     proHorario: ProHorario,
     proHorariosViewModel: ProHorariosViewModel,
-    homeViewModel: HomeViewModel
+    homeViewModel: HomeViewModel,
+    navController: NavHostController,
+    proClasesViewModel: ProClasesViewModel
 ) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
     ) {
         items(proHorario.clases) { clase ->
-            ClaseItem(clase, proHorariosViewModel, homeViewModel)
+            ClaseItem(clase, proHorariosViewModel, homeViewModel, navController, proClasesViewModel)
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
@@ -253,7 +221,9 @@ fun Clases(
 fun ClaseItem(
     clase: ProHorarioClase,
     proHorariosViewModel: ProHorariosViewModel,
-    homeViewModel: HomeViewModel
+    homeViewModel: HomeViewModel,
+    navController: NavHostController,
+    proClasesViewModel: ProClasesViewModel
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -319,9 +289,7 @@ fun ClaseItem(
                         icon = Icons.Filled.Start,
                         onClickAction = {
                             homeViewModel.homeData.value?.persona?.idDocente?.let {
-                                proHorariosViewModel.comenzarClase(clase,
-                                    it
-                                )
+                                proHorariosViewModel.comenzarClase(clase, it, navController, proClasesViewModel)
                             }
                         },
                         buttonColor = MaterialTheme.colorScheme.onPrimaryContainer,

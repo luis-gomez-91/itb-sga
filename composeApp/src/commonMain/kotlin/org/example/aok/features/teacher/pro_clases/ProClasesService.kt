@@ -13,8 +13,10 @@ import org.example.aok.data.network.Error
 import org.example.aok.data.network.LeccionGrupoResult
 import org.example.aok.data.network.ProClases
 import org.example.aok.data.network.ProClasesResult
-import org.example.aok.data.network.form.ComenzarClaseForm
+import org.example.aok.data.network.UpdateAsistenciaResult
+import org.example.aok.data.network.form.UpdateAsistencia
 import org.example.aok.data.network.form.VerClase
+import org.example.aok.data.network.pro_clases.Asistencia
 import org.example.aok.data.network.pro_clases.LeccionGrupo
 
 class ProClasesService(
@@ -53,6 +55,25 @@ class ProClasesService(
         } catch (e: Exception) {
             val error = Error("Error", "Error inesperado: ${e.message}")
             LeccionGrupoResult.Failure(error)
+        }
+    }
+
+    suspend fun updateAsistencia(client: HttpClient, form: UpdateAsistencia): UpdateAsistenciaResult {
+        return try {
+            val response = client.post("${SERVER_URL}api_rest?action=pro_clases") {
+                contentType(ContentType.Application.Json)
+                setBody(form)
+            }
+            if (response.status == HttpStatusCode.OK) {
+                val data = response.body<Asistencia>()
+                UpdateAsistenciaResult.Success(data)
+            } else {
+                val error = response.body<Error>()
+                UpdateAsistenciaResult.Failure(error)
+            }
+        } catch (e: Exception) {
+            val error = Error("Error", "Error inesperado: ${e.message}")
+            UpdateAsistenciaResult.Failure(error)
         }
     }
 }

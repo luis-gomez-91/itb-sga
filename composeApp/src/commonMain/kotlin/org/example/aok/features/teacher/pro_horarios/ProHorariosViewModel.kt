@@ -2,21 +2,21 @@ package org.example.aok.features.teacher.pro_horarios
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
+import org.example.aok.data.network.ComenzarClaseResult
 import org.example.aok.data.network.Error
-import org.example.aok.data.network.LeccionGrupoResult
 import org.example.aok.data.network.Periodo
 import org.example.aok.data.network.ProHorario
 import org.example.aok.data.network.ProHorarioClase
 import org.example.aok.data.network.ProHorariosResult
-import org.example.aok.data.network.Response
 import org.example.aok.data.network.form.ComenzarClaseForm
-import org.example.aok.data.network.pro_clases.LeccionGrupo
 import org.example.aok.features.common.home.HomeViewModel
+import org.example.aok.features.teacher.pro_clases.ProClasesViewModel
 
 class ProHorariosViewModel : ViewModel() {
     val client = createHttpClient()
@@ -25,18 +25,8 @@ class ProHorariosViewModel : ViewModel() {
     private val _data = MutableStateFlow<List<ProHorario>>(emptyList())
     val data: StateFlow<List<ProHorario>> = _data
 
-    private val _response = MutableStateFlow<Response?>(null)
-    val response: StateFlow<Response?> = _response
-
-    private val _leccionAbierta = MutableStateFlow<LeccionGrupo?>(null)
-    val leccionAbierta: StateFlow<LeccionGrupo?> = _leccionAbierta
-
     private val _error = MutableStateFlow<Error?>(null)
     val error: StateFlow<Error?> = _error
-
-    fun clearResponse() {
-        _response.value = null
-    }
 
     fun clearError() {
         _error.value = null
@@ -72,7 +62,9 @@ class ProHorariosViewModel : ViewModel() {
 
     fun comenzarClase(
         clase: ProHorarioClase,
-        idDocente: Int
+        idDocente: Int,
+        navHostController: NavHostController,
+        proClasesViewModel: ProClasesViewModel
     ) {
         viewModelScope.launch {
             val form = ComenzarClaseForm(
@@ -83,11 +75,12 @@ class ProHorariosViewModel : ViewModel() {
             val response = service.comenzarClase(client, form)
 
             when (response) {
-                is LeccionGrupoResult.Success -> {
-                    _leccionAbierta.value = response.data
+                is ComenzarClaseResult.Success -> {
+                    proClasesViewModel.updateClaseSelect(response.data.claseX)
+                    proClasesViewModel.verLeccion(response.data.leccionGrupo.leccionGrupoId, navHostController)
                     clearError()
                 }
-                is LeccionGrupoResult.Failure -> {
+                is ComenzarClaseResult.Failure -> {
                     _error.value = response.error
                 }
             }

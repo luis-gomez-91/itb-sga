@@ -8,17 +8,14 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import io.ktor.http.isSuccess
 import org.example.aok.core.SERVER_URL
-import org.example.aok.core.logInfo
+import org.example.aok.data.network.ComenzarClaseResult
 import org.example.aok.data.network.Error
-import org.example.aok.data.network.LeccionGrupoResult
 import org.example.aok.data.network.Periodo
 import org.example.aok.data.network.ProHorario
 import org.example.aok.data.network.ProHorariosResult
-import org.example.aok.data.network.Response
 import org.example.aok.data.network.form.ComenzarClaseForm
-import org.example.aok.data.network.pro_clases.LeccionGrupo
+import org.example.aok.data.network.pro_clases.ComenzarClase
 
 class ProHorariosService(
     private val client: HttpClient
@@ -40,22 +37,22 @@ class ProHorariosService(
         }
     }
 
-    suspend fun comenzarClase(client: HttpClient, form: ComenzarClaseForm): LeccionGrupoResult {
+    suspend fun comenzarClase(client: HttpClient, form: ComenzarClaseForm): ComenzarClaseResult {
         return try {
             val response = client.post("${SERVER_URL}api_rest?action=pro_horarios") {
                 contentType(ContentType.Application.Json)
                 setBody(form)
             }
             if (response.status == HttpStatusCode.OK) {
-                val data = response.body<LeccionGrupo>()
-                LeccionGrupoResult.Success(data)
+                val data = response.body<ComenzarClase>()
+                ComenzarClaseResult.Success(data)
             } else {
                 val error = response.body<Error>()
-                LeccionGrupoResult.Failure(error)
+                ComenzarClaseResult.Failure(error)
             }
         } catch (e: Exception) {
             val error = Error("Error", "Error inesperado: ${e.message}")
-            LeccionGrupoResult.Failure(error)
+            ComenzarClaseResult.Failure(error)
         }
     }
 }

@@ -102,7 +102,7 @@ fun MyNavigation(
         composable("alu_notas") { AluNotasScreen(navController, homeViewModel, loginViewModel, aluNotasViewModel) }
         composable("docentes") { DocentesScreen(navController, homeViewModel, loginViewModel, docentesViewModel) }
         composable("pro_clases") { ProClasesScreen(navController, homeViewModel, loginViewModel, proClasesViewModel) }
-        composable("pro_horarios") { ProHorariosScreen(navController, homeViewModel, loginViewModel, proHorariosViewModel) }
+        composable("pro_horarios") { ProHorariosScreen(navController, homeViewModel, loginViewModel, proHorariosViewModel, proClasesViewModel) }
         composable("solicitudonline") { AluSolicitudesScreen(navController, homeViewModel, loginViewModel, aluSolicitudesViewModel) }
         composable("addSolicitud") { AddSolicitudForm(aluSolicitudesViewModel, homeViewModel, navController) }
         composable("admin_ayudafinanciera") { AluAyudaFinancieraScreen(navController, homeViewModel, loginViewModel) }
