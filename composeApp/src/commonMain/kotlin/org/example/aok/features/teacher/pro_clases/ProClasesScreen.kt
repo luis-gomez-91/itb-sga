@@ -119,9 +119,13 @@ fun Screen(
             ) {
                 clasesFintradas?.let {
                     items(it.clases) { clase ->
-                        ClaseItem(
-                            clase = clase
-                        )
+                        homeViewModel.homeData.value?.persona?.idDocente?.let { it1 ->
+                            ClaseItem(
+                                clase = clase,
+                                proClasesViewModel = proClasesViewModel,
+                                navController = navController
+                            )
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
@@ -216,12 +220,20 @@ fun Paginado(
 
 @Composable
 fun ClaseItem(
-    clase: ClaseX
+    clase: ClaseX,
+    proClasesViewModel: ProClasesViewModel,
+    navController: NavHostController
 ) {
     var expanded by remember { mutableStateOf(false) }
 
     MyCard (
-        onClick = { }
+        onClick = {
+            proClasesViewModel.updateClaseSelect(clase)
+            proClasesViewModel.verLeccion(
+                idLeccionGrupo = clase.idLeccionGrupo,
+                navHostController = navController
+            )
+        }
     ) {
         Column(
             modifier = Modifier

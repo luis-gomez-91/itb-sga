@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ClaseX(
+    val idLeccionGrupo: Int,
     val abierta: Boolean,
     val asignatura: String,
     val asistenciaCantidad: String,
