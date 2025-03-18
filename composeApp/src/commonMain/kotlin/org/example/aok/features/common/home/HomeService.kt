@@ -9,6 +9,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import org.example.aok.core.SERVER_URL
+import org.example.aok.core.logInfo
 import org.example.aok.data.network.Error
 import org.example.aok.data.network.Home
 import org.example.aok.data.network.HomeResult

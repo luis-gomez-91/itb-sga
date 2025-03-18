@@ -43,7 +43,8 @@ fun MyErrorAlert(
             title = {
                 Text(
                     text = titulo,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center
                 )
             },
             text = {
@@ -68,7 +69,6 @@ fun MyErrorAlert(
                     )
                 }
             },
-//            containerColor = MaterialTheme.colorScheme.errorContainer,
             shape = AlertDialogDefaults.shape,
             tonalElevation = AlertDialogDefaults.TonalElevation,
         )

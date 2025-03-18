@@ -180,7 +180,8 @@ fun AddParentesco(
             },
             getOptionDescription = { it.nombre },
             enabled = enable,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            onSearchTextChange = {}
         )
 
         Spacer(modifier = Modifier.width(8.dp))

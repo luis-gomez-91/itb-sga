@@ -50,6 +50,10 @@ import org.example.aok.features.student.pago_online.PagoOnlineViewModel
 import org.example.aok.features.teacher.pro_clases.ProClasesScreen
 import org.example.aok.features.teacher.pro_clases.ProClasesViewModel
 import org.example.aok.features.teacher.pro_clases.VerClaseScreen
+import org.example.aok.features.teacher.pro_cronograma.ProCronogramaScreen
+import org.example.aok.features.teacher.pro_cronograma.ProCronogramaViewModel
+import org.example.aok.features.teacher.pro_entrega_actas.ProEntregaActasScreen
+import org.example.aok.features.teacher.pro_entrega_actas.ProEntregaActasViewModel
 import org.example.aok.features.teacher.pro_evaluaciones.ProCalificacionesScreen
 import org.example.aok.features.teacher.pro_evaluaciones.ProEvaluacionesScreen
 import org.example.aok.features.teacher.pro_evaluaciones.ProEvaluacionesViewModel
@@ -80,7 +84,9 @@ fun MyNavigation(
     aluConsultaGeneralViewModel: AluConsultaGeneralViewModel,
     aluMatriculaViewModel: AluMatriculaViewModel,
     reportesViewModel: ReportesViewModel,
-    proEvaluacionesViewModel: ProEvaluacionesViewModel
+    proEvaluacionesViewModel: ProEvaluacionesViewModel,
+    proCronogramaViewModel: ProCronogramaViewModel,
+    proEntregaActasViewModel: ProEntregaActasViewModel
 ) {
     val navController = rememberNavController()
     NavHost(
@@ -114,6 +120,9 @@ fun MyNavigation(
         composable("alu_matricula") { AluMatriculaScreen(navController, homeViewModel, loginViewModel, aluMatriculaViewModel) }
         composable("reportes") { ReportesScreen(navController, homeViewModel, loginViewModel, reportesViewModel) }
         composable("pro_evaluaciones") { ProEvaluacionesScreen(navController, homeViewModel, loginViewModel, proEvaluacionesViewModel) }
+        composable("pro_cronograma") { ProCronogramaScreen(navController, homeViewModel, loginViewModel, proCronogramaViewModel) }
+        composable("pro_entrega_acta") { ProEntregaActasScreen(navController, homeViewModel, loginViewModel, proEntregaActasViewModel) }
+
 
         composable("pro_calificaciones") { ProCalificacionesScreen(navController, homeViewModel, proEvaluacionesViewModel) }
         composable("ver_clase") { VerClaseScreen(navController, homeViewModel, proClasesViewModel) }

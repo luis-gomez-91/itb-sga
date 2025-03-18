@@ -146,7 +146,8 @@ fun Departamentos(
             expandedDepartamento = false
         },
         getOptionDescription = { it.nombre },
-        enabled = true
+        enabled = true,
+        onSearchTextChange = {}
     )
     Spacer(modifier = Modifier.height(16.dp))
 }
@@ -174,7 +175,8 @@ fun Especies(
                 expandedTipoSolicitud = false
             },
             getOptionDescription = { it.nombre },
-            enabled = true
+            enabled = true,
+            onSearchTextChange = {}
         )
         Spacer(modifier = Modifier.height(16.dp))
     }
@@ -270,7 +272,8 @@ fun Materias(
             expanded = false
         },
         getOptionDescription = { it.nombre },
-        enabled = true
+        enabled = true,
+        onSearchTextChange = {}
     )
 
     Spacer(Modifier.height(16.dp))
@@ -302,7 +305,8 @@ fun Docentes(
             expanded = false
         },
         getOptionDescription = { it.nombre },
-        enabled = true
+        enabled = true,
+        onSearchTextChange = {}
     )
 
     Spacer(Modifier.height(16.dp))

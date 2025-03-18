@@ -106,7 +106,8 @@ fun DatosPersonales(
                         }
                     },
                     getOptionDescription = { it.descripcion },
-                    enabled = enable
+                    enabled = enable,
+                    onSearchTextChange = {}
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -122,7 +123,8 @@ fun DatosPersonales(
                         }
                     },
                     getOptionDescription = { it.descripcion },
-                    enabled = enable
+                    enabled = enable,
+                    onSearchTextChange = {}
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

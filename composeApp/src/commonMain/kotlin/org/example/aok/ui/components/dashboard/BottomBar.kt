@@ -59,7 +59,7 @@ fun MyBottomBar(
                     homeViewModel.changeBottomSheet()
                 },
                 icon = { Icon(Icons.Filled.Menu, contentDescription = "Periodos") },
-                label = { Text("Periodos") }
+                label = { Text("Períodos") }
             )
 
             NavigationBarItem(

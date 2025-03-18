@@ -2,8 +2,8 @@ package org.example.aok.core
 
 import com.preat.peekaboo.image.picker.ResizeOptions
 
-//const val SERVER_URL = "https://sga.itb.edu.ec/"
-const val SERVER_URL = "http://10.0.2.2:8000/"
+const val SERVER_URL = "https://sga.itb.edu.ec/"
+//const val SERVER_URL = "http://10.0.2.2:8000/"
 
 val ROUTES = setOf(
     "login", "home", "inscripciones", "account", "alu_finanzas",
@@ -12,7 +12,7 @@ val ROUTES = setOf(
     "docentes", "pro_clases", "pro_horarios", "solicitudonline", "addSolicitud",
     "admin_ayudafinanciera", "documentos_alu", "documentos", "beca_solicitud",
     "alumnos_cab", "consultaalumno", "alu_matricula", "pro_cronograma",
-    "reportes", "pro_evaluaciones"
+    "reportes", "pro_evaluaciones", "pro_entrega_acta"
 )
 
 val resizeOptions = ResizeOptions(

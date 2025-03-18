@@ -5,7 +5,9 @@ import org.example.aok.data.network.pro_clases.Asistencia
 import org.example.aok.data.network.pro_clases.ComenzarClase
 import org.example.aok.data.network.pro_clases.LeccionGrupo
 import org.example.aok.data.network.pro_cronograma.ProCronograma
+import org.example.aok.data.network.pro_entrega_actas.ProEntregaActas
 import org.example.aok.data.network.pro_evaluaciones.ProEvaluaciones
+import org.example.aok.data.network.reportes.DjangoModel
 import org.example.aok.data.network.reportes.ReporteCategoria
 import org.example.aok.data.network.solicitud_becas.FichaSocioeconomica
 import org.example.aok.data.network.solicitud_becas.SolicitudBeca
@@ -158,4 +160,14 @@ sealed class ComenzarClaseResult {
 sealed class UpdateAsistenciaResult {
     data class Success(val data: Asistencia) : UpdateAsistenciaResult()
     data class Failure(val error: Error) : UpdateAsistenciaResult()
+}
+
+sealed class ProEntregaActasResult {
+    data class Success(val data: List<ProEntregaActas>) : ProEntregaActasResult()
+    data class Failure(val error: Error) : ProEntregaActasResult()
+}
+
+sealed class DjangoModelResult {
+    data class Success(val data: DjangoModel) : DjangoModelResult()
+    data class Failure(val error: Error) : DjangoModelResult()
 }

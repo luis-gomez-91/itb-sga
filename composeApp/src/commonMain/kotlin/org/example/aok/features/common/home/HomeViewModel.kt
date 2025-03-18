@@ -2,15 +2,18 @@ package org.example.aok.features.common.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.example.aok.core.URLOpener
 import org.example.aok.core.createHttpClient
 import org.example.aok.core.logInfo
 import org.example.aok.core.requestPostDispatcher
 import org.example.aok.data.database.AokDatabase
+import org.example.aok.data.entity.ParametroReporte
 import org.example.aok.data.entity.ThemePreference
 import org.example.aok.data.entity.User
 import org.example.aok.data.network.Home
@@ -122,12 +125,16 @@ class HomeViewModel(
             _isLoading.value = true
             try {
                 val result = service.fetchReport(form)
+                logInfo("prueba", "${result}")
                 when (result) {
                     is ReportResult.Success -> {
                         _report.value = result.report
                         _error.value = null
-                        val url = "https://sga.itb.edu.ec${_report.value!!.url}"
-                        openURL(url)
+                        val url = "https://sga.itb.edu.ec${result.report.url}"
+//                        openURL(url)
+                        withContext(Dispatchers.Main) { // Asegurar que se ejecuta en el hilo principal
+                            openURL(url)
+                        }
                     }
                     is ReportResult.Failure -> {
                         _error.value = result.error
@@ -144,11 +151,13 @@ class HomeViewModel(
     }
 
     fun openURL(url: String) {
-        viewModelScope.launch {
+        logInfo("prueba", "ENTRO A URL OPENER")
+
+        viewModelScope.launch(Dispatchers.Main) {
             try {
                 pdfOpener.openURL(url)
             } catch (e: Exception) {
-                logInfo("alu_facturacion", "ERROR: ${e}")
+                logInfo("prueba", "ERROR: ${e}")
             }
         }
     }
@@ -393,6 +402,23 @@ class HomeViewModel(
             }
             val themeSelected = aokDatabase.themePreferenceDao().getSelected()
             _selectedTheme.value = themeSelected
+
+            aokDatabase.themePreferenceDao().getAll().collect { parametro ->
+                if (parametro.isEmpty()) {
+                    val list = listOf(
+                        ParametroReporte(id = 1, name = "Texto"),
+                        ParametroReporte(id = 2, name = "Número entero"),
+                        ParametroReporte(id = 3, name = "Número decimal"),
+                        ParametroReporte(id = 4, name = "Verdadero o falso"),
+                        ParametroReporte(id = 5, name = "Registro de datos"),
+                        ParametroReporte(id = 6, name = "Fecha"),
+                        ParametroReporte(id = 7, name = "Cuadro de texto"),
+                    )
+                    list.forEach {
+                        aokDatabase.parametroReporteDao().upsert(it)
+                    }
+                }
+            }
         }
     }
 

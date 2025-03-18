@@ -2,34 +2,29 @@ package org.example.aok.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuBoxScope
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import kotlin.math.exp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <T> MyExposedDropdownMenuBox (
+fun <T> MyExposedDropdownMenuBox(
     modifier: Modifier = Modifier,
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
@@ -38,13 +33,20 @@ fun <T> MyExposedDropdownMenuBox (
     options: List<T>,
     onOptionSelected: (T) -> Unit,
     getOptionDescription: (T) -> String,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    onSearchTextChange: (String) -> Unit
 ) {
-    val shape = if (expanded) {
-        RoundedCornerShape(4.dp).copy(bottomEnd = CornerSize(0.dp), bottomStart = CornerSize(0.dp))
-    } else {
-        RoundedCornerShape(4.dp).copy(bottomEnd = CornerSize(0.dp), bottomStart = CornerSize(0.dp))
+    var searchText by remember { mutableStateOf("") }
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val interactionSource = remember { MutableInteractionSource() }
+
+    // Actualizar el texto cuando cambia la opción seleccionada
+    LaunchedEffect(selectedOption) {
+        searchText = selectedOption?.let { getOptionDescription(it) } ?: ""
     }
+
+    val shape = RoundedCornerShape(4.dp)
 
     ExposedDropdownMenuBox(
         modifier = modifier
@@ -56,14 +58,14 @@ fun <T> MyExposedDropdownMenuBox (
                 shape = shape
             ),
         expanded = expanded,
-        onExpandedChange = { if (enabled) onExpandedChange(it) },
+        onExpandedChange = { if (enabled) onExpandedChange(it) }
     ) {
         TextField(
-            value = selectedOption?.let { getOptionDescription(it) } ?: "",
-            enabled = enabled,
-            onValueChange = { },
-            readOnly = true,
-            shape = RoundedCornerShape(16.dp),
+            value = searchText,
+            onValueChange = { newText ->
+                searchText = newText
+                onSearchTextChange(newText) // Mantener el texto actualizado
+            },
             label = {
                 Text(
                     text = label,
@@ -72,8 +74,13 @@ fun <T> MyExposedDropdownMenuBox (
                 )
             },
             trailingIcon = {
-//                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
-                IconButton(onClick = { if (enabled) onExpandedChange(!expanded) }) {
+                IconButton(
+                    onClick = {
+                        if (enabled) {
+                            onExpandedChange(!expanded) // Alternar el estado del menú
+                        }
+                    }
+                ) {
                     Icon(
                         imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                         contentDescription = "Expand",
@@ -82,27 +89,43 @@ fun <T> MyExposedDropdownMenuBox (
                     )
                 }
             },
-            modifier = Modifier.menuAnchor().fillMaxWidth(),
             textStyle = MaterialTheme.typography.labelSmall,
             colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = Color.Transparent,
                 focusedContainerColor = Color.Transparent,
                 focusedIndicatorColor = MaterialTheme.colorScheme.secondary.copy(alpha = 1f),
                 disabledIndicatorColor = MaterialTheme.colorScheme.outlineVariant
-            )
+            ),
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth()
+                .focusRequester(focusRequester)
+                .focusable(enabled)
+                .onFocusChanged { focusState ->
+                    if (focusState.isFocused) {
+                        onExpandedChange(true) // Expande el menú solo si el campo tiene foco
+                    }
+                },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboardController?.hide()
+                }
+            ),
+            singleLine = true,
+            interactionSource = interactionSource
         )
+
+        // Mostrar el menú desplegable solo si hay opciones
         if (options.isNotEmpty()) {
             ExposedDropdownMenu(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(horizontal = 8.dp),
                 expanded = expanded,
                 onDismissRequest = { onExpandedChange(false) }
             ) {
                 options.forEach { option ->
                     DropdownMenuItem(
-                        modifier = Modifier.fillMaxWidth(),
                         text = {
                             Text(
                                 text = getOptionDescription(option),
@@ -111,22 +134,13 @@ fun <T> MyExposedDropdownMenuBox (
                             )
                         },
                         onClick = {
+                            searchText = getOptionDescription(option)
                             onOptionSelected(option)
-                            onExpandedChange(false)
-                        },
-                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                            onExpandedChange(false) // Cierra el menú después de seleccionar la opción
+                        }
                     )
                 }
             }
         }
-//        else {
-//            Text(
-//                text = "No hay opciones disponibles",
-//                modifier = Modifier.fillMaxWidth().padding(8.dp),
-//                style = MaterialTheme.typography.bodySmall,
-//                color = MaterialTheme.colorScheme.error
-//            )
-//        }
-
     }
 }
