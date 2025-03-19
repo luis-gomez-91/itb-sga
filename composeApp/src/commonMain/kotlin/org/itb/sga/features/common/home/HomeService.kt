@@ -1,4 +1,4 @@
-package org.example.aok.features.common.home
+package org.itb.sga.features.common.home
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -8,14 +8,13 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import org.example.aok.core.SERVER_URL
-import org.example.aok.core.logInfo
-import org.example.aok.data.network.Error
-import org.example.aok.data.network.Home
-import org.example.aok.data.network.HomeResult
-import org.example.aok.data.network.Report
-import org.example.aok.data.network.ReportForm
-import org.example.aok.data.network.ReportResult
+import org.itb.sga.core.SERVER_URL
+import org.itb.sga.data.network.Error
+import org.itb.sga.data.network.Home
+import org.itb.sga.data.network.HomeResult
+import org.itb.sga.data.network.Report
+import org.itb.sga.data.network.ReportForm
+import org.itb.sga.data.network.ReportResult
 
 class HomeService(
     private val client: HttpClient
