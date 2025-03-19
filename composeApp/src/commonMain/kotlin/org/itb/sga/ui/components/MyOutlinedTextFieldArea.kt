@@ -7,7 +7,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
@@ -23,12 +27,21 @@ fun MyOutlinedTextFieldArea(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     enabled: Boolean = true,
     trailingIcon: @Composable (() -> Unit)? = null,
-    visualTransformation: VisualTransformation = VisualTransformation.None
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    onFocusLost: () -> Unit = {}
 ) {
+    val focusRequester = remember { FocusRequester() }
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = modifier.height(150.dp),
+        modifier = modifier
+            .height(150.dp)
+            .focusRequester(focusRequester)
+            .onFocusChanged { focusState ->
+                if (!focusState.isFocused) {
+                    onFocusLost()
+                }
+            },
         placeholder = { Text(text = placeholder) },
         label = {
             Text(
@@ -45,7 +58,7 @@ fun MyOutlinedTextFieldArea(
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = MaterialTheme.colorScheme.secondary.copy(alpha = 1f),
             unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
-            disabledIndicatorColor = MaterialTheme.colorScheme.outlineVariant,
+            disabledIndicatorColor = MaterialTheme.colorScheme.surfaceContainerLow,
             unfocusedContainerColor = Color.Transparent,
             focusedContainerColor = Color.Transparent
         ),

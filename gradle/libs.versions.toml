@@ -17,9 +17,11 @@ coilCompose = "3.0.0-alpha8"
 compose-plugin = "1.7.0"
 filekitCore = "0.8.7"
 junit = "4.13.2"
-kotlin = "2.1.0"
+kotlin = "2.0.0"
 foundationAndroid = "1.7.7"
 kotlinxDatetime = "0.6.0"
+kotlinxMetadataJvm = "0.9.0"
+kotlinxMetadataJvmVersion = "0.9.0"
 materialIconsExtended = "1.5.2"
 paymentezAndroid = "v1.3.5"
 runtimeAndroid = "1.7.7"
@@ -27,23 +29,24 @@ uiGraphicsAndroid = "1.7.7"
 lifecycleLivedataCoreKtx = "2.8.7"
 lifecycleViewmodelAndroid = "2.8.7"
 uiAndroid = "1.7.7"
-constraintlayoutCompose = "1.1.0"
+constraintlayoutCompose = "1.1.1"
 coil = "3.0.0-alpha06"
 ktor = "2.3.11"
 #composeMaterial = "1.4.0"
-uiTextGoogleFonts = "1.7.7"
+uiTextGoogleFonts = "1.7.8"
 navigation-compose = "2.8.0-alpha02"
 core = "1.15.0"
 places = "4.1.0"
 protoliteWellKnownTypes = "18.0.0"
-coreI18n = "1.0.0-alpha01"
+coreI18n = "1.0.0-beta01"
 peekaboo = "0.5.2"
 
 composeMaterial3 = "1.2.1"
 
-ksp = "2.1.0-1.0.29"
-androidx-room = "2.7.0-alpha13"
-sqlite = "2.5.0-alpha13"
+#ksp = "2.1.0-1.0.29"
+ksp = "2.0.0-1.0.24"
+androidx-room = "2.7.0-rc02"
+sqlite = "2.5.0-rc02"
 compiler = "3.2.0-alpha11"
 compilerVersion = "3.2.0-alpha11"
 
@@ -77,6 +80,8 @@ coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref 
 coil-network-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor", version.ref = "coil" }
 
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlinx-metadata-jvm = { module = "org.jetbrains.kotlinx:kotlinx-metadata-jvm", version.ref = "kotlinxMetadataJvm" }
+kotlinx-metadata-jvm-v070 = { module = "org.jetbrains.kotlinx:kotlinx-metadata-jvm", version.ref = "kotlinxMetadataJvmVersion" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }

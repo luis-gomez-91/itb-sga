@@ -13,8 +13,10 @@ import org.itb.sga.data.network.Error
 import org.itb.sga.data.network.LeccionGrupoResult
 import org.itb.sga.data.network.ProClases
 import org.itb.sga.data.network.ProClasesResult
+import org.itb.sga.data.network.Response
 import org.itb.sga.data.network.UpdateAsistenciaResult
 import org.itb.sga.data.network.form.UpdateAsistencia
+import org.itb.sga.data.network.form.UpdateValue
 import org.itb.sga.data.network.form.VerClase
 import org.itb.sga.data.network.pro_clases.Asistencia
 import org.itb.sga.data.network.pro_clases.LeccionGrupo
@@ -74,6 +76,22 @@ class ProClasesService(
         } catch (e: Exception) {
             val error = Error("Error", "Error inesperado: ${e.message}")
             UpdateAsistenciaResult.Failure(error)
+        }
+    }
+
+    suspend fun updateContenido(client: HttpClient, form: UpdateValue): Response {
+        return try {
+            val response = client.post("${SERVER_URL}api_rest?action=pro_clases") {
+                contentType(ContentType.Application.Json)
+                setBody(form)
+            }
+            if (response.status == HttpStatusCode.OK) {
+                response.body<Response>()
+            } else {
+                response.body<Response>()
+            }
+        } catch (e: Exception) {
+            Response("Error", "Error inesperado: ${e.message}")
         }
     }
 }

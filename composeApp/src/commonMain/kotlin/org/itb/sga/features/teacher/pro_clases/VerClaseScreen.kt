@@ -1,5 +1,12 @@
 package org.itb.sga.features.teacher.pro_clases
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,48 +17,70 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import org.itb.sga.core.formatoText
+import org.itb.sga.data.network.ClaseX
 import org.itb.sga.data.network.pro_clases.Asistencia
-import org.itb.sga.features.common.home.HomeViewModel
+import org.itb.sga.data.network.pro_clases.LeccionGrupo
 import org.itb.sga.ui.components.MyAssistChip
+import org.itb.sga.ui.components.MyFilledTonalButton
+import org.itb.sga.ui.components.MyOutlinedTextFieldArea
+import org.itb.sga.ui.components.MySwitch
 import org.itb.sga.ui.components.dashboard.DashboardScreen2
 
 @Composable
 fun VerClaseScreen(
     navController: NavHostController,
-    homeViewModel: HomeViewModel,
     proClasesViewModel: ProClasesViewModel
 ) {
     DashboardScreen2(
-        content = { Screen(proClasesViewModel) },
-        backScreen = "pro_clases",
+        content = { Screen(proClasesViewModel, navController) },
         title = "Clase",
-        navHostController = navController
-
+        onBack = {
+            navController.navigate("pro_clases")
+//            proClasesViewModel.updateClaseSelect(null)
+        }
     )
 }
 
 @Composable
 fun Screen(
-    proClasesViewModel: ProClasesViewModel
+    proClasesViewModel: ProClasesViewModel,
+    navController: NavHostController
 ) {
     val leccionGrupo by proClasesViewModel.leccionGrupoData.collectAsState(null)
     val claseSelect by proClasesViewModel.claseSelect.collectAsState(null)
+    var expandedAsistencias by remember { mutableStateOf(false) }
+    var expandedContenido by remember { mutableStateOf(false) }
+    var expandedObservaciones by remember { mutableStateOf(false) }
+    var contenido by remember { mutableStateOf(leccionGrupo?.leccionGrupoContenido ?: "") }
+    var observaciones by remember { mutableStateOf(leccionGrupo?.leccionGrupoObservaciones ?: "") }
 
+    LaunchedEffect(leccionGrupo) {
+        contenido = leccionGrupo?.leccionGrupoContenido ?: ""
+        observaciones = leccionGrupo?.leccionGrupoObservaciones ?: ""
+    }
 
     Column (
         modifier = Modifier
@@ -65,7 +94,7 @@ fun Screen(
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = formatoText("Grupo: ","${it.grupo}"),
+                text = formatoText("Grupo: ", it.grupo),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
@@ -75,46 +104,180 @@ fun Screen(
                 color = MaterialTheme.colorScheme.secondary
             )
             Text(
-                text = formatoText("Turno: ","${it.turno}"),
+                text = formatoText("Turno: ", it.turno),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
             Text(
-                text = formatoText("Aula: ","${it.aula}"),
+                text = formatoText("Aula: ", it.aula),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
         }
 
         Spacer(Modifier.height(16.dp))
-        Text(
-            text = "Listado de alumnos",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.secondary
-        )
-        Spacer(Modifier.height(8.dp))
-        LazyColumn(
-            modifier = Modifier.weight(1f)
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            leccionGrupo?.let {
-                items(it.asistencias) { asistencia ->
-                    HorizontalDivider()
-                    Spacer(modifier = Modifier.height(8.dp))
-                    AsistenciaItem(asistencia, proClasesViewModel)
-                    Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Listado de alumnos",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            AnimatedContent(targetState = expandedAsistencias) { isExpanded ->
+                IconButton(onClick = { expandedAsistencias = !expandedAsistencias }) {
+                    Icon(
+                        imageVector = if (expandedAsistencias) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        contentDescription = if (expandedAsistencias) "Collapse" else "Expand",
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
+        }
+        AnimatedVisibility(
+            visible = expandedAsistencias,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            Spacer(Modifier.height(4.dp))
+            LazyColumn(
+                modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
+            ) {
+                leccionGrupo?.let { leccion ->
+                    itemsIndexed(leccion.asistencias) { index, asistencia ->
+                        Spacer(modifier = Modifier.height(8.dp))
+                        claseSelect?.let {
+                            AsistenciaItem(
+                                index = index,
+                                asistencia = asistencia,
+                                proClasesViewModel = proClasesViewModel,
+                                leccionGrupo = leccion,
+                                claseSelect = it
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        HorizontalDivider()
+                    }
                 }
             }
         }
 
+        Spacer(Modifier.height(8.dp))
+        Row (
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Contenido",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            AnimatedContent(targetState = expandedContenido) { isExpanded ->
+                IconButton(onClick = { expandedContenido = !expandedContenido }) {
+                    Icon(
+                        imageVector = if (expandedContenido) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        contentDescription = if (expandedContenido) "Collapse" else "Expand",
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
+        }
+        AnimatedVisibility(
+            visible = expandedContenido,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            MyOutlinedTextFieldArea(
+                value = contenido,
+                onValueChange = { contenido = it },
+                label = "Contenido",
+                modifier = Modifier.fillMaxWidth(),
+                enabled = claseSelect!!.abierta,
+                onFocusLost = {
+                    if (contenido != leccionGrupo?.leccionGrupoContenido) {
+                        proClasesViewModel.updateValueAction(contenido, "updateContenido")
+                    }
+                }
+            )
+        }
+
+        Spacer(Modifier.height(8.dp))
+        Row (
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Observaciones",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            AnimatedContent(targetState = expandedObservaciones) { isExpanded ->
+                IconButton(onClick = { expandedObservaciones = !expandedObservaciones }) {
+                    Icon(
+                        imageVector = if (expandedObservaciones) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        contentDescription = if (expandedObservaciones) "Collapse" else "Expand",
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
+        }
+        AnimatedVisibility(
+            visible = expandedObservaciones,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            MyOutlinedTextFieldArea(
+                value = observaciones,
+                onValueChange = { observaciones = it },
+                label = "Contenido",
+                modifier = Modifier.fillMaxWidth(),
+                enabled = claseSelect!!.abierta,
+                onFocusLost = {
+                    if (observaciones != leccionGrupo?.leccionGrupoObservaciones) {
+                        proClasesViewModel.updateValueAction(observaciones, "updateObservaciones")
+                    }
+                }
+            )
+        }
+        claseSelect?.let {
+            if (it.abierta) {
+                Spacer(Modifier.height(16.dp))
+                MyFilledTonalButton(
+                    text = "Cerrar clase",
+                    enabled = true,
+                    onClickAction = {
+                        proClasesViewModel.updateValueAction("", "cerrarClase")
+                        navController.popBackStack()
+                    },
+                    buttonColor = MaterialTheme.colorScheme.errorContainer,
+                    textColor = MaterialTheme.colorScheme.error
+                )
+            }
+        }
     }
-
-
 }
 
 @Composable
 fun AsistenciaItem(
+    index: Int,
     asistencia: Asistencia,
-    proClasesViewModel: ProClasesViewModel
+    proClasesViewModel: ProClasesViewModel,
+    leccionGrupo: LeccionGrupo,
+    claseSelect: ClaseX,
 ) {
     Column(
         modifier = Modifier
@@ -126,23 +289,39 @@ fun AsistenciaItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = asistencia.alumno,
+                modifier = Modifier.weight(1f),
+                text = "asistencia.alumno",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Row {
+            Spacer(Modifier.width(8.dp))
+
+            Row (
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 MyAssistChip(
-                    label = "12/15",
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    labelColor = MaterialTheme.colorScheme.secondary
+                    label = "${asistencia.cantidad}/${leccionGrupo.totalLecciones} (${asistencia.porcentaje}%)",
+                    containerColor = if (asistencia.porcentaje >= leccionGrupo.minimoAsistencia) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.errorContainer,
+                    labelColor = if (asistencia.porcentaje >= leccionGrupo.minimoAsistencia) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.error
                 )
                 Spacer(Modifier.width(8.dp))
-                Icon(
-                    imageVector = Icons.Filled.Check,
-                    contentDescription = "Asistencia",
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
+                if (!claseSelect.abierta) {
+                    Icon(
+                        imageVector = if (asistencia.asistio) Icons.Filled.CheckCircle else Icons.Filled.Cancel,
+                        contentDescription = "Asistencia",
+                        tint = if (asistencia.asistio) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.error
+                    )
+                } else {
+                    MySwitch(
+                        checked = asistencia.asistio,
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        onCheckedChange = { checked ->
+                            proClasesViewModel.updateAsistencia(asistencia, checked, index)
+                        },
+                        enabled = claseSelect.abierta
+                    )
+                }
             }
         }
     }

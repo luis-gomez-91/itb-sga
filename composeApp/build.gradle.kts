@@ -18,7 +18,7 @@ kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
 
@@ -110,12 +110,12 @@ android {
     }
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         compose = true
@@ -128,6 +128,7 @@ android {
 repositories {
     google()
     mavenCentral()
+    gradlePluginPortal()
     maven {
         url = uri("https://jitpack.io")
     }
@@ -151,6 +152,9 @@ dependencies {
 
     commonMainApi("dev.icerock.moko:biometry-compose:0.4.0")
     commonMainApi("dev.icerock.moko:biometry:0.4.0")
+    implementation(libs.kotlinx.metadata.jvm)
+
+
 }
 
 dependencies {
@@ -162,4 +166,10 @@ dependencies {
 
 room {
     schemaDirectory("$projectDir/schemas")
+}
+
+configurations.all {
+    resolutionStrategy {
+        force("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.7.0")
+    }
 }

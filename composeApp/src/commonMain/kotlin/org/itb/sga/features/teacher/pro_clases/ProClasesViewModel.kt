@@ -15,6 +15,8 @@ import org.itb.sga.data.network.ProClases
 import org.itb.sga.data.network.ProClasesResult
 import org.itb.sga.data.network.UpdateAsistenciaResult
 import org.itb.sga.data.network.form.UpdateAsistencia
+import org.itb.sga.data.network.form.UpdateValue
+import org.itb.sga.data.network.form.ValueData
 import org.itb.sga.data.network.form.VerClase
 import org.itb.sga.data.network.pro_clases.Asistencia
 import org.itb.sga.data.network.pro_clases.LeccionGrupo
@@ -79,6 +81,7 @@ class ProClasesViewModel: ViewModel() {
                 idLeccionGrupo = idLeccionGrupo,
             )
             val response = service.verClase(client, form)
+            logInfo("prueba", "${response}")
             when (response) {
                 is LeccionGrupoResult.Success -> {
                     _leccionGrupoData.value = response.data.copy()
@@ -122,6 +125,33 @@ class ProClasesViewModel: ViewModel() {
                         _error.value = response.error
                     }
                 }
+            } catch (e: Exception) {
+                logInfo("prueba", "${e}")
+            }
+        }
+    }
+
+    fun updateValueAction(
+        newValue: String,
+        action: String
+    ) {
+        viewModelScope.launch {
+            try {
+                _leccionGrupoData.value?.let {
+                    val form = UpdateValue(
+                        action = action,
+                        id = it.leccionGrupoId,
+                        value = ValueData.StringValue(newValue)
+                    )
+
+                    val response = service.updateContenido(client, form)
+                    if (response.status == "success") {
+                        it.leccionGrupoContenido = response.message
+                    } else {
+
+                    }
+                }
+
             } catch (e: Exception) {
                 logInfo("prueba", "${e}")
             }

@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Start
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +45,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.itb.sga.core.formatoText
@@ -277,24 +281,42 @@ fun ClaseItem(
                 }
             }
 
-            if (isShowButton(clase.turnoComienza)) {
-                Spacer(Modifier.height(8.dp))
+            if (clase.claseAbierta) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
                     MyFilledTonalButton(
-                        text = "Comenzar clase",
+                        text = "Ver clase abierta",
                         enabled = true,
-                        icon = Icons.Filled.Start,
+                        icon = Icons.Filled.Visibility,
                         onClickAction = {
-                            homeViewModel.homeData.value?.persona?.idDocente?.let {
-                                proHorariosViewModel.comenzarClase(clase, it, navController, proClasesViewModel)
-                            }
+                            navController.navigate("pro_clases")
                         },
-                        buttonColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        textColor = MaterialTheme.colorScheme.onPrimary
+                        buttonColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        textColor = MaterialTheme.colorScheme.tertiary
                     )
+                }
+            } else {
+                if (isShowButton(clase) && clase.habilitaAbrirClase) {
+                    Spacer(Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        MyFilledTonalButton(
+                            text = "Comenzar clase",
+                            enabled = true,
+                            icon = Icons.Filled.Start,
+                            onClickAction = {
+                                homeViewModel.homeData.value?.persona?.idDocente?.let {
+                                    proHorariosViewModel.comenzarClase(clase, it, navController, proClasesViewModel)
+                                }
+                            },
+                            buttonColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            textColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
                 }
             }
         }
@@ -330,15 +352,26 @@ fun ClaseMoreInfo(
     )
 }
 
-fun isShowButton(turnoComienza: String): Boolean {
-    val classTime = parseTime(turnoComienza)
-    val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time
+fun isShowButton(clase: ProHorarioClase): Boolean {
+    val timeZone = TimeZone.currentSystemDefault()
+    val currentDateTime = Clock.System.now().toLocalDateTime(timeZone)
 
-    val classTimeInMinutes = classTime.hour * 60 + classTime.minute
-    val currentTimeInMinutes = currentTime.hour * 60 + currentTime.minute
+    val classDateTime = parseDateTime(clase.turnoComienza, currentDateTime.date)
 
-    val startRangeInMinutes = classTimeInMinutes - 15
-    val endRangeInMinutes = classTimeInMinutes + 15
+    if (classDateTime.date != currentDateTime.date) return false
 
-    return currentTimeInMinutes in startRangeInMinutes..endRangeInMinutes
+    val classTimeInMinutes = classDateTime.time.hour * 60 + classDateTime.time.minute
+    val currentTimeInMinutes = currentDateTime.time.hour * 60 + currentDateTime.time.minute
+
+    return currentTimeInMinutes in (classTimeInMinutes - clase.tiempoAperturaAntes)..(classTimeInMinutes + clase.tiempoAperturaDespues)
+}
+
+fun parseDateTime(timeString: String, currentDate: LocalDate): LocalDateTime {
+    val parts = timeString.split(":")
+    if (parts.size != 2) throw IllegalArgumentException("Formato inválido, se espera HH:mm")
+
+    val hour = parts[0].toInt()
+    val minute = parts[1].toInt()
+
+    return LocalDateTime(currentDate, LocalTime(hour, minute))
 }

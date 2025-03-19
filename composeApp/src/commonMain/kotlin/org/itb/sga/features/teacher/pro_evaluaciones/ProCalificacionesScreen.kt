@@ -60,9 +60,10 @@ fun ProCalificacionesScreen(
 ) {
     DashboardScreen2(
         content = { Screen(proEvaluacionesViewModel, homeViewModel) },
-        backScreen = "pro_evaluaciones",
         title = "Calificaciones",
-        navHostController = navController
+        onBack = {
+            navController.navigate("pro_evaluaciones")
+        }
     )
 }
 

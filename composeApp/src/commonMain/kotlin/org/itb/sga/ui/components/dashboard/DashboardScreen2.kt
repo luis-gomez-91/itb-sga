@@ -17,14 +17,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import org.example.aok.data.network.PagingBack
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen2(
     content: @Composable () -> Unit = {},
-    backScreen: String,
     title: String = "",
-    navHostController: NavHostController
+    onBack: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -35,7 +35,7 @@ fun DashboardScreen2(
 //                ),
                 navigationIcon = {
                     IconButton(
-                        onClick = { navHostController.navigate(backScreen) }
+                        onClick = { onBack() }
                     ) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBackIosNew,

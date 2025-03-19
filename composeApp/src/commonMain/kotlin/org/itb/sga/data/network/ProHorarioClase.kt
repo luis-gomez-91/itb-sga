@@ -13,5 +13,11 @@ data class ProHorarioClase(
     val materiaHasta: String,
     val nivel: String,
     val turnoComienza: String,
-    val turnoTermina: String
+    val turnoTermina: String,
+    val tiempoAperturaAntes: Int,
+    val tiempoAperturaDespues: Int,
+    val habilitaAbrirClase: Boolean,
+    val claseAbierta: Boolean,
+    val leccionGrupoId: Int?
+
 )

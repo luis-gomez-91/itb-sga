@@ -125,7 +125,7 @@ fun MyNavigation(
 
 
         composable("pro_calificaciones") { ProCalificacionesScreen(navController, homeViewModel, proEvaluacionesViewModel) }
-        composable("ver_clase") { VerClaseScreen(navController, homeViewModel, proClasesViewModel) }
+        composable("ver_clase") { VerClaseScreen(navController, proClasesViewModel) }
 
     }
 }
