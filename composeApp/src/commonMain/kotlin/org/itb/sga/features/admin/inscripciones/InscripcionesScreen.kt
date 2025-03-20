@@ -1,5 +1,6 @@
 package org.itb.sga.features.admin.inscripciones
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -58,9 +59,11 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import org.itb.sga.core.formatoText
 import org.itb.sga.data.network.Inscripcion
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
+import org.itb.sga.features.teacher.pro_entrega_actas.DropdownActions
 import org.itb.sga.ui.components.MyAssistChip
 import org.itb.sga.ui.components.MyCard
 import org.itb.sga.ui.components.MyCircularProgressIndicator
@@ -118,12 +121,11 @@ fun Screen(
             if (isLoading) {
                 MyCircularProgressIndicator()
             } else {
-                Spacer(modifier = Modifier.height(8.dp))
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(data?.inscripciones ?: emptyList()) { inscripcion ->
-                        cardInscripcion(
+                        InscripcionItem(
                             inscripcion = inscripcion,
                             loginViewModel = loginViewModel,
                             homeViewModel = homeViewModel,
@@ -148,7 +150,7 @@ fun Screen(
                     homeViewModel.pageLess()
                     inscripcionesViewModel.onloadInscripciones(
                         query,
-                        actualPage,
+                        actualPage - 1,
                         homeViewModel
                     )
                 },
@@ -172,7 +174,7 @@ fun Screen(
                     homeViewModel.pageMore()
                     inscripcionesViewModel.onloadInscripciones(
                         query,
-                        actualPage,
+                        actualPage + 1,
                         homeViewModel
                     )
                 },
@@ -186,12 +188,10 @@ fun Screen(
             }
         }
     }
-
-
 }
 
 @Composable
-fun cardInscripcion(
+fun InscripcionItem(
     inscripcion: Inscripcion,
     loginViewModel: LoginViewModel,
     homeViewModel: HomeViewModel,
@@ -200,155 +200,160 @@ fun cardInscripcion(
     var expanded by remember { mutableStateOf(false) }
     var showActions by remember { mutableStateOf(false) }
 
-    Box(
+    Row (
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 4.dp)
-            .background(color = MaterialTheme.colorScheme.surface)
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.Top
     ) {
-        Row (
+        AsyncImage(
+            model = inscripcion.foto,
+            contentDescription = "Foto",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 4.dp)
-                .background(color = MaterialTheme.colorScheme.surface),
-            verticalAlignment = Alignment.Top,
-        ){
-            AsyncImage(
-                model = inscripcion.foto,
-                contentDescription = "Foto",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .height(64.dp)
-                    .aspectRatio(1/1f)
-                    .aspectRatio(1f)
-                    .clip(CircleShape)
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        shape = CircleShape
-                    )
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(
-                    Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = inscripcion.nombre,
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
-                    )
-
-                    Row {
-                        MyAssistChip(
-                            label = "Cédula: ${inscripcion.identificacion}",
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            labelColor = MaterialTheme.colorScheme.secondary,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        MyAssistChip(
-                            label = inscripcion.username,
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            labelColor = MaterialTheme.colorScheme.secondary,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-
-                        Column {
-                            IconButton(
-                                onClick = {
-                                    showActions = !showActions
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.MoreVert,
-                                    contentDescription = "More Information",
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            }
-
-                            Box {
-                                if (showActions) {
-                                    DropdownInscripcion(
-                                        loginViewModel = loginViewModel,
-                                        homeViewModel = homeViewModel,
-                                        navController = navController,
-                                        inscripcion = inscripcion,
-                                        onDismissRequest = { showActions = false }
-                                    )
-                                }
-                            }
-                        }
-
-                    }
-                }
-
-                IconButton(
-                    onClick = { expanded = !expanded }
-                ) {
-                    Icon(
-                        imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = if (expanded) "Collapse options" else "Expand options",
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
-                }
-            }
-
-
-        }
-        HorizontalDivider(
-            thickness = 1.dp,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+                .height(64.dp)
+                .aspectRatio(1/1f)
+                .aspectRatio(1f)
+                .clip(CircleShape)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = CircleShape
+                )
         )
 
-    }
-    detalleInscripcion(inscripcion, expanded)
-}
+        Spacer(Modifier.width(16.dp))
 
-@Composable
-fun detalleInscripcion(
-    inscripcion: Inscripcion,
-    expanded: Boolean
-) {
-    AnimatedVisibility(
-        visible = expanded,
-        enter = fadeIn() + expandVertically(),
-        exit = fadeOut() + shrinkVertically()
-    ) {
-        MyCard (
-            modifier = Modifier.padding(horizontal = 16.dp),
-            onClick = { },
-
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            verticalArrangement = Arrangement.Top
         ) {
-            Column {
+            Row (
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = "Correo institucional: ${inscripcion.email}",
-                    fontSize = 8.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f),
+                    text = inscripcion.nombre,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
                 )
-                Text(
-                    text = "Correo personal: ${inscripcion.email_personal}",
-                    fontSize = 8.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Text(
-                    text = "Carrera: ${inscripcion.carrera}",
-                    fontSize = 8.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Text(
-                    text = "Grupo: ${inscripcion.grupo}",
-                    fontSize = 8.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
+                Spacer(Modifier.width(8.dp))
+                AnimatedContent(targetState = expanded) { isExpanded ->
+                    IconButton(
+                        onClick = { expanded = !expanded }
+                    ) {
+                        Icon(
+                            imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                            contentDescription = if (expanded) "Collapse options" else "Expand options",
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                }
+            }
+
+            Row (
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Column (
+                    modifier = Modifier.fillMaxWidth().weight(1f)
+                ) {
+                    Text(
+                        text = formatoText("Fecha inscripción: ", inscripcion.fecha),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = formatoText("Identificación: ", inscripcion.identificacion),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = formatoText("Usuario: ", inscripcion.username),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    AnimatedVisibility(
+                        visible = expanded,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        Column {
+                            Text(
+                                text = formatoText("Correo institucional: ", inscripcion.email),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            inscripcion.email_personal?.let {
+                                Text(
+                                    text = formatoText("Correo personal: ", it),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            inscripcion.celular?.let {
+                                Text(
+                                    text = formatoText("Teléfono celular: ", it),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            inscripcion.convencional?.let {
+                                Text(
+                                    text = formatoText("Teléfono convencional: ", it),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            Text(
+                                text = formatoText("Grupo: ", inscripcion.grupo),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Text(
+                                text = formatoText("Carrera: ", inscripcion.carrera),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
+
+                Spacer(Modifier.width(8.dp))
+
+                IconButton(
+                    onClick = {
+                        showActions = !showActions
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.MoreVert,
+                        contentDescription = "More Information",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                Box {
+                    if (showActions) {
+                        DropdownInscripcion(
+                            loginViewModel = loginViewModel,
+                            homeViewModel = homeViewModel,
+                            navController = navController,
+                            inscripcion = inscripcion,
+                            onDismissRequest = { showActions = false }
+                        )
+                    }
+                }
             }
         }
     }
+    HorizontalDivider()
 }
 
 @Composable
@@ -377,9 +382,9 @@ fun DropdownInscripcion(
                 ) {
                     Row(
                         modifier = Modifier.clickable {
-                            loginViewModel.changeLogin(inscripcion.idUsuario, navController)
+                            homeViewModel.clearHomeData()
                             homeViewModel.clearSearchQuery()
-                            navController.navigate("home")
+                            loginViewModel.changeLogin(inscripcion.idUsuario, navController)
                         }
                     ){
                         Icon(

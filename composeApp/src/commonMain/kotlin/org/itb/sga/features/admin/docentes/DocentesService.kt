@@ -12,9 +12,9 @@ import org.itb.sga.data.network.Error
 class DocentesService(
     private val client: HttpClient
 ) {
-    suspend fun fetchDocentes(search: String): DocentesResult {
+    suspend fun fetchDocentes(search: String, page: Int): DocentesResult {
         return try {
-            val response = client.get("${SERVER_URL}api_rest?action=docentes&search=$search")
+            val response = client.get("${SERVER_URL}api_rest?action=docentes&search=$search&page=${page}")
 
             if (response.status == HttpStatusCode.OK) {
                 val data = response.body<Docentes>()

@@ -39,6 +39,10 @@ class HomeViewModel(
     private val _homeData = MutableStateFlow<Home?>(null)
     val homeData: StateFlow<Home?> = _homeData
 
+    fun clearHomeData() {
+        _homeData.value = null
+    }
+
     private val _notificaciones = MutableStateFlow<List<Notificacion>>(emptyList())
     val notificaciones: StateFlow<List<Notificacion>> = _notificaciones
 

@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.itb.sga.core.createHttpClient
+import org.itb.sga.core.logInfo
 import org.itb.sga.data.network.Docentes
 import org.itb.sga.data.network.DocentesResult
 import org.itb.sga.features.common.home.HomeViewModel
@@ -24,8 +25,8 @@ class DocentesViewModel: ViewModel() {
         homeViewModel.changeLoading(true)
         viewModelScope.launch {
             try {
-                val result = service.fetchDocentes(search)
-
+                val result = service.fetchDocentes(search, page)
+                logInfo("LoginViewModel", "$result")
                 when (result) {
                     is DocentesResult.Success -> {
                         _data.value = result.docentes

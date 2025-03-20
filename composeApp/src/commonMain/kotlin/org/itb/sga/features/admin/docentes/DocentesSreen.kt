@@ -1,5 +1,6 @@
 package org.itb.sga.features.admin.docentes
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -58,7 +59,9 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import org.itb.sga.core.formatoText
 import org.itb.sga.data.network.Docente
+import org.itb.sga.features.admin.inscripciones.DropdownInscripcion
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
 import org.itb.sga.ui.components.MyAssistChip
@@ -118,7 +121,6 @@ fun Screen(
             Column (
                 modifier = Modifier.weight(1f)
             ) {
-                Spacer(modifier = Modifier.height(8.dp))
                 LazyColumn(
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -146,7 +148,7 @@ fun Screen(
                         homeViewModel.pageLess()
                         docentesViewModel.onloadDocentes(
                             query,
-                            actualPage,
+                            actualPage - 1,
                             homeViewModel
                         )
                     },
@@ -170,7 +172,7 @@ fun Screen(
                         homeViewModel.pageMore()
                         docentesViewModel.onloadDocentes(
                             query,
-                            actualPage,
+                            actualPage + 1,
                             homeViewModel
                         )
                     },
@@ -198,138 +200,143 @@ fun DocenteItem(
     var expanded by remember { mutableStateOf(false) }
     var showActions by remember { mutableStateOf(false) }
 
-    Box(
+    Row (
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 4.dp)
-            .background(color = MaterialTheme.colorScheme.surface)
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.Top
     ) {
-        Row(
+        AsyncImage(
+            model = docente.foto,
+            contentDescription = "Foto",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .height(64.dp)
+                .aspectRatio(1 / 1f)
+                .aspectRatio(1f)
+                .clip(CircleShape)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = CircleShape
+                )
+        )
+
+        Spacer(Modifier.width(16.dp))
+
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 4.dp)
-                .background(color = MaterialTheme.colorScheme.surface),
-            verticalAlignment = Alignment.Top,
+                .weight(1f),
+            verticalArrangement = Arrangement.Top
         ) {
-            AsyncImage(
-                model = docente.foto,
-                contentDescription = "Foto",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .height(64.dp)
-                    .aspectRatio(1 / 1f)
-                    .aspectRatio(1f)
-                    .clip(CircleShape)
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        shape = CircleShape
-                    )
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-
-
-            Row(
+            Row (
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = docente.nombre,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Spacer(Modifier.width(8.dp))
+                AnimatedContent(targetState = expanded) { isExpanded ->
+                    IconButton(
+                        onClick = { expanded = !expanded }
+                    ) {
+                        Icon(
+                            imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                            contentDescription = if (expanded) "Collapse options" else "Expand options",
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                }
+            }
+
+            Row (
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Column (
+                    modifier = Modifier.fillMaxWidth().weight(1f)
+                ) {
                     Text(
-                        text = docente.nombre,
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
+                        text = formatoText("Identificación: ", docente.identificacion),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-
-                    Row {
-                        MyAssistChip(
-                            label = "Cédula: ${docente.identificacion}",
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            labelColor = MaterialTheme.colorScheme.secondary,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        MyAssistChip(
-                            label = docente.username,
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            labelColor = MaterialTheme.colorScheme.secondary,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-
+                    Text(
+                        text = formatoText("Usuario: ", docente.username),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    AnimatedVisibility(
+                        visible = expanded,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
                         Column {
-                            IconButton(
-                                onClick = {
-                                    showActions = !showActions
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.MoreVert,
-                                    contentDescription = "More Information",
-                                    tint = MaterialTheme.colorScheme.primary
+                            Text(
+                                text = formatoText("Correo institucional: ", docente.email),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Text(
+                                text = formatoText("Correo personal: ", docente.email_personal),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            docente.celular?.let {
+                                Text(
+                                    text = formatoText("Teléfono celular: ", it),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
-
-                            Box {
-                                if (showActions) {
-                                    DropdownDocente(
-                                        loginViewModel = loginViewModel,
-                                        homeViewModel = homeViewModel,
-                                        navController = navController,
-                                        docente = docente,
-                                        onDismissRequest = { showActions = false }
-                                    )
-                                }
+                            docente.convencional?.let {
+                                Text(
+                                    text = formatoText("Teléfono convencional: ", it),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
                             }
+                            Spacer(Modifier.height(8.dp))
                         }
                     }
                 }
 
+                Spacer(Modifier.width(8.dp))
+
                 IconButton(
-                    onClick = { expanded = !expanded }
+                    onClick = {
+                        showActions = !showActions
+                    }
                 ) {
                     Icon(
-                        imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = "More options",
-                        tint = MaterialTheme.colorScheme.secondary
+                        imageVector = Icons.Filled.MoreVert,
+                        contentDescription = "More Information",
+                        tint = MaterialTheme.colorScheme.primary
                     )
+                }
+
+                Box {
+                    if (showActions) {
+                        DropdownDocente(
+                            loginViewModel = loginViewModel,
+                            homeViewModel = homeViewModel,
+                            navController = navController,
+                            docente = docente,
+                            onDismissRequest = { showActions = false }
+                        )
+                    }
                 }
             }
         }
-        HorizontalDivider(
-            thickness = 1.dp,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
-        )
     }
-    DetalleDocente(docente, expanded)
-}
-
-@Composable
-fun DetalleDocente(
-    docente: Docente,
-    expanded: Boolean
-) {
-    AnimatedVisibility(
-        visible = expanded,
-        enter = fadeIn() + expandVertically(),
-        exit = fadeOut() + shrinkVertically()
-    ) {
-        MyCard (
-            modifier = Modifier.padding(horizontal = 16.dp),
-            onClick = { }
-        ) {
-            Column {
-                Text(
-                    text = "Correo institucional: ${docente.email}",
-                    fontSize = 8.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Text(
-                    text = "Correo personal: ${docente.email_personal}",
-                    fontSize = 8.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-            }
-        }
-    }
+    HorizontalDivider()
 }
 
 @Composable
@@ -358,9 +365,9 @@ fun DropdownDocente(
                 ) {
                     Row(
                         modifier = Modifier.clickable {
-                            loginViewModel.changeLogin(docente.idUsuario, navController)
+                            homeViewModel.clearHomeData()
                             homeViewModel.clearSearchQuery()
-                            navController.navigate("home")
+                            loginViewModel.changeLogin(docente.idUsuario, navController)
                         }
                     ){
                         Icon(

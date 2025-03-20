@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Docente(
     val activo: Boolean,
-    val categoria: String,
-    val celular: String,
-    val convencional: String,
+    val categoria: String?,
+    val celular: String?,
+    val convencional: String?,
     val dedicacion: String,
     val email: String,
     val email_personal: String,

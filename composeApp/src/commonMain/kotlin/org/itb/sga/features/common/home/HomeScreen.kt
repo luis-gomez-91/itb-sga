@@ -84,7 +84,7 @@ fun Screen(
     homeViewModel: HomeViewModel,
     loginViewModel: LoginViewModel
 ) {
-    val homeData by homeViewModel.homeData.collectAsState()
+    val homeData by homeViewModel.homeData.collectAsState(null)
     val isLoading by homeViewModel.isLoading.collectAsState(false)
     val response by homeViewModel.response.collectAsState(null)
 
