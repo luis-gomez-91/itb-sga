@@ -72,8 +72,7 @@ fun ProEntregaActasScreen(
         content = {
             Screen(
                 proEntregaActasViewModel,
-                homeViewModel,
-                navController
+                homeViewModel
             )
         },
         homeViewModel = homeViewModel,
@@ -84,8 +83,7 @@ fun ProEntregaActasScreen(
 @Composable
 fun Screen(
     proEntregaActasViewModel: ProEntregaActasViewModel,
-    homeViewModel: HomeViewModel,
-    navController: NavHostController
+    homeViewModel: HomeViewModel
 ) {
     val data by proEntregaActasViewModel.data.collectAsState(emptyList())
     val periodo by homeViewModel.periodoSelect.collectAsState(null)
@@ -104,7 +102,7 @@ fun Screen(
             .fillMaxSize()
     ) {
         items(data) { materia ->
-            MateriaItem(proEntregaActasViewModel, materia, navController)
+            MateriaItem(proEntregaActasViewModel, materia)
             HorizontalDivider()
         }
     }
@@ -123,8 +121,7 @@ fun Screen(
 @Composable
 fun MateriaItem(
     proEntregaActasViewModel: ProEntregaActasViewModel,
-    materia: ProEntregaActas,
-    navController: NavHostController
+    materia: ProEntregaActas
 ) {
     var expanded by remember { mutableStateOf(false) }
     var showActions by remember { mutableStateOf(false) }
@@ -164,17 +161,17 @@ fun MateriaItem(
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
                 Text(
-                    text = formatoText("Grupo: ", "${materia.grupo} (${materia.nivelMalla})"),
+                    text = formatoText("Grupo:", "${materia.grupo} (${materia.nivelMalla})"),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = formatoText("Carrera: ", materia.carrera),
+                    text = formatoText("Carrera:", materia.carrera),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = formatoText("Fecha: ", "${materia.desde} a ${materia.hasta}"),
+                    text = formatoText("Fecha:", "${materia.desde} a ${materia.hasta}"),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -320,12 +317,12 @@ fun DocenteItem(
                 color = MaterialTheme.colorScheme.secondary,
             )
             Text(
-                text = formatoText("Fecha: ", "${docente.fechaDesde} a ${docente.fechaHasta}"),
+                text = formatoText("Fecha:", "${docente.fechaDesde} a ${docente.fechaHasta}"),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                text = formatoText("Segmento: ", docente.segmento),
+                text = formatoText("Segmento:", docente.segmento),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

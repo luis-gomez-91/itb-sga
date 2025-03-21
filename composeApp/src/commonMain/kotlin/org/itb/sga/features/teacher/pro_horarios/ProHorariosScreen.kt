@@ -51,7 +51,6 @@ import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.itb.sga.core.formatoText
-import org.itb.sga.core.parseTime
 import org.itb.sga.data.network.ProHorario
 import org.itb.sga.data.network.ProHorarioClase
 import org.itb.sga.features.common.home.HomeViewModel
@@ -98,7 +97,6 @@ fun Screen(
     val data by proHorariosViewModel.data.collectAsState(emptyList())
     val error by proHorariosViewModel.error.collectAsState(null)
     val isLoading by homeViewModel.isLoading.collectAsState(false)
-    val searchQuery by homeViewModel.searchQuery.collectAsState("")
     val periodoSelect by homeViewModel.periodoSelect.collectAsState()
     val pagerState = rememberPagerState { data.size }
     var selectedTabIndex by remember { mutableStateOf(0) }
@@ -250,12 +248,12 @@ fun ClaseItem(
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = formatoText("Horario: ", "${clase.turnoComienza} - ${clase.turnoTermina}"),
+                        text = formatoText("Horario:", "${clase.turnoComienza} - ${clase.turnoTermina}"),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = formatoText("Grupo: ", "${clase.grupo} (${clase.nivel})"),
+                        text = formatoText("Grupo:", "${clase.grupo} (${clase.nivel})"),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -328,25 +326,25 @@ fun ClaseMoreInfo(
     clase: ProHorarioClase
 ) {
     Text(
-        text = formatoText("Fecha inicio: ", clase.materiaDesde),
+        text = formatoText("Fecha inicio:", clase.materiaDesde),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
 
     Text(
-        text = formatoText("Fecha fin: ", clase.materiaHasta),
+        text = formatoText("Fecha fin:", clase.materiaHasta),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
 
     Text(
-        text = formatoText("Aula: ", clase.aula),
+        text = formatoText("Aula:", clase.aula),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
 
     Text(
-        text = formatoText("Carrera: ", clase.carrera),
+        text = formatoText("Carrera:", clase.carrera),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )

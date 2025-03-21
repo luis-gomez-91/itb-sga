@@ -1,6 +1,7 @@
 package org.itb.sga.ui.components.dashboard
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -137,12 +138,13 @@ fun DashBoardScreen(
                                             text = notificacion.notificacion_descripcion,
                                             style = MaterialTheme.typography.bodySmall
                                         )
-                                        if (notificacion.urls.isNotEmpty()) {
-                                            Spacer(Modifier.height(4.dp))
+
+                                        notificacion.urls?.takeIf { it.isNotEmpty() }?.let { urls ->
                                             LazyRow(
                                                 modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.spacedBy(4.dp)
                                             ) {
-                                                items(notificacion.urls) { url ->
+                                                items(urls) { url ->
                                                     MyFilledTonalButton(
                                                         text = url.name,
                                                         enabled = true,

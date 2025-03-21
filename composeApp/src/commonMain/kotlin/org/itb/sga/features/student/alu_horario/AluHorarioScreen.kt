@@ -26,7 +26,7 @@ import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -39,9 +39,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.itb.sga.core.formatoText
 import org.itb.sga.data.network.AluHorario
@@ -157,9 +155,8 @@ fun HorarioItem(
             ) {
                 Text(
                     text = horario.materiaNombre,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.outlineVariant
                 )
 
                 Row() {
@@ -185,7 +182,7 @@ fun HorarioItem(
                 ) {
                     Column {
                         Spacer(modifier = Modifier.height(8.dp))
-                        Divider()
+                        HorizontalDivider()
                         Spacer(modifier = Modifier.height(8.dp))
                         Clases(horario.clases)
                     }
@@ -241,23 +238,19 @@ fun ClaseItem(
         {
             Text(
                 text = clase.dia,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleMedium
             )
             Text(
-                text = formatoText("Docente: ", clase.profesor),
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold
+                text = formatoText("Docente:", clase.profesor),
+                color = MaterialTheme.colorScheme.outlineVariant
             )
             Text(
-                text = formatoText("Aula: ", "${clase.aula} ${clase.sede}"),
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold
+                text = formatoText("Aula:", "${clase.aula} ${clase.sede}"),
+                color = MaterialTheme.colorScheme.outlineVariant
             )
             Text(
-                text = formatoText("Sesión: ", "${clase.sesion}"),
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold
+                text = formatoText("Sesión:", clase.sesion),
+                color = MaterialTheme.colorScheme.outlineVariant
             )
 
             Row(

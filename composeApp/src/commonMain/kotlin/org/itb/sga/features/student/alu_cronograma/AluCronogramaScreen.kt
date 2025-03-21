@@ -38,9 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.itb.sga.core.capitalizeWords
 import org.itb.sga.core.formatoText
@@ -147,8 +145,7 @@ fun AluCronogramaItem(
             ) {
                 Text(
                     text = data.asignatura,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.weight(1f)
                 )
@@ -209,7 +206,11 @@ fun AluCronogramaItem(
 @Composable
 fun Profesores(profesores: List<Profesor>) {
     Column() {
-        Text(text = "Profesores", color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        Text(
+            text = "Profesores",
+            color = MaterialTheme.colorScheme.secondary,
+            style = MaterialTheme.typography.titleMedium,
+        )
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
@@ -238,8 +239,7 @@ fun ProfesorItem(profesor: Profesor) {
         {
             Text(
                 text = profesor.profesor,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleSmall,
             )
             MyAssistChip(
                 label = formatoText("", "${profesor.desde} - ${profesor.hasta}").toString(),
@@ -271,7 +271,11 @@ fun ProfesorItem(profesor: Profesor) {
 @Composable
 fun Horarios(horarios: List<Horario>) {
     Column() {
-        Text(text = "Horarios", color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        Text(
+            text = "Horarios",
+            color = MaterialTheme.colorScheme.secondary,
+            style = MaterialTheme.typography.titleMedium,
+        )
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
@@ -299,8 +303,7 @@ fun HorarioItem(horario: Horario) {
         {
             Text(
                 text = horario.dia,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleSmall,
             )
             MyAssistChip(
                 label = "${horario.turnoComienza} - ${horario.turnoTermina}",

@@ -23,9 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.itb.sga.data.network.AluFacturacion
 import org.itb.sga.features.common.home.HomeViewModel
@@ -138,8 +136,7 @@ fun CardItem(
         ) {
             Text(
                 text = data.numero,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary
             )
             Row(
@@ -163,7 +160,7 @@ fun CardItem(
 
             Text(
                 text = data.numeroAutorizacion,
-                fontSize = 12.sp,
+                style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
 

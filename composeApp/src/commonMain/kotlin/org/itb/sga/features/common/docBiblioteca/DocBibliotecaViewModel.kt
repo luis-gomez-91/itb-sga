@@ -22,7 +22,7 @@ class DocBibliotecaViewModel: ViewModel() {
         homeViewModel.changeLoading(true)
         viewModelScope.launch {
             try {
-                val result = service.fetchDocBiblioteca(search, 1)
+                val result = service.fetchDocBiblioteca(search, page)
                 when (result) {
                     is DocBibliotecaResult.Success -> {
                         _data.value = result.docBiblioteca

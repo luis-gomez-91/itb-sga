@@ -25,9 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
@@ -161,14 +159,13 @@ fun CardAluFinanza(
         ) {
             Text(
                 text = rubro.rubro,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary
             )
 
             Row() {
                 MyAssistChip(
-                    label = formatoText("Fecha vencimiento: ", rubro.fechaVencimiento).toString(),
+                    label = formatoText("Fecha vencimiento:", rubro.fechaVencimiento).toString(),
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     labelColor = MaterialTheme.colorScheme.secondary,
                     icon = Icons.Filled.DateRange
@@ -188,16 +185,16 @@ fun CardAluFinanza(
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = formatoText("Valor: ", "$${rubro.valor}"),
-                    fontSize = 12.sp,
+                    text = formatoText("Valor:", "$${rubro.valor}"),
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Text(text = formatoText("Abono: ", "$${rubro.pagado}"),
-                    fontSize = 12.sp,
+                Text(text = formatoText("Abono:", "$${rubro.pagado}"),
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Text(text = formatoText("Saldo: ", "$${rubro.porPagar}"),
-                    fontSize = 12.sp,
+                Text(text = formatoText("Saldo:", "$${rubro.porPagar}"),
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }

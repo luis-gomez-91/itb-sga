@@ -5,7 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,11 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIos
-import androidx.compose.material.icons.filled.ArrowForwardIos
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,16 +22,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.itb.sga.core.SERVER_URL
-import org.itb.sga.data.network.Paging
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
 import org.itb.sga.ui.components.MyCircularProgressIndicator
+import org.itb.sga.ui.components.Paginado
 import org.itb.sga.ui.components.alerts.MyErrorAlert
 import org.itb.sga.ui.components.dashboard.DashBoardScreen
 import kotlin.random.Random
@@ -97,7 +90,7 @@ fun Screen(
                 columns = StaggeredGridCells.Fixed(2),
                 verticalItemSpacing  = 8.dp,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth().padding(8.dp).weight(1f)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).weight(1f)
             ) {
                 dataFiltrada?.let {
                     items(it) { documento ->
@@ -156,13 +149,29 @@ fun Screen(
                 }
             }
 
-            data?.let {
+            Spacer(Modifier.height(4.dp))
+
+            data?.paging?.let {
                 Paginado(
-                    homeViewModel,
-                    docBibliotecaViewModel,
-                    query,
-                    isLoading,
-                    it.paging
+                    isLoading = isLoading,
+                    paging = it,
+                    homeViewModel = homeViewModel,
+                    onBack = {
+                        homeViewModel.pageLess()
+                        docBibliotecaViewModel.onloadDocBiblioteca(
+                            query,
+                            actualPage - 1,
+                            homeViewModel
+                        )
+                    },
+                    onNext = {
+                        homeViewModel.pageMore()
+                        docBibliotecaViewModel.onloadDocBiblioteca(
+                            query,
+                            actualPage + 1,
+                            homeViewModel
+                        )
+                    }
                 )
             }
         }
@@ -176,68 +185,6 @@ fun Screen(
                     navController.popBackStack()
                 },
                 showAlert = true
-            )
-        }
-    }
-}
-
-@Composable
-fun Paginado(
-    homeViewModel: HomeViewModel,
-    docBibliotecaViewModel: DocBibliotecaViewModel,
-    query: String,
-    isLoading: Boolean,
-    paging: Paging
-) {
-    val actualPage by homeViewModel.actualPage.collectAsState(1)
-
-    Row (
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-            .background(color = MaterialTheme.colorScheme.surfaceContainer),
-        horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
-    ){
-        IconButton(
-            onClick = {
-                homeViewModel.pageLess()
-                docBibliotecaViewModel.onloadDocBiblioteca(
-                    query,
-                    actualPage,
-                    homeViewModel
-                )
-            },
-            enabled = actualPage > 1  && !isLoading
-        ) {
-            Icon(
-                imageVector = Icons.Filled.ArrowBackIos,
-                contentDescription = "Back",
-                tint = if (actualPage > 1  && !isLoading) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outlineVariant
-            )
-        }
-
-        Text(
-            text = "${actualPage}/${paging.lastPage}",
-            fontWeight = FontWeight.Normal,
-            fontSize = 20.sp
-        )
-
-        IconButton(
-            onClick = {
-                homeViewModel.pageMore()
-                docBibliotecaViewModel.onloadDocBiblioteca(
-                    query,
-                    actualPage,
-                    homeViewModel
-                )
-            },
-            enabled = actualPage < (paging.lastPage) && !isLoading
-        ) {
-            Icon(
-                imageVector = Icons.Filled.ArrowForwardIos,
-                contentDescription = "Next",
-                tint = if (actualPage < (paging.lastPage)  && !isLoading) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outlineVariant
             )
         }
     }

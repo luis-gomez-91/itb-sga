@@ -20,9 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import org.itb.sga.data.network.Account
@@ -74,7 +72,7 @@ fun Screen(
         MyCircularProgressIndicator()
     } else {
         data?.let { persona ->
-            dataPersona(navController, persona)
+            dataPersona(persona)
         } ?: run {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -101,7 +99,6 @@ fun Screen(
 
 @Composable
 fun dataPersona(
-    navController: NavHostController,
     persona: Account,
 ) {
     Column (
@@ -121,14 +118,12 @@ fun dataPersona(
         )
         Text(
             text = persona.nombre,
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp,
+            style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary
         )
         Text(
             text = persona.identificacion,
-            fontWeight = FontWeight.Bold,
-            fontSize = 12.sp,
+            style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.secondary
         )
     }
@@ -146,15 +141,13 @@ fun dataPersona(
                 ){
                     Text(
                         text = "${key}:",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.secondary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = value.toString(),
-                        fontWeight = FontWeight.Light,
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
@@ -172,8 +165,8 @@ fun dataPersona(
 fun obtenerData(persona: Account): List<Map<String, Any>> {
     val nacionalidad = if (persona.extranjero) "Si" else "No"
     val provinciaNacimiento = if (persona.provinciaNacimiento != null) persona.provinciaNacimiento.toString() else ""
-    val cantonNacimiento = if (persona.cantonNacimiento != null) persona.cantonNacimiento.toString() else ""
-    val email = if (persona.email != null) persona.email.toString() else ""
+    val cantonNacimiento = persona.cantonNacimiento
+    val email = if (persona.email != null) { persona.email.toString() } else ""
     val convencional = if (persona.convencional != null) persona.convencional.toString() else ""
 
     val list: List<Map<String, Any>> = listOf(

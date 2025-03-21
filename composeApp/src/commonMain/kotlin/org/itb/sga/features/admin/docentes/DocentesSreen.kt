@@ -25,8 +25,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIos
-import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Login
@@ -52,21 +50,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import org.itb.sga.core.formatoText
 import org.itb.sga.data.network.Docente
-import org.itb.sga.features.admin.inscripciones.DropdownInscripcion
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
-import org.itb.sga.ui.components.MyAssistChip
-import org.itb.sga.ui.components.MyCard
 import org.itb.sga.ui.components.MyCircularProgressIndicator
+import org.itb.sga.ui.components.Paginado
 import org.itb.sga.ui.components.dashboard.DashBoardScreen
 
 @Composable
@@ -122,7 +116,8 @@ fun Screen(
                 modifier = Modifier.weight(1f)
             ) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(data?.profesores ?: emptyList()) { docente ->
                         DocenteItem(
@@ -131,20 +126,18 @@ fun Screen(
                             homeViewModel = homeViewModel,
                             navController = navController
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
-            Row (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-                    .background(color = MaterialTheme.colorScheme.surfaceContainer),
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                IconButton(
-                    onClick = {
+
+            Spacer(Modifier.height(4.dp))
+
+            data?.paging?.let {
+                Paginado(
+                    isLoading = isLoading,
+                    paging = it,
+                    homeViewModel = homeViewModel,
+                    onBack = {
                         homeViewModel.pageLess()
                         docentesViewModel.onloadDocentes(
                             query,
@@ -152,41 +145,18 @@ fun Screen(
                             homeViewModel
                         )
                     },
-                    enabled = actualPage > 1  && !isLoading
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBackIos,
-                        contentDescription = "Back",
-                        tint = if (actualPage > 1  && !isLoading) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outlineVariant
-                    )
-                }
-
-                Text(
-                    text = "${actualPage}/${data?.paging?.lastPage?: 0}",
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 20.sp
-                )
-
-                IconButton(
-                    onClick = {
+                    onNext = {
+                        homeViewModel.pageMore()
                         homeViewModel.pageMore()
                         docentesViewModel.onloadDocentes(
                             query,
                             actualPage + 1,
                             homeViewModel
                         )
-                    },
-                    enabled = actualPage < (data?.paging?.lastPage ?: Int.MAX_VALUE) && !isLoading
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowForwardIos,
-                        contentDescription = "Next",
-                        tint = if (actualPage < (data?.paging?.lastPage ?: Int.MAX_VALUE)  && !isLoading) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outlineVariant
-                    )
-                }
+                    }
+                )
             }
         }
-
     }
 }
 
@@ -264,12 +234,12 @@ fun DocenteItem(
                     modifier = Modifier.fillMaxWidth().weight(1f)
                 ) {
                     Text(
-                        text = formatoText("Identificación: ", docente.identificacion),
+                        text = formatoText("Identificación:", docente.identificacion),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
-                        text = formatoText("Usuario: ", docente.username),
+                        text = formatoText("Usuario:", docente.username),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -280,25 +250,25 @@ fun DocenteItem(
                     ) {
                         Column {
                             Text(
-                                text = formatoText("Correo institucional: ", docente.email),
+                                text = formatoText("Correo institucional:", docente.email),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Text(
-                                text = formatoText("Correo personal: ", docente.email_personal),
+                                text = formatoText("Correo personal:", docente.email_personal),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             docente.celular?.let {
                                 Text(
-                                    text = formatoText("Teléfono celular: ", it),
+                                    text = formatoText("Teléfono celular:", it),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                             docente.convencional?.let {
                                 Text(
-                                    text = formatoText("Teléfono convencional: ", it),
+                                    text = formatoText("Teléfono convencional:", it),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -379,7 +349,7 @@ fun DropdownDocente(
                         Spacer(Modifier.width(4.dp))
                         Text(
                             text = "Login",
-                            fontSize = 12.sp,
+                            style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
@@ -394,7 +364,7 @@ fun DropdownDocente(
                         Spacer(Modifier.width(8.dp))
                         Text(
                             text = "Clases",
-                            fontSize = 12.sp,
+                            style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
@@ -409,7 +379,7 @@ fun DropdownDocente(
                         Spacer(Modifier.width(8.dp))
                         Text(
                             text = "Calificaciones",
-                            fontSize = 12.sp,
+                            style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                     }

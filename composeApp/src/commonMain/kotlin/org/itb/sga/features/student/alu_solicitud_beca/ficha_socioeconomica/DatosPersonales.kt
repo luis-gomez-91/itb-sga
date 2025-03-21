@@ -60,32 +60,32 @@ fun DatosPersonales(
             // Nombres y Edad
             data?.datosPersonales?.data?.let {
                 Text(
-                    text = formatoText("Nombre: ", it.nombre.toString()),
+                    text = formatoText("Nombre:", it.nombre.toString()),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = formatoText("${it.tipoIdentificacion}: ", it.identificacion.toString()),
+                    text = formatoText("${it.tipoIdentificacion}:", it.identificacion.toString()),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = formatoText("Fecha nacimiento: ", "${it.fechaNacimiento} (${it.edad} años)"),
+                    text = formatoText("Fecha nacimiento:", "${it.fechaNacimiento} (${it.edad} años)"),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = formatoText("Nacionalidad: ", it.nacionalidad.toString()),
+                    text = formatoText("Nacionalidad:", it.nacionalidad.toString()),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = formatoText("Ciudad de nacimiento: ", it.ciudadNacimiento.toString()),
+                    text = formatoText("Ciudad de nacimiento:", it.ciudadNacimiento.toString()),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = formatoText("Email institucional: ", it.emailInst.toString()),
+                    text = formatoText("Email institucional:", it.emailInst.toString()),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }

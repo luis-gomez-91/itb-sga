@@ -24,7 +24,7 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -38,9 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.itb.sga.core.formatoText
 import org.itb.sga.data.network.AluSolicitud
@@ -118,8 +116,7 @@ fun Screen(
                 if (filterData.isEmpty()) {
                     Text(
                         text = "No existen solicitudes generadas",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 } else {
@@ -194,8 +191,7 @@ fun CardAluFinanza(
                     solicitud.tipoEspecie?.let {
                         Text(
                             text = it,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -234,7 +230,7 @@ fun CardAluFinanza(
             ) {
                 Column {
                     Spacer(modifier = Modifier.height(8.dp))
-                    Divider()
+                    HorizontalDivider()
                     Spacer(modifier = Modifier.height(8.dp))
                     MoreInfo(solicitud)
                 }
@@ -250,48 +246,49 @@ fun MoreInfo(
     solicitud: AluSolicitud
 ) {
     Text(
-        text = formatoText("Observación: ", "${solicitud.observacion}"),
-        fontSize = 10.sp,
+        text = formatoText("Observación:", "${solicitud.observacion}"
+        ),
+        style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
     Text(
-        text = formatoText("Departamento: ", "${solicitud.departamento}"),
-        fontSize = 10.sp,
+        text = formatoText("Departamento:", solicitud.departamento),
+        style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
     Text(
-        text = formatoText("Asignado a: ", "${solicitud.usuarioAsignado}"),
-        fontSize = 10.sp,
+        text = formatoText("Asignado a:", "${solicitud.usuarioAsignado}"),
+        style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
 //    Text(
 //        text = formatoText("Valor: ", "${solicitud.valor}"),
-//        fontSize = 10.sp,
+//        style = MaterialTheme.typography.labelSmall,
 //        color = MaterialTheme.colorScheme.onSurface
 //    )
 //    Text(
 //        text = formatoText("Pagado: ", "${solicitud.pagado}"),
-//        fontSize = 10.sp,
+//        style = MaterialTheme.typography.labelSmall,
 //        color = MaterialTheme.colorScheme.onSurface
 //    )
     Text(
-        text = formatoText("Autorizado: ", "${solicitud.autorizado}"),
-        fontSize = 10.sp,
+        text = formatoText("Autorizado:", "${solicitud.autorizado}"),
+        style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
     Text(
-        text = formatoText("Resolución: ", "${solicitud.resolucion}"),
-        fontSize = 10.sp,
+        text = formatoText("Resolución:", "${solicitud.resolucion}"),
+        style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
     Text(
-        text = formatoText("Respuesta: ", "${solicitud.respuesta}"),
-        fontSize = 10.sp,
+        text = formatoText("Respuesta:", "${solicitud.respuesta}"),
+        style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
     Text(
-        text = formatoText("Respuesta docente: ", "${solicitud.respuestaDocente}"),
-        fontSize = 10.sp,
+        text = formatoText("Respuesta docente:", "${solicitud.respuestaDocente}"),
+        style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
 }

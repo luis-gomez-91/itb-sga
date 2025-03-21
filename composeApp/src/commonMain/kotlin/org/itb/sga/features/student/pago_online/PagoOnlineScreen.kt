@@ -31,7 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,11 +44,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.itb.sga.data.network.RubroX
 import org.itb.sga.features.common.home.HomeViewModel
@@ -93,8 +91,7 @@ fun Screen(
 ) {
     val data by pagoOnlineViewModel.data.collectAsState(null)
     val isLoading by homeViewModel.isLoading.collectAsState(false)
-    val searchQuery by homeViewModel.searchQuery.collectAsState("")
-    var selectedTabIndex by remember { mutableStateOf(0) }
+    var selectedTabIndex: Int by remember { mutableStateOf(0) }
     val pagerState = rememberPagerState { 2 }
     val error by homeViewModel.error.collectAsState(null)
 
@@ -127,7 +124,6 @@ fun Screen(
 
             TabRowPagoOnline(
                 selectedTabIndex = selectedTabIndex,
-                pagoOnlineViewModel = pagoOnlineViewModel,
                 onTabSelected = { index ->
                     selectedTabIndex = index
                 }
@@ -163,7 +159,6 @@ fun Screen(
 @Composable
 fun TabRowPagoOnline(
     selectedTabIndex: Int,
-    pagoOnlineViewModel: PagoOnlineViewModel,
     onTabSelected: (Int) -> Unit
 ) {
     TabRow(
@@ -172,7 +167,7 @@ fun TabRowPagoOnline(
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.surfaceContainer),
         indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
+            SecondaryIndicator(
                 Modifier
                     .tabIndicatorOffset(tabPositions[selectedTabIndex])
                     .height(3.dp),
@@ -188,8 +183,7 @@ fun TabRowPagoOnline(
             text = {
                 Text(
                     text = "Rubros",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
                     color = if (selectedTabIndex == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
@@ -211,8 +205,7 @@ fun TabRowPagoOnline(
             text = {
                 Text(
                     text = "Datos facturación",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
                     color = if (selectedTabIndex == 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
@@ -236,7 +229,6 @@ fun CardRubros(
 ) {
     val switchStates by pagoOnlineViewModel.switchStates.collectAsState()
     val total:Double by pagoOnlineViewModel.total.collectAsState(0.00)
-    val linkToPay by pagoOnlineViewModel.linkToPay.collectAsState(null)
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -290,8 +282,6 @@ fun CardRubros(
     val showDiferirPago by pagoOnlineViewModel.showDiferirPago.collectAsState(false)
     val showTerminosCondiciones by pagoOnlineViewModel.showTerminosCondiciones.collectAsState(false)
     val terminosCondiciones by pagoOnlineViewModel.terminosCondiciones.collectAsState(false)
-    val showPayAlert by pagoOnlineViewModel.showPayAlert.collectAsState(false)
-    val payData by pagoOnlineViewModel.payData.collectAsState()
 
     if (showDiferirPago) {
         MyConfirmAlert(
@@ -508,9 +498,8 @@ fun RubroItem(
             ) {
                 Text(
                     text = rubro.nombre,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontSize = 12.sp
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -518,9 +507,8 @@ fun RubroItem(
                 ) {
                     Text(
                         text = "$ ${rubro.valor}",
-                        fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.tertiary,
-                        fontSize = 20.sp
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.tertiary
                     )
                     Spacer(Modifier.width(8.dp))
                     MyAssistChip(

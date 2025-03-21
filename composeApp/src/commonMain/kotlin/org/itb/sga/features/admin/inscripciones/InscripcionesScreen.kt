@@ -25,8 +25,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIos
-import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
@@ -52,9 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavHostController
@@ -63,10 +59,8 @@ import org.itb.sga.core.formatoText
 import org.itb.sga.data.network.Inscripcion
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
-import org.itb.sga.features.teacher.pro_entrega_actas.DropdownActions
-import org.itb.sga.ui.components.MyAssistChip
-import org.itb.sga.ui.components.MyCard
 import org.itb.sga.ui.components.MyCircularProgressIndicator
+import org.itb.sga.ui.components.Paginado
 import org.itb.sga.ui.components.dashboard.DashBoardScreen
 
 @Composable
@@ -100,7 +94,7 @@ fun Screen(
     loginViewModel: LoginViewModel
 
 ) {
-    val data by inscripcionesViewModel.data.collectAsState()
+    val data by inscripcionesViewModel.data.collectAsState(null)
     val isLoading by homeViewModel.isLoading.collectAsState(false)
     val query by homeViewModel.searchQuery.collectAsState("")
     val actualPage by homeViewModel.actualPage.collectAsState(1)
@@ -122,7 +116,8 @@ fun Screen(
                 MyCircularProgressIndicator()
             } else {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(data?.inscripciones ?: emptyList()) { inscripcion ->
                         InscripcionItem(
@@ -131,22 +126,19 @@ fun Screen(
                             homeViewModel = homeViewModel,
                             navController = navController
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
         }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(4.dp)
-                .background(color = MaterialTheme.colorScheme.surfaceContainer),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(
-                onClick = {
+        Spacer(Modifier.height(4.dp))
+
+        data?.paging?.let {
+            Paginado(
+                isLoading = isLoading,
+                paging = it,
+                homeViewModel = homeViewModel,
+                onBack = {
                     homeViewModel.pageLess()
                     inscripcionesViewModel.onloadInscripciones(
                         query,
@@ -154,38 +146,15 @@ fun Screen(
                         homeViewModel
                     )
                 },
-                enabled = actualPage > 1  && !isLoading
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBackIos,
-                    contentDescription = "Back",
-                    tint = if (actualPage > 1  && !isLoading) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outlineVariant
-                )
-            }
-
-            Text(
-                text = "${actualPage}/${data?.paging?.lastPage?: 0}",
-                fontWeight = FontWeight.Normal,
-                fontSize = 20.sp
-            )
-
-            IconButton(
-                onClick = {
+                onNext = {
                     homeViewModel.pageMore()
                     inscripcionesViewModel.onloadInscripciones(
                         query,
                         actualPage + 1,
                         homeViewModel
                     )
-                },
-                enabled = actualPage < (data?.paging?.lastPage ?: Int.MAX_VALUE) && !isLoading
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowForwardIos,
-                    contentDescription = "Next",
-                    tint = if (actualPage < (data?.paging?.lastPage ?: Int.MAX_VALUE)  && !isLoading) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outlineVariant
-                )
-            }
+                }
+            )
         }
     }
 }
@@ -264,17 +233,17 @@ fun InscripcionItem(
                     modifier = Modifier.fillMaxWidth().weight(1f)
                 ) {
                     Text(
-                        text = formatoText("Fecha inscripción: ", inscripcion.fecha),
+                        text = formatoText("Fecha inscripción:", inscripcion.fecha),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
-                        text = formatoText("Identificación: ", inscripcion.identificacion),
+                        text = formatoText("Identificación:", inscripcion.identificacion),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
-                        text = formatoText("Usuario: ", inscripcion.username),
+                        text = formatoText("Usuario:", inscripcion.username),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -285,38 +254,38 @@ fun InscripcionItem(
                     ) {
                         Column {
                             Text(
-                                text = formatoText("Correo institucional: ", inscripcion.email),
+                                text = formatoText("Correo institucional:", inscripcion.email),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             inscripcion.email_personal?.let {
                                 Text(
-                                    text = formatoText("Correo personal: ", it),
+                                    text = formatoText("Correo personal:", it),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                             inscripcion.celular?.let {
                                 Text(
-                                    text = formatoText("Teléfono celular: ", it),
+                                    text = formatoText("Teléfono celular:", it),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                             inscripcion.convencional?.let {
                                 Text(
-                                    text = formatoText("Teléfono convencional: ", it),
+                                    text = formatoText("Teléfono convencional:", it),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                             Text(
-                                text = formatoText("Grupo: ", inscripcion.grupo),
+                                text = formatoText("Grupo:", inscripcion.grupo),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Text(
-                                text = formatoText("Carrera: ", inscripcion.carrera),
+                                text = formatoText("Carrera:", inscripcion.carrera),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -396,7 +365,7 @@ fun DropdownInscripcion(
                         Spacer(Modifier.width(4.dp))
                         Text(
                             text = "Login",
-                            fontSize = 12.sp,
+                            style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
@@ -411,7 +380,7 @@ fun DropdownInscripcion(
                         Spacer(Modifier.width(8.dp))
                         Text(
                             text = "Finanzas",
-                            fontSize = 12.sp,
+                            style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
@@ -426,7 +395,7 @@ fun DropdownInscripcion(
                         Spacer(Modifier.width(8.dp))
                         Text(
                             text = "Malla",
-                            fontSize = 12.sp,
+                            style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                     }

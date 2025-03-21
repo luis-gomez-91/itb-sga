@@ -8,6 +8,6 @@ data class Notificacion(
     val notificacion_descripcion: String,
     val notificacion_titulo: String,
     val tipo: String,
-    val urls: List<NotificacionUrl>,
+    val urls: List<NotificacionUrl>? = null,
     val utiliza_detalle: Boolean
 )

@@ -24,11 +24,11 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Pending
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,11 +39,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.itb.sga.data.network.AluMateria
 import org.itb.sga.data.network.AluMateriaLeccion
@@ -174,7 +172,7 @@ fun ScrollableTabRowAluMateria(
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.surfaceContainer),
         indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
+            SecondaryIndicator(
                 Modifier
                     .tabIndicatorOffset(tabPositions[selectedTabIndex])
                     .height(3.dp),
@@ -191,9 +189,8 @@ fun ScrollableTabRowAluMateria(
                 },
                 text = {
                     Text(
-                        text = aluMateria.materiaNombre ?: "N/A",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
+                        text = aluMateria.materiaNombre,
+                        style = MaterialTheme.typography.titleMedium,
                         color = if (selectedTabIndex == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
                         modifier = Modifier.padding(horizontal = 16.dp),
                         maxLines = 2,
@@ -251,9 +248,8 @@ fun AluMateriaItem(
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
                 text = "Del ${aluMateria.materiaInicio} al ${aluMateria.materiaFin}",
-                fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.secondary,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.labelMedium
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -301,8 +297,7 @@ fun LeccionItem(
     ){
         Text(
             text = leccion.fecha,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.primary
         )
         Row(
@@ -323,5 +318,5 @@ fun LeccionItem(
             )
         }
     }
-    Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f), thickness = 1.dp)
+    HorizontalDivider()
 }

@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import org.itb.sga.data.network.AluSolicitudDepartamentos
@@ -161,7 +160,6 @@ fun Especies(
     val selectedTipoSolicitud by aluSolicitudesViewModel.selectedTipoSolicitud.collectAsState(null)
     val solicitudes by aluSolicitudesViewModel.solicitudes.collectAsState(null)
     val fileName by aluSolicitudesViewModel.fileName.collectAsState(null)
-    val bytes by aluSolicitudesViewModel.byteArray.collectAsState(null)
 
     selectedDepartamento?.let { departamento ->
         MyExposedDropdownMenuBox(
@@ -228,7 +226,7 @@ fun Especies(
                 Text(
                     modifier = Modifier.padding(8.dp),
                     text = it,
-                    fontSize = 10.sp
+                    style = MaterialTheme.typography.labelSmall,
                 )
             }
         }

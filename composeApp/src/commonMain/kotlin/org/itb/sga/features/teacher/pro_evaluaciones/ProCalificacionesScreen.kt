@@ -143,7 +143,7 @@ fun Screen(
             ) {
                 itemsIndexed(dataFilter) { index, calificacion ->
                     HorizontalDivider()
-                    CalificacionItem(calificacion, proEvaluacionesViewModel, showAll)
+                    CalificacionItem(calificacion, showAll)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
@@ -165,7 +165,6 @@ fun Screen(
 @Composable
 fun CalificacionItem(
     calificacion: ProEvaluacionesCalificacion,
-    proEvaluacionesViewModel: ProEvaluacionesViewModel,
     showAll: Boolean
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -203,7 +202,7 @@ fun CalificacionItem(
             )
             Spacer(Modifier.width(4.dp))
             MyAssistChip(
-                label = formatoText("NOTA FINAL: ", "${calificacion.notafinal} PUNTOS").toString(),
+                label = formatoText("NOTA FINAL:", "${calificacion.notafinal} PUNTOS").toString(),
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 labelColor = MaterialTheme.colorScheme.secondary,
             )
@@ -219,7 +218,7 @@ fun CalificacionItem(
                     .fillMaxWidth()
                     .padding(top = 4.dp)
             ) {
-                NotasAlumno(calificacion, proEvaluacionesViewModel)
+                NotasAlumno(calificacion)
             }
         }
 
@@ -228,8 +227,7 @@ fun CalificacionItem(
 
 @Composable
 fun NotasAlumno(
-    calificacion: ProEvaluacionesCalificacion,
-    proEvaluacionesViewModel: ProEvaluacionesViewModel
+    calificacion: ProEvaluacionesCalificacion
 ) {
     val textStyle = TextStyle(
         color = MaterialTheme.colorScheme.onSurfaceVariant,

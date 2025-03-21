@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Cancel
@@ -92,8 +91,8 @@ fun Screen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        itemsIndexed(data) { index, cronograma ->
-            CronogramaItem(index, proCronogramaViewModel, cronograma)
+        items(data) { cronograma ->
+            CronogramaItem(cronograma)
             HorizontalDivider()
         }
     }
@@ -101,11 +100,9 @@ fun Screen(
 
 @Composable
 fun CronogramaItem (
-    index: Int,
-    proCronogramaViewModel: ProCronogramaViewModel,
     cronograma: ProCronograma
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded: Boolean by remember { mutableStateOf(false) }
 
     Column (
         modifier = Modifier
@@ -134,17 +131,17 @@ fun CronogramaItem (
         }
 
         Text(
-            text = formatoText("Grupo: ", "${cronograma.grupo} (${cronograma.nivelMalla})"),
+            text = formatoText("Grupo:", "${cronograma.grupo} (${cronograma.nivelMalla})"),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-            text = formatoText("Fecha: ", "${cronograma.fechaDesde} a ${cronograma.fechaHasta}"),
+            text = formatoText("Fecha:", "${cronograma.fechaDesde} a ${cronograma.fechaHasta}"),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-            text = formatoText("Carrera: ", cronograma.carrera),
+            text = formatoText("Carrera:", cronograma.carrera),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -208,12 +205,12 @@ fun HorarioItem(horario: ProCronogramaHorarios) {
                 color = MaterialTheme.colorScheme.secondary,
             )
             Text(
-                text = formatoText("Horario: ", horario.horario),
+                text = formatoText("Horario:", horario.horario),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                text = formatoText("Aula: ", horario.aula),
+                text = formatoText("Aula:", horario.aula),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -255,12 +252,12 @@ fun ProfesorItem(
                 color = MaterialTheme.colorScheme.secondary,
             )
             Text(
-                text = formatoText("Fecha: ", "${profesor.desde} a ${profesor.hasta}"),
+                text = formatoText("Fecha:", "${profesor.desde} a ${profesor.hasta}"),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                text = formatoText("Segmento: ", profesor.segmento),
+                text = formatoText("Segmento:", profesor.segmento),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

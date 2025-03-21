@@ -6,7 +6,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,8 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIos
-import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ExpandLess
@@ -38,18 +35,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.itb.sga.core.formatoText
 import org.itb.sga.data.network.ClaseX
-import org.itb.sga.data.network.Paging
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
 import org.itb.sga.ui.components.MyAssistChip
 import org.itb.sga.ui.components.MyCard
 import org.itb.sga.ui.components.MyCircularProgressIndicator
+import org.itb.sga.ui.components.Paginado
 import org.itb.sga.ui.components.alerts.MyErrorAlert
 import org.itb.sga.ui.components.dashboard.DashBoardScreen
 
@@ -104,13 +99,12 @@ fun Screen(
         Column (
             modifier = Modifier
                 .fillMaxSize()
-
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 clasesFintradas?.let {
                     items(it.clases) { clase ->
@@ -121,18 +115,33 @@ fun Screen(
                                 navController = navController
                             )
                         }
-                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
+
             Spacer(modifier = Modifier.height(4.dp))
-            data?.let {
+
+            data?.paging?.let {
                 Paginado(
-                    homeViewModel,
-                    proClasesViewModel,
-                    query,
-                    isLoading,
-                    it.paging
+                    isLoading = isLoading,
+                    paging = it,
+                    homeViewModel = homeViewModel,
+                    onBack = {
+                        homeViewModel.pageLess()
+                        proClasesViewModel.onloadProClases(
+                            query,
+                            actualPage - 1,
+                            homeViewModel
+                        )
+                    },
+                    onNext = {
+                        homeViewModel.pageMore()
+                        proClasesViewModel.onloadProClases(
+                            query,
+                            actualPage + 1,
+                            homeViewModel
+                        )
+                    }
                 )
             }
         }
@@ -146,68 +155,6 @@ fun Screen(
                     navController.popBackStack()
                 },
                 showAlert = true
-            )
-        }
-    }
-}
-
-@Composable
-fun Paginado(
-    homeViewModel: HomeViewModel,
-    proClasesViewModel: ProClasesViewModel,
-    query: String,
-    isLoading: Boolean,
-    paging: Paging
-) {
-    val actualPage by homeViewModel.actualPage.collectAsState(1)
-
-    Row (
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-            .background(color = MaterialTheme.colorScheme.surfaceContainer),
-        horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
-    ){
-        IconButton(
-            onClick = {
-                homeViewModel.pageLess()
-                proClasesViewModel.onloadProClases(
-                    query,
-                    actualPage - 1,
-                    homeViewModel
-                )
-            },
-            enabled = actualPage > 1  && !isLoading
-        ) {
-            Icon(
-                imageVector = Icons.Filled.ArrowBackIos,
-                contentDescription = "Back",
-                tint = if (actualPage > 1  && !isLoading) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outlineVariant
-            )
-        }
-
-        Text(
-            text = "${actualPage}/${paging.lastPage}",
-            fontWeight = FontWeight.Normal,
-            fontSize = 20.sp
-        )
-
-        IconButton(
-            onClick = {
-                homeViewModel.pageMore()
-                proClasesViewModel.onloadProClases(
-                    query,
-                    actualPage + 1,
-                    homeViewModel
-                )
-            },
-            enabled = actualPage < (paging.lastPage) && !isLoading
-        ) {
-            Icon(
-                imageVector = Icons.Filled.ArrowForwardIos,
-                contentDescription = "Next",
-                tint = if (actualPage < (paging.lastPage)  && !isLoading) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outlineVariant
             )
         }
     }
@@ -248,12 +195,12 @@ fun ClaseItem(
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = formatoText("Grupo: ", clase.grupo),
+                        text = formatoText("Grupo:", clase.grupo),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.secondary
                     )
                     Text(
-                        text = formatoText("Fecha y apertura: ", "${clase.fecha} (${clase.horaEntrada} a ${clase.horaSalida})"),
+                        text = formatoText("Fecha y apertura:", "${clase.fecha} (${clase.horaEntrada} a ${clase.horaSalida})"),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -302,17 +249,17 @@ fun MoreInfo(
     clase: ClaseX
 ) {
     Text(
-        text = formatoText("Turno: ", clase.turno),
+        text = formatoText("Turno:", clase.turno),
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.secondary
     )
     Text(
-        text = formatoText("Aula: ", clase.aula),
+        text = formatoText("Aula:", clase.aula),
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.secondary
     )
     Text(
-        text = formatoText("Asistencias: ", "${clase.asistenciaCantidad} (${clase.asistenciaProciento}%)"),
+        text = formatoText("Asistencias:", "${clase.asistenciaCantidad} (${clase.asistenciaProciento}%)"),
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.secondary
     )

@@ -10,7 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import org.itb.sga.features.common.home.HomeViewModel
@@ -27,10 +26,7 @@ fun AluAyudaFinancieraScreen(
         title = "Ayuda Financiera",
         navController = navController,
         content = {
-            Screen(
-                homeViewModel,
-                navController
-            )
+            Screen()
         },
         homeViewModel = homeViewModel,
         loginViewModel = loginViewModel
@@ -38,10 +34,7 @@ fun AluAyudaFinancieraScreen(
 }
 
 @Composable
-fun Screen(
-    homeViewModel: HomeViewModel,
-    navController: NavHostController
-) {
+fun Screen() {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -53,7 +46,6 @@ fun Screen(
                 text = "Requisitos importantes para solicitar una Ayuda Financiera",
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
         }
@@ -92,7 +84,6 @@ fun Screen(
                 text = "Documentos que debe adjuntar a la solicitud:",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold
             )
         }
 
@@ -118,7 +109,6 @@ fun Screen(
                 text = "Importante:",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.secondary,
-                fontWeight = FontWeight.Bold
             )
         }
 
@@ -149,7 +139,6 @@ fun Screen(
                 text = "Nota:",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.tertiary,
-                fontWeight = FontWeight.Bold
             )
         }
 

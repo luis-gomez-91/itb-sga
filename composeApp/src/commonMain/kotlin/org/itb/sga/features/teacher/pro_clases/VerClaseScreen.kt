@@ -94,22 +94,22 @@ fun Screen(
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = formatoText("Grupo: ", it.grupo),
+                text = formatoText("Grupo:", it.grupo),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
             Text(
-                text = formatoText("Fecha: ","${it.fecha} (${it.horaEntrada} - ${it.horaSalida}"),
+                text = formatoText("Fecha:","${it.fecha} (${it.horaEntrada} - ${it.horaSalida}"),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
             Text(
-                text = formatoText("Turno: ", it.turno),
+                text = formatoText("Turno:", it.turno),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
             Text(
-                text = formatoText("Aula: ", it.aula),
+                text = formatoText("Aula:", it.aula),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.secondary
             )

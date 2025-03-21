@@ -15,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.ui.components.MyFilledTonalButton
@@ -57,7 +56,6 @@ fun RequisitosBeca(
                         Text(
                             text = "1. Cumplimiento Académico",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.secondary
                         )
                         Text(
@@ -73,7 +71,6 @@ fun RequisitosBeca(
                         Text(
                             text = "2. Matrícula",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.secondary
                         )
                         Text(
@@ -88,7 +85,6 @@ fun RequisitosBeca(
                         Text(
                             text = "3. Actualización de Datos",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.secondary
                         )
                         Text(
@@ -103,7 +99,6 @@ fun RequisitosBeca(
                         Text(
                             text = "4. Ficha socioeconómica",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.secondary
                         )
                         Text(
@@ -118,7 +113,6 @@ fun RequisitosBeca(
                         Text(
                             text = "5. Solicitud de Beca",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.secondary
                         )
                         Text(
@@ -134,7 +128,6 @@ fun RequisitosBeca(
                         Text(
                             text = "Documentos Requeridos",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.secondary
                         )
                         Text(
@@ -155,7 +148,6 @@ fun RequisitosBeca(
                         Text(
                             text = "Importante",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.error
                         )
                         Text(

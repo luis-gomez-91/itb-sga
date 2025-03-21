@@ -32,7 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,9 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.UiComposable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.itb.sga.core.formatoText
 import org.itb.sga.data.network.AluMalla
@@ -193,7 +191,7 @@ fun ScrollableTabRowNivelesMalla(
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.surfaceContainer),
         indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
+            SecondaryIndicator(
                 Modifier
                     .tabIndicatorOffset(tabPositions[selectedTabIndex])
                     .height(3.dp),
@@ -210,8 +208,7 @@ fun ScrollableTabRowNivelesMalla(
                 text = {
                     Text(
                         text = aluMalla.nivelmallaNombreCorto ?: "N/A",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium,
                         color = if (selectedTabIndex == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
@@ -283,8 +280,7 @@ fun AsignaturaItem(
         ) {
             Text(
                 text = asignatura.asignaturaNombre,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
             )
             Row(
@@ -318,14 +314,14 @@ fun AsignaturaItem(
                     horizontalAlignment = Alignment.End
                 ) {
                     Text(
-                        text = formatoText("Nota: ", "${asignatura.nota}"),
-                        fontSize = 12.sp,
+                        text = formatoText("Nota:", asignatura.nota),
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.secondary
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = formatoText("Asistencia: ", "${asignatura.asistencia}"),
-                        fontSize = 12.sp,
+                        text = formatoText("Asistencia:", asignatura.asistencia),
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }

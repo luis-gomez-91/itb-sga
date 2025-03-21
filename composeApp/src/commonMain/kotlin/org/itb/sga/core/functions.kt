@@ -6,9 +6,7 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
@@ -16,7 +14,6 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
-import kotlinx.datetime.LocalTime
 import org.itb.sga.data.domain.ChipState
 import org.itb.sga.data.network.Response
 
@@ -26,18 +23,23 @@ fun String.capitalizeWords(): String {
     }
 }
 
+@Composable
 fun formatoText(titulo: String, descripcion: String): AnnotatedString {
     return buildAnnotatedString {
-        pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-        append(titulo)
-        pop()
-        append(descripcion)
+        append(
+            AnnotatedString(
+                text = titulo,
+                spanStyle = MaterialTheme.typography.titleSmall.toSpanStyle()
+            )
+        )
+        append(" ")
+        append(
+            AnnotatedString(
+                text = descripcion,
+                spanStyle = MaterialTheme.typography.bodyMedium.toSpanStyle()
+            )
+        )
     }
-}
-
-fun parseTime(hora: String): LocalTime {
-    val (hour, minute) = hora.split(":").map { it.toInt() }
-    return LocalTime(hour, minute)
 }
 
 @Composable

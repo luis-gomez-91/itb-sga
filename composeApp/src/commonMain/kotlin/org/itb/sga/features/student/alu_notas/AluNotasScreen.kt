@@ -36,9 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.itb.sga.core.capitalizeWords
 import org.itb.sga.data.network.AluNotas
@@ -133,8 +131,7 @@ fun TipoItem(
                     Text(
                         modifier = Modifier.padding(8.dp),
                         text = "Asignaturas".capitalizeWords(),
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 16.sp,
+                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -176,8 +173,7 @@ fun TipoItem(
                     Text(
                         modifier = Modifier.padding(8.dp),
                         text = "Otras Notas".capitalizeWords(),
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 16.sp,
+                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -253,8 +249,7 @@ fun AluNotaItem(
                 ) {
                     Text(
                         text = data.asignatura,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.weight(1f)
                     )
@@ -377,8 +372,7 @@ fun OtraNotaItem(
                 ) {
                     Text(
                         text = data.nombre,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.weight(1f)
                     )
