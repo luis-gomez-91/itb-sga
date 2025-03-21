@@ -71,21 +71,12 @@ fun Screen(
 ) {
     val leccionGrupo by proClasesViewModel.leccionGrupoData.collectAsState(null)
     val claseSelect by proClasesViewModel.claseSelect.collectAsState(null)
-    var expandedAsistencias by remember { mutableStateOf(false) }
-    var expandedContenido by remember { mutableStateOf(false) }
-    var expandedObservaciones by remember { mutableStateOf(false) }
-    var contenido by remember { mutableStateOf(leccionGrupo?.leccionGrupoContenido ?: "") }
-    var observaciones by remember { mutableStateOf(leccionGrupo?.leccionGrupoObservaciones ?: "") }
-
-    LaunchedEffect(leccionGrupo) {
-        contenido = leccionGrupo?.leccionGrupoContenido ?: ""
-        observaciones = leccionGrupo?.leccionGrupoObservaciones ?: ""
-    }
 
     Column (
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         claseSelect?.let {
             Text(
@@ -113,161 +104,206 @@ fun Screen(
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
-        }
 
-        Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(8.dp))
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceContainer)
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Listado de alumnos",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.secondary
-            )
-            AnimatedContent(targetState = expandedAsistencias) { isExpanded ->
-                IconButton(onClick = { expandedAsistencias = !expandedAsistencias }) {
-                    Icon(
-                        imageVector = if (expandedAsistencias) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = if (expandedAsistencias) "Collapse" else "Expand",
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
-                }
-            }
-        }
-        AnimatedVisibility(
-            visible = expandedAsistencias,
-            enter = fadeIn() + expandVertically(),
-            exit = fadeOut() + shrinkVertically()
-        ) {
-            Spacer(Modifier.height(4.dp))
-            LazyColumn(
-                modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
-            ) {
-                leccionGrupo?.let { leccion ->
-                    itemsIndexed(leccion.asistencias) { index, asistencia ->
-                        Spacer(modifier = Modifier.height(8.dp))
-                        claseSelect?.let {
-                            AsistenciaItem(
-                                index = index,
-                                asistencia = asistencia,
-                                proClasesViewModel = proClasesViewModel,
-                                leccionGrupo = leccion,
-                                claseSelect = it
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        HorizontalDivider()
+            leccionGrupo?.let { itLeccionGruopo ->
+                Column (
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    ListadoAlumnos(itLeccionGruopo, it, proClasesViewModel)
+                    ContenidoItem(itLeccionGruopo, it, proClasesViewModel)
+                    ObservacionesItem(itLeccionGruopo, it, proClasesViewModel)
+                    if (it.abierta) {
+                        Spacer(Modifier.height(16.dp))
+                        MyFilledTonalButton(
+                            text = "Cerrar clase",
+                            enabled = true,
+                            onClickAction = {
+                                proClasesViewModel.updateValueAction("", "cerrarClase")
+                                navController.popBackStack()
+                            },
+                            buttonColor = MaterialTheme.colorScheme.errorContainer,
+                            textColor = MaterialTheme.colorScheme.error
+                        )
                     }
                 }
             }
+
+
         }
 
-        Spacer(Modifier.height(8.dp))
-        Row (
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceContainer)
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Contenido",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.secondary
-            )
-            AnimatedContent(targetState = expandedContenido) { isExpanded ->
-                IconButton(onClick = { expandedContenido = !expandedContenido }) {
-                    Icon(
-                        imageVector = if (expandedContenido) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = if (expandedContenido) "Collapse" else "Expand",
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
-                }
-            }
-        }
-        AnimatedVisibility(
-            visible = expandedContenido,
-            enter = fadeIn() + expandVertically(),
-            exit = fadeOut() + shrinkVertically()
-        ) {
-            MyOutlinedTextFieldArea(
-                value = contenido,
-                onValueChange = { contenido = it },
-                label = "Contenido",
-                modifier = Modifier.fillMaxWidth(),
-                enabled = claseSelect!!.abierta,
-                onFocusLost = {
-                    if (contenido != leccionGrupo?.leccionGrupoContenido) {
-                        proClasesViewModel.updateValueAction(contenido, "updateContenido")
-                    }
-                }
-            )
-        }
 
-        Spacer(Modifier.height(8.dp))
-        Row (
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceContainer)
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Observaciones",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.secondary
-            )
-            AnimatedContent(targetState = expandedObservaciones) { isExpanded ->
-                IconButton(onClick = { expandedObservaciones = !expandedObservaciones }) {
-                    Icon(
-                        imageVector = if (expandedObservaciones) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = if (expandedObservaciones) "Collapse" else "Expand",
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
-                }
-            }
-        }
-        AnimatedVisibility(
-            visible = expandedObservaciones,
-            enter = fadeIn() + expandVertically(),
-            exit = fadeOut() + shrinkVertically()
-        ) {
-            MyOutlinedTextFieldArea(
-                value = observaciones,
-                onValueChange = { observaciones = it },
-                label = "Contenido",
-                modifier = Modifier.fillMaxWidth(),
-                enabled = claseSelect!!.abierta,
-                onFocusLost = {
-                    if (observaciones != leccionGrupo?.leccionGrupoObservaciones) {
-                        proClasesViewModel.updateValueAction(observaciones, "updateObservaciones")
-                    }
-                }
-            )
-        }
-        claseSelect?.let {
-            if (it.abierta) {
-                Spacer(Modifier.height(16.dp))
-                MyFilledTonalButton(
-                    text = "Cerrar clase",
-                    enabled = true,
-                    onClickAction = {
-                        proClasesViewModel.updateValueAction("", "cerrarClase")
-                        navController.popBackStack()
-                    },
-                    buttonColor = MaterialTheme.colorScheme.errorContainer,
-                    textColor = MaterialTheme.colorScheme.error
+    }
+}
+
+@Composable
+fun ListadoAlumnos(
+    leccionGrupo: LeccionGrupo,
+    claseSelect: ClaseX,
+    proClasesViewModel: ProClasesViewModel
+) {
+    var expandedAsistencias by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Listado de alumnos",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.secondary
+        )
+        AnimatedContent(targetState = expandedAsistencias) { isExpanded ->
+            IconButton(onClick = { expandedAsistencias = !expandedAsistencias }) {
+                Icon(
+                    imageVector = if (expandedAsistencias) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = if (expandedAsistencias) "Collapse" else "Expand",
+                    tint = MaterialTheme.colorScheme.secondary
                 )
             }
         }
+    }
+    AnimatedVisibility(
+        visible = expandedAsistencias,
+        enter = fadeIn() + expandVertically(),
+        exit = fadeOut() + shrinkVertically()
+    ) {
+        Spacer(Modifier.height(4.dp))
+        LazyColumn(
+            modifier = Modifier.padding(horizontal = 8.dp)
+        ) {
+            leccionGrupo.let { leccion ->
+                itemsIndexed(leccion.asistencias) { index, asistencia ->
+                    Spacer(modifier = Modifier.height(8.dp))
+                    AsistenciaItem(
+                        index = index,
+                        asistencia = asistencia,
+                        proClasesViewModel = proClasesViewModel,
+                        leccionGrupo = leccion,
+                        claseSelect = claseSelect
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    HorizontalDivider()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ContenidoItem(
+    leccionGrupo: LeccionGrupo,
+    claseSelect: ClaseX,
+    proClasesViewModel: ProClasesViewModel
+) {
+    var expandedContenido by remember { mutableStateOf(false) }
+    var contenido by remember { mutableStateOf(leccionGrupo.leccionGrupoContenido) }
+
+    LaunchedEffect(leccionGrupo) {
+        contenido = leccionGrupo.leccionGrupoContenido
+    }
+
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Contenido",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.secondary
+        )
+        AnimatedContent(targetState = expandedContenido) { isExpanded ->
+            IconButton(onClick = { expandedContenido = !expandedContenido }) {
+                Icon(
+                    imageVector = if (expandedContenido) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = if (expandedContenido) "Collapse" else "Expand",
+                    tint = MaterialTheme.colorScheme.secondary
+                )
+            }
+        }
+    }
+    AnimatedVisibility(
+        visible = expandedContenido,
+        enter = fadeIn() + expandVertically(),
+        exit = fadeOut() + shrinkVertically()
+    ) {
+        MyOutlinedTextFieldArea(
+            value = contenido,
+            onValueChange = { contenido = it },
+            label = "Contenido",
+            modifier = Modifier.fillMaxWidth(),
+            enabled = claseSelect.abierta,
+            onFocusLost = {
+                if (contenido != leccionGrupo.leccionGrupoContenido) {
+                    proClasesViewModel.updateValueAction(contenido, "updateContenido")
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun ObservacionesItem(
+    leccionGrupo: LeccionGrupo,
+    claseSelect: ClaseX,
+    proClasesViewModel: ProClasesViewModel
+) {
+    var expandedObservaciones by remember { mutableStateOf(false) }
+    var observaciones by remember { mutableStateOf(leccionGrupo.leccionGrupoObservaciones) }
+
+    LaunchedEffect(leccionGrupo) {
+        observaciones = leccionGrupo.leccionGrupoObservaciones
+    }
+
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Observaciones",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.secondary
+        )
+        AnimatedContent(targetState = expandedObservaciones) { isExpanded ->
+            IconButton(onClick = { expandedObservaciones = !expandedObservaciones }) {
+                Icon(
+                    imageVector = if (expandedObservaciones) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = if (expandedObservaciones) "Collapse" else "Expand",
+                    tint = MaterialTheme.colorScheme.secondary
+                )
+            }
+        }
+    }
+    AnimatedVisibility(
+        visible = expandedObservaciones,
+        enter = fadeIn() + expandVertically(),
+        exit = fadeOut() + shrinkVertically()
+    ) {
+        MyOutlinedTextFieldArea(
+            value = observaciones,
+            onValueChange = { observaciones = it },
+            label = "Observaciones",
+            modifier = Modifier.fillMaxWidth(),
+            enabled = claseSelect.abierta,
+            onFocusLost = {
+                if (observaciones != leccionGrupo.leccionGrupoObservaciones) {
+                    proClasesViewModel.updateValueAction(observaciones, "updateObservaciones")
+                }
+            }
+        )
     }
 }
 
@@ -290,7 +326,7 @@ fun AsistenciaItem(
         ) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = "asistencia.alumno",
+                text = asistencia.alumno,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

@@ -48,14 +48,14 @@ fun Paginado(
             Icon(
                 imageVector = Icons.Filled.ArrowBackIos,
                 contentDescription = "Back",
-                tint = if (actualPage > 1  && !isLoading) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.outlineVariant
+                tint = if (actualPage > 1  && !isLoading) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.outlineVariant
             )
         }
 
         Text(
             text = "${actualPage}/${paging.lastPage}",
-            style = MaterialTheme.typography.titleLarge,
-            color = if (!isLoading) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.outlineVariant
+            style = MaterialTheme.typography.bodyLarge,
+            color = if (!isLoading) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.outlineVariant
         )
 
         IconButton(
@@ -67,7 +67,7 @@ fun Paginado(
             Icon(
                 imageVector = Icons.Filled.ArrowForwardIos,
                 contentDescription = "Next",
-                tint = if (actualPage < (paging.lastPage)  && !isLoading) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.outlineVariant
+                tint = if (actualPage < (paging.lastPage)  && !isLoading) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.outlineVariant
             )
         }
     }

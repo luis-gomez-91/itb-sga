@@ -230,21 +230,22 @@ fun InscripcionItem(
                 verticalAlignment = Alignment.Top
             ) {
                 Column (
-                    modifier = Modifier.fillMaxWidth().weight(1f)
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
                         text = formatoText("Fecha inscripción:", inscripcion.fecha),
-                        style = MaterialTheme.typography.labelMedium,
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
                         text = formatoText("Identificación:", inscripcion.identificacion),
-                        style = MaterialTheme.typography.labelMedium,
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
                         text = formatoText("Usuario:", inscripcion.username),
-                        style = MaterialTheme.typography.labelMedium,
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     AnimatedVisibility(
@@ -252,41 +253,43 @@ fun InscripcionItem(
                         enter = fadeIn() + expandVertically(),
                         exit = fadeOut() + shrinkVertically()
                     ) {
-                        Column {
+                        Column (
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
                             Text(
-                                text = formatoText("Correo institucional:", inscripcion.email),
-                                style = MaterialTheme.typography.labelMedium,
+                                text = formatoText("Grupo:", inscripcion.grupo),
+                                style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
-                            inscripcion.email_personal?.let {
-                                Text(
-                                    text = formatoText("Correo personal:", it),
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
                             inscripcion.celular?.let {
                                 Text(
                                     text = formatoText("Teléfono celular:", it),
-                                    style = MaterialTheme.typography.labelMedium,
+                                    style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                             inscripcion.convencional?.let {
                                 Text(
                                     text = formatoText("Teléfono convencional:", it),
-                                    style = MaterialTheme.typography.labelMedium,
+                                    style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                             Text(
-                                text = formatoText("Grupo:", inscripcion.grupo),
-                                style = MaterialTheme.typography.labelMedium,
+                                text = formatoText("Correo institucional:", inscripcion.email),
+                                style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
+                            inscripcion.email_personal?.let {
+                                Text(
+                                    text = formatoText("Correo personal:", it),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
                             Text(
                                 text = formatoText("Carrera:", inscripcion.carrera),
-                                style = MaterialTheme.typography.labelMedium,
+                                style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }

@@ -1,6 +1,9 @@
 package org.itb.sga.features.teacher.pro_evaluaciones
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,9 +18,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import org.itb.sga.core.logInfo
 import org.itb.sga.data.network.pro_evaluaciones.ProEvaluacionesMateria
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
@@ -80,34 +83,73 @@ fun Screen(
     if (isLoading) {
         MyCircularProgressIndicator()
     } else {
-        Column (
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Spacer(modifier = Modifier.height(8.dp))
-            LazyColumn(
+        periodo?.let {
+            Row(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
             ) {
-                items(dataFilter) { materia ->
-                    MateriaItem(materia, proEvaluacionesViewModel, navController)
-                    Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    text = it.nombre,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.secondary,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            when {
+                data?.materias?.isEmpty() == true -> {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "No se encontraron materias para el periodo seleccionado.",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.secondary,
+                        textAlign = TextAlign.Center
+                    )
+                }
+                else -> {
+                    Column (
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        LazyColumn(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = 16.dp)
+                        ) {
+                            items(dataFilter) { materia ->
+                                MateriaItem(materia, proEvaluacionesViewModel, navController)
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
                 }
             }
-            Spacer(modifier = Modifier.height(4.dp))
-        }
 
-        error?.let {
-            logInfo("evaluaciones", "${error}")
-            MyErrorAlert(
-                titulo = it.title,
-                mensaje = it.error,
-                onDismiss = {
-                    proEvaluacionesViewModel.clearError()
-                },
-                showAlert = true
+        } ?: run {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "Seleccione un periodo.",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.secondary,
+                textAlign = TextAlign.Center
             )
         }
+    }
+
+    error?.let {
+        MyErrorAlert(
+            titulo = it.title,
+            mensaje = it.error,
+            onDismiss = {
+                proEvaluacionesViewModel.clearError()
+            },
+            showAlert = true
+        )
     }
 }
 
@@ -124,11 +166,12 @@ fun MateriaItem(
         }
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
                 text = materia.nombre,
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
             )
             Text(

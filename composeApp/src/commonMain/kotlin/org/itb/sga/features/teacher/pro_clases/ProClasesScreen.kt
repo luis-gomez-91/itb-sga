@@ -87,10 +87,9 @@ fun Screen(
     }
 
     val clasesFintradas = if (query.isNotEmpty()) {
-        data
-//        data?.clases?.filter { it.asignatura.contains(query, ignoreCase = true) }
+        data?.clases?.filter { it.asignatura.contains(query, ignoreCase = true) }
     } else {
-        data
+        data?.clases
     }
 
     if (isLoading) {
@@ -107,7 +106,7 @@ fun Screen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 clasesFintradas?.let {
-                    items(it.clases) { clase ->
+                    items(it) { clase ->
                         homeViewModel.homeData.value?.persona?.idDocente?.let { it1 ->
                             ClaseItem(
                                 clase = clase,
@@ -145,18 +144,17 @@ fun Screen(
                 )
             }
         }
-
-        if (error != null) {
-            MyErrorAlert(
-                titulo = error!!.title,
-                mensaje = error!!.error,
-                onDismiss = {
-                    homeViewModel.clearError()
-                    navController.popBackStack()
-                },
-                showAlert = true
-            )
-        }
+    }
+    if (error != null) {
+        MyErrorAlert(
+            titulo = error!!.title,
+            mensaje = error!!.error,
+            onDismiss = {
+                homeViewModel.clearError()
+                navController.popBackStack()
+            },
+            showAlert = true
+        )
     }
 }
 
@@ -187,7 +185,8 @@ fun ClaseItem(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
                         text = clase.asignatura,
@@ -209,9 +208,7 @@ fun ClaseItem(
                         enter = fadeIn() + expandVertically(),
                         exit = fadeOut() + shrinkVertically()
                     ) {
-                        Column {
-                            MoreInfo(clase)
-                        }
+                        MoreInfo(clase)
                     }
                 }
 
@@ -248,19 +245,23 @@ fun ClaseItem(
 fun MoreInfo(
     clase: ClaseX
 ) {
-    Text(
-        text = formatoText("Turno:", clase.turno),
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.secondary
-    )
-    Text(
-        text = formatoText("Aula:", clase.aula),
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.secondary
-    )
-    Text(
-        text = formatoText("Asistencias:", "${clase.asistenciaCantidad} (${clase.asistenciaProciento}%)"),
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.secondary
-    )
+    Column (
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = formatoText("Turno:", clase.turno),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.secondary
+        )
+        Text(
+            text = formatoText("Aula:", clase.aula),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.secondary
+        )
+        Text(
+            text = formatoText("Asistencias:", "${clase.asistenciaCantidad} (${clase.asistenciaProciento}%)"),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.secondary
+        )
+    }
 }

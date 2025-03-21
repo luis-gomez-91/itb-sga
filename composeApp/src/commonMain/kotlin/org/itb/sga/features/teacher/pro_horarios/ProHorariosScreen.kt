@@ -42,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.datetime.Clock
@@ -97,7 +98,7 @@ fun Screen(
     val data by proHorariosViewModel.data.collectAsState(emptyList())
     val error by proHorariosViewModel.error.collectAsState(null)
     val isLoading by homeViewModel.isLoading.collectAsState(false)
-    val periodoSelect by homeViewModel.periodoSelect.collectAsState()
+    val periodoSelect by homeViewModel.periodoSelect.collectAsState(null)
     val pagerState = rememberPagerState { data.size }
     var selectedTabIndex by remember { mutableStateOf(0) }
 
@@ -117,47 +118,84 @@ fun Screen(
     if (isLoading) {
         MyCircularProgressIndicator()
     } else {
-        Column (
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = MaterialTheme.colorScheme.surface)
-        ) {
-            if (data.isNotEmpty()) {
-                homeViewModel.clearError()
-                LaunchedEffect(selectedTabIndex) {
-                    pagerState.animateScrollToPage(selectedTabIndex)
-                }
-                LaunchedEffect(pagerState.currentPage) {
-                    selectedTabIndex = pagerState.currentPage
-                }
-                ScrollableTabRowProHorarios(
-                    proHorarios = data,
-                    selectedTabIndex = selectedTabIndex,
-                    onTabSelected = { index ->
-                        selectedTabIndex = index
-                    }
+        periodoSelect?.let { periodo ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
+            ) {
+                Text(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    text = periodo.nombre,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.secondary,
+                    textAlign = TextAlign.Center
                 )
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp)
-                ) { index ->
-                    Clases(data[selectedTabIndex], proHorariosViewModel, homeViewModel, navController, proClasesViewModel)
+            }
+
+            when {
+                data.isEmpty() -> {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "No se encontraron materias para el periodo seleccionado.",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.secondary,
+                        textAlign = TextAlign.Center
+                    )
+                }
+                else -> {
+                    Column (
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = MaterialTheme.colorScheme.surface)
+                    ) {
+                        if (data.isNotEmpty()) {
+                            homeViewModel.clearError()
+                            LaunchedEffect(selectedTabIndex) {
+                                pagerState.animateScrollToPage(selectedTabIndex)
+                            }
+                            LaunchedEffect(pagerState.currentPage) {
+                                selectedTabIndex = pagerState.currentPage
+                            }
+                            ScrollableTabRowProHorarios(
+                                proHorarios = data,
+                                selectedTabIndex = selectedTabIndex,
+                                onTabSelected = { index ->
+                                    selectedTabIndex = index
+                                }
+                            )
+                            HorizontalPager(
+                                state = pagerState,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp)
+                            ) { index ->
+                                Clases(data[selectedTabIndex], proHorariosViewModel, homeViewModel, navController, proClasesViewModel)
+                            }
+                        }
+                    }
                 }
             }
-        }
-
-        error?.let {
-            MyErrorAlert(
-                titulo = it.title,
-                mensaje = it.error,
-                onDismiss = {
-                    proHorariosViewModel.clearError()
-                },
-                showAlert = true
+        } ?: run {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "Seleccione un periodo.",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.secondary,
+                textAlign = TextAlign.Center
             )
         }
+    }
+
+    error?.let {
+        MyErrorAlert(
+            titulo = it.title,
+            mensaje = it.error,
+            onDismiss = {
+                proHorariosViewModel.clearError()
+            },
+            showAlert = true
+        )
     }
 }
 
@@ -240,7 +278,8 @@ fun ClaseItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
                         text = clase.materia,
@@ -257,6 +296,14 @@ fun ClaseItem(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+
+                    AnimatedVisibility(
+                        visible = expanded,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        ClaseMoreInfo(clase)
+                    }
                 }
                 Spacer(Modifier.width(8.dp))
                 AnimatedContent(targetState = expanded) { isExpanded ->
@@ -266,16 +313,6 @@ fun ClaseItem(
                             contentDescription = if (expanded) "Collapse" else "Expand"
                         )
                     }
-                }
-            }
-
-            AnimatedVisibility(
-                visible = expanded,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
-            ) {
-                Column {
-                    ClaseMoreInfo(clase)
                 }
             }
 
@@ -325,29 +362,33 @@ fun ClaseItem(
 fun ClaseMoreInfo(
     clase: ProHorarioClase
 ) {
-    Text(
-        text = formatoText("Fecha inicio:", clase.materiaDesde),
-        style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onSurface
-    )
+    Column (
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = formatoText("Fecha inicio:", clase.materiaDesde),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurface
+        )
 
-    Text(
-        text = formatoText("Fecha fin:", clase.materiaHasta),
-        style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onSurface
-    )
+        Text(
+            text = formatoText("Fecha fin:", clase.materiaHasta),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurface
+        )
 
-    Text(
-        text = formatoText("Aula:", clase.aula),
-        style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onSurface
-    )
+        Text(
+            text = formatoText("Aula:", clase.aula),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurface
+        )
 
-    Text(
-        text = formatoText("Carrera:", clase.carrera),
-        style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onSurface
-    )
+        Text(
+            text = formatoText("Carrera:", clase.carrera),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    }
 }
 
 fun isShowButton(clase: ProHorarioClase): Boolean {

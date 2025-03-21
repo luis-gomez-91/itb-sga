@@ -36,7 +36,7 @@ fun formatoText(titulo: String, descripcion: String): AnnotatedString {
         append(
             AnnotatedString(
                 text = descripcion,
-                spanStyle = MaterialTheme.typography.bodyMedium.toSpanStyle()
+                spanStyle = MaterialTheme.typography.labelSmall.toSpanStyle()
             )
         )
     }

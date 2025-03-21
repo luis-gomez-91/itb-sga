@@ -27,8 +27,6 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
@@ -97,13 +96,54 @@ fun Screen(
         }
     }
 
-    LazyColumn (
-        modifier = Modifier
-            .fillMaxSize()
+    Column (
+        Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        items(data) { materia ->
-            MateriaItem(proEntregaActasViewModel, materia)
-            HorizontalDivider()
+        periodo?.let {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
+            ) {
+                Text(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    text = it.nombre,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.secondary,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            when {
+                data.isEmpty() -> {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "No se encontraron materias para el periodo seleccionado.",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.secondary,
+                        textAlign = TextAlign.Center
+                    )
+                }
+                else -> {
+                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                        items(data) { materia ->
+                            MateriaItem(proEntregaActasViewModel, materia)
+                            Spacer(Modifier.height(8.dp))
+                            HorizontalDivider()
+                        }
+                    }
+                }
+            }
+
+        } ?: run {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "Seleccione un periodo.",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.secondary,
+                textAlign = TextAlign.Center
+            )
         }
     }
     if (error != null) {
@@ -127,9 +167,7 @@ fun MateriaItem(
     var showActions by remember { mutableStateOf(false) }
 
     Column (
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 16.dp)
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
     ) {
         Row (
             modifier = Modifier.fillMaxWidth(),
@@ -158,7 +196,8 @@ fun MateriaItem(
             verticalAlignment = Alignment.Top
         ) {
             Column (
-                modifier = Modifier.fillMaxWidth().weight(1f)
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
                     text = formatoText("Grupo:", "${materia.grupo} (${materia.nivelMalla})"),
@@ -175,7 +214,7 @@ fun MateriaItem(
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Spacer(Modifier.height(4.dp))
+
                 Row (
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -191,7 +230,6 @@ fun MateriaItem(
                         labelColor = MaterialTheme.colorScheme.onPrimary,
                     )
                 }
-
 
                 AnimatedVisibility(
                     visible = expanded,
@@ -260,9 +298,7 @@ fun DropdownActions(
         properties = PopupProperties(),
         onDismissRequest = onDismissRequest
     ){
-        Card(
-            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
-        ) {
+        MyCard() {
             Surface(
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.background)

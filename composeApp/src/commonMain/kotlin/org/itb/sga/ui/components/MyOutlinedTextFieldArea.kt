@@ -58,9 +58,10 @@ fun MyOutlinedTextFieldArea(
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = MaterialTheme.colorScheme.secondary.copy(alpha = 1f),
             unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
-            disabledIndicatorColor = MaterialTheme.colorScheme.surfaceContainerLow,
+            disabledIndicatorColor = MaterialTheme.colorScheme.outlineVariant,
             unfocusedContainerColor = Color.Transparent,
-            focusedContainerColor = Color.Transparent
+            focusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent
         ),
         enabled = enabled,
         trailingIcon = trailingIcon,

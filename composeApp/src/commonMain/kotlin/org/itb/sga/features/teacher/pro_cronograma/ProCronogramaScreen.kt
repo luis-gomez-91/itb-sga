@@ -89,7 +89,8 @@ fun Screen(
 
     LazyColumn (
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         items(data) { cronograma ->
             CronogramaItem(cronograma)
@@ -107,7 +108,8 @@ fun CronogramaItem (
     Column (
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 16.dp)
+            .padding(vertical = 8.dp, horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Row (
             modifier = Modifier.fillMaxWidth(),
@@ -157,14 +159,14 @@ fun CronogramaItem (
                 Horarios(cronograma.horarios)
             }
         }
-        Spacer(Modifier.height(4.dp))
+
         Row (
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
             MyFilledTonalButton(
                 text = if (true) "Aceptar materia" else "Rechazar materia",
-                enabled = true,
+                enabled = false,
                 onClickAction = {
 
                 },
