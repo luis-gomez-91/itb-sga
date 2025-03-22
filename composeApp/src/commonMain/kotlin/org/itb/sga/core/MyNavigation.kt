@@ -59,6 +59,7 @@ import org.itb.sga.features.teacher.pro_evaluaciones.ProEvaluacionesScreen
 import org.itb.sga.features.teacher.pro_evaluaciones.ProEvaluacionesViewModel
 import org.itb.sga.features.teacher.pro_horarios.ProHorariosScreen
 import org.itb.sga.features.teacher.pro_horarios.ProHorariosViewModel
+import org.itb.sga.ui.components.NotFoundScreen
 
 @Composable
 fun MyNavigation(
@@ -93,7 +94,7 @@ fun MyNavigation(
         navController = navController,
         startDestination = "login"
     ) {
-        composable("404") {NotFoundScreen(onNavigateBack = { navController.popBackStack() }) }
+        composable("404") { NotFoundScreen(onNavigateBack = { navController.popBackStack() }) }
         composable("login") { LoginScreen(navController, loginViewModel, homeViewModel) }
         composable("home") { HomeScreen(navController, homeViewModel, loginViewModel) }
         composable("inscripciones") { InscripcionesScreen(navController, homeViewModel, loginViewModel, inscripcionesViewModel) }

@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.itb.sga.core.createHttpClient
+import org.itb.sga.core.logInfo
 import org.itb.sga.data.network.Account
 import org.itb.sga.data.network.AccountResult
 import org.itb.sga.data.network.Error
@@ -23,7 +24,7 @@ class AccountViewModel: ViewModel() {
         viewModelScope.launch {
             try {
                 val result = accountService.fetchAccount(id)
-
+                logInfo("prueba", "$result")
                 when (result) {
                     is AccountResult.Success -> {
                         _data.value = result.account

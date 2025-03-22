@@ -1,20 +1,30 @@
 package org.itb.sga
 
 import AppTheme
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import aok.composeapp.generated.resources.Res
+import aok.composeapp.generated.resources.logo
+import aok.composeapp.generated.resources.logo_dark
 import org.itb.sga.core.MyNavigation
+import org.itb.sga.core.appIsLastVersion
+import org.itb.sga.core.openPlayStoreOrAppStore
 import org.itb.sga.features.admin.docentes.DocentesViewModel
 import org.itb.sga.features.admin.inscripciones.InscripcionesViewModel
 import org.itb.sga.features.common.account.AccountViewModel
@@ -40,6 +50,8 @@ import org.itb.sga.features.teacher.pro_cronograma.ProCronogramaViewModel
 import org.itb.sga.features.teacher.pro_entrega_actas.ProEntregaActasViewModel
 import org.itb.sga.features.teacher.pro_evaluaciones.ProEvaluacionesViewModel
 import org.itb.sga.features.teacher.pro_horarios.ProHorariosViewModel
+import org.itb.sga.ui.components.MyFilledTonalButton
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun App(
@@ -73,66 +85,90 @@ fun App(
     AppTheme(
         homeViewModel = homeViewModel
     ) {
-        if (true) {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colorScheme.background
-            ) {
-                MyNavigation(
-                    loginViewModel = loginViewModel,
-                    homeViewModel = homeViewModel,
-                    inscripcionesViewModel = inscripcionesViewModel,
-                    accountViewModel = accountViewModel,
-                    aluFinanzasViewModel = aluFinanzasViewModel,
-                    aluCronogramaViewModel = aluCronogramaViewModel,
-                    aluMallaViewModel = aluMallaViewModel,
-                    aluHorarioViewModel = aluHorarioViewModel,
-                    pagoOnlineViewModel = pagoOnlineViewModel,
-                    aluMateriasViewModel = aluMateriasViewModel,
-                    aluFacturacionViewModel = aluFacturacionViewModel,
-                    aluNotasViewModel = aluNotasViewModel,
-                    docentesViewModel = docentesViewModel,
-                    proClasesViewModel = proClasesViewModel,
-                    proHorariosViewModel = proHorariosViewModel,
-                    aluSolicitudesViewModel = aluSolicitudesViewModel,
-                    aluDocumentosViewModel = aluDocumentosViewModel,
-                    docBibliotecaViewModel = docBibliotecaViewModel,
-                    aluSolicitudBecaViewModel = aluSolicitudBecaViewModel,
-                    aluConsultaGeneralViewModel = aluConsultaGeneralViewModel,
-                    aluMatriculaViewModel = aluMatriculaViewModel,
-                    reportesViewModel = reportesViewModel,
-                    proEvaluacionesViewModel = proEvaluacionesViewModel,
-                    proCronogramaViewModel = proCronogramaViewModel,
-                    proEntregaActasViewModel = proEntregaActasViewModel
-                )
-            }
-        } else {
-            Box(
-                modifier = Modifier.padding(32.dp)
-            ) {
-                val users by homeViewModel.aokDatabase.userDao().getAllUsers().collectAsState(emptyList())
+        val appLastVersion by loginViewModel.appLastVersion.collectAsState(null)
 
-//                val usuario = User(
-//                    username = "prueba",
-//                    password = "123"
-//                )
-//
-//                val scope = rememberCoroutineScope()
-//
-//                scope.launch {
-//                    homeViewModel.aokDatabase.userDao().upsert(usuario)
-//                }
-
-                LazyColumn {
-                    items(users) { user ->
-                        Text(user.username)
-                        Text(user.password)
-                        Spacer(Modifier.height(8.dp))
-                    }
-                }
-            }
-
+        LaunchedEffect(Unit) {
+            loginViewModel.fetchLastVersionApp()
         }
 
+        appLastVersion?.let {
+            if (appIsLastVersion(it)) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    MyNavigation(
+                        loginViewModel = loginViewModel,
+                        homeViewModel = homeViewModel,
+                        inscripcionesViewModel = inscripcionesViewModel,
+                        accountViewModel = accountViewModel,
+                        aluFinanzasViewModel = aluFinanzasViewModel,
+                        aluCronogramaViewModel = aluCronogramaViewModel,
+                        aluMallaViewModel = aluMallaViewModel,
+                        aluHorarioViewModel = aluHorarioViewModel,
+                        pagoOnlineViewModel = pagoOnlineViewModel,
+                        aluMateriasViewModel = aluMateriasViewModel,
+                        aluFacturacionViewModel = aluFacturacionViewModel,
+                        aluNotasViewModel = aluNotasViewModel,
+                        docentesViewModel = docentesViewModel,
+                        proClasesViewModel = proClasesViewModel,
+                        proHorariosViewModel = proHorariosViewModel,
+                        aluSolicitudesViewModel = aluSolicitudesViewModel,
+                        aluDocumentosViewModel = aluDocumentosViewModel,
+                        docBibliotecaViewModel = docBibliotecaViewModel,
+                        aluSolicitudBecaViewModel = aluSolicitudBecaViewModel,
+                        aluConsultaGeneralViewModel = aluConsultaGeneralViewModel,
+                        aluMatriculaViewModel = aluMatriculaViewModel,
+                        reportesViewModel = reportesViewModel,
+                        proEvaluacionesViewModel = proEvaluacionesViewModel,
+                        proCronogramaViewModel = proCronogramaViewModel,
+                        proEntregaActasViewModel = proEntregaActasViewModel
+                    )
+                }
+            } else {
+                val selectedTheme by homeViewModel.selectedTheme.collectAsState(null)
+                var imageLogo by remember { mutableStateOf(Res.drawable.logo) }
+
+                LaunchedEffect(selectedTheme) {
+                    imageLogo = if (selectedTheme?.dark == true) {
+                        Res.drawable.logo_dark
+                    } else {
+                        Res.drawable.logo
+                    }
+                }
+
+                Column (
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 0.dp, start = 32.dp, end = 32.dp, bottom = 64.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(imageLogo),
+                        contentDescription = "logo",
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "¡Una nueva versión está disponible! Actualiza la app para seguir disfrutando de las mejores funciones.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.secondary,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    MyFilledTonalButton(
+                        text = "Actualizar",
+                        buttonColor = MaterialTheme.colorScheme.primaryContainer,
+                        textColor = MaterialTheme.colorScheme.primary,
+                        icon = Icons.Filled.Update,
+                        onClickAction = { openPlayStoreOrAppStore() },
+                        iconSize = 32.dp,
+                        textStyle = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+        }
     }
 }

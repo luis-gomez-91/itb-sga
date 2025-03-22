@@ -184,7 +184,7 @@ class HomeViewModel(
     }
 
     //  --------------------------------------------------- BOTTOM SHEET PERIODOS ---------------------------------------------------
-    private val _showBottomSheet = MutableStateFlow<Boolean>(false)
+    private val _showBottomSheet = MutableStateFlow(false)
     val showBottomSheet: StateFlow<Boolean> = _showBottomSheet
 
     private val _periodoSelect = MutableStateFlow<Periodo?>(null)

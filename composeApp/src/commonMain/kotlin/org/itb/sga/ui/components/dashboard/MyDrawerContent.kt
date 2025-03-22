@@ -342,7 +342,7 @@ fun ChangePasswordForm(
 
     ModalBottomSheet(
         onDismissRequest = {
-            homeViewModel.changeBottomSheet()
+            homeViewModel.changeShowPasswordForm(false)
         }
     ) {
         Column(

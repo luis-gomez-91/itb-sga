@@ -42,8 +42,6 @@ kotlin {
             implementation("dev.icerock.moko:biometry-compose:0.4.0")
             implementation(libs.androidx.room.paging)
             implementation("org.mindrot:jbcrypt:0.4")
-
-
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -100,8 +98,8 @@ android {
         applicationId = "org.itb.sga"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 4
-        versionName = "1.0-alpha"
+        versionCode = 7
+        versionName = "1.1-alpha"
     }
     packaging {
         resources {

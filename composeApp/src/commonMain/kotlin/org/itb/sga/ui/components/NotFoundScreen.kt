@@ -1,4 +1,4 @@
-package org.itb.sga.core
+package org.itb.sga.ui.components
 
 import androidx.compose.runtime.Composable
 import org.itb.sga.ui.components.alerts.MyWarningAlert

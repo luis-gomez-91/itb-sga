@@ -18,7 +18,6 @@ import org.itb.sga.data.database.AokDatabase
 import org.itb.sga.data.network.Response
 import org.itb.sga.data.network.form.RequestPasswordRecoveryForm
 
-
 class LoginViewModel(
     val biometryAuthenticator: BiometryAuthenticator
 ) : ViewModel(){
@@ -188,6 +187,27 @@ class LoginViewModel(
 
         } catch (throwable: Throwable) {
             logInfo("LoginViewModel", "Error en autenticación biométrica: ${throwable.message}")
+        }
+    }
+
+    private val _appLastVersion = MutableStateFlow<Int?>(null)
+    val appLastVersion: StateFlow<Int?> = _appLastVersion
+
+    fun fetchLastVersionApp() {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+
+                val result = loginService.fetchLastVersionApp()
+                _appLastVersion.value = result.message.toInt()
+                logInfo("prueba", "$result")
+
+            } catch (e: Exception) {
+                logInfo("prueba", "Exception: ${e.message}")
+                _error.value = Error(title = "Error", error = "${e.message}")
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 

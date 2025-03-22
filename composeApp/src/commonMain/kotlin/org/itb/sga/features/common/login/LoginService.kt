@@ -55,4 +55,14 @@ private val client: HttpClient
             Response(status = "error", message = "Exception occurred: ${e.message}")
         }
     }
+
+    suspend fun fetchLastVersionApp(): Response {
+        return try {
+            val response = client.get("${SERVER_URL}api_rest?action=fetchLastVersionApp")
+            response.body<Response>()
+
+        } catch (e: Exception) {
+            Response("error", "Error inesperado: ${e.message}")
+        }
+    }
 }

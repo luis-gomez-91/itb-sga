@@ -1,7 +1,7 @@
 [versions]
 agp = "8.3.2"
 android-compileSdk = "35"
-android-minSdk = "26"
+android-minSdk = "28"
 android-targetSdk = "35"
 androidx-activityCompose = "1.10.0"
 androidx-appcompat = "1.7.0"
@@ -15,6 +15,7 @@ calfFilePicker = "0.5.3"
 calfFilePickerCoil = "0.5.1"
 coilCompose = "3.0.0-alpha8"
 compose-plugin = "1.7.0"
+coreVersion = "1.11.0"
 filekitCore = "0.8.7"
 junit = "4.13.2"
 kotlin = "2.0.0"
@@ -54,6 +55,7 @@ compilerVersion = "3.2.0-alpha11"
 calf-file-picker = { module = "com.mohamedrejeb.calf:calf-file-picker", version.ref = "calfFilePicker" }
 calf-file-picker-coil = { module = "com.mohamedrejeb.calf:calf-file-picker-coil", version.ref = "calfFilePickerCoil" }
 coil-compose-v300alpha8 = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
+core = { module = "com.google.android.play:core", version.ref = "coreVersion" }
 filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref = "filekitCore" }
 filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekitCore" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
