@@ -90,13 +90,14 @@ fun Screen(
 
     homeViewModel.actualPageRestart()
 
-    if (isLoading) {
-        ShimmerFormLoadingAnimation(20)
-    } else {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        if (isLoading) {
+            ShimmerFormLoadingAnimation(20)
+        } else {
             homeData?.grupoModulos?.let { grupoModulos ->
                 grupoModulos.forEach { item ->
                     GrupoItem(item, navController, homeViewModel)
@@ -163,7 +164,6 @@ fun GrupoItem(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
     ) {
 
         Card(

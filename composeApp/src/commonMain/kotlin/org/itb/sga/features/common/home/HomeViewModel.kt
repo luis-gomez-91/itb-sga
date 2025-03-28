@@ -24,7 +24,7 @@ import org.itb.sga.data.network.ReportForm
 import org.itb.sga.data.network.ReportResult
 import org.itb.sga.data.network.form.UploadPhotoForm
 import org.itb.sga.data.network.Error
-import org.itb.sga.data.network.Notificacion
+import org.itb.sga.data.network.notificaciones.Notificacion
 import org.itb.sga.data.network.Response
 import org.itb.sga.data.network.form.RequestPasswordChangeForm
 import org.itb.sga.features.common.login.LoginViewModel
@@ -43,16 +43,6 @@ class HomeViewModel(
         _homeData.value = null
     }
 
-    private val _notificaciones = MutableStateFlow<List<Notificacion>>(emptyList())
-    val notificaciones: StateFlow<List<Notificacion>> = _notificaciones
-
-    private val _showNotifications = MutableStateFlow(false)
-    val showNotifications: StateFlow<Boolean> = _showNotifications
-
-    fun changeShowNotifications(value: Boolean) {
-        _showNotifications.value = value
-    }
-
     fun onloadHome(id: Int) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -63,7 +53,6 @@ class HomeViewModel(
                 when (result) {
                     is HomeResult.Success -> {
                         _homeData.value = result.home
-                        logInfo("prueba", "${result.home.notificaciones}")
                         _notificaciones.value = result.home.notificaciones
                         clearError()
                         _periodoSelect.value = _periodoSelect.value ?: result.home.periodos.getOrNull(0)
@@ -129,7 +118,6 @@ class HomeViewModel(
             _isLoading.value = true
             try {
                 val result = service.fetchReport(form)
-                logInfo("prueba", "${result}")
                 when (result) {
                     is ReportResult.Success -> {
                         _report.value = result.report
@@ -155,8 +143,6 @@ class HomeViewModel(
     }
 
     fun openURL(url: String) {
-        logInfo("prueba", "ENTRO A URL OPENER")
-
         viewModelScope.launch(Dispatchers.Main) {
             try {
                 pdfOpener.openURL(url)
@@ -423,6 +409,24 @@ class HomeViewModel(
                     }
                 }
             }
+        }
+    }
+
+//    Notificaciones
+    private val _notificaciones = MutableStateFlow<List<Notificacion>>(emptyList())
+    val notificaciones: StateFlow<List<Notificacion>> = _notificaciones
+
+    private val _showNotifications = MutableStateFlow(false)
+    val showNotifications: StateFlow<Boolean> = _showNotifications
+
+    fun changeShowNotifications(value: Boolean) {
+        _showNotifications.value = value
+    }
+
+    fun onloadNotificacionDetalle(not: Notificacion) {
+        viewModelScope.launch {
+            val result = homeData.value?.persona?.let { service.fetchNotificacionesDetalle(not.id, it.idPersona) }
+            not.detail = result
         }
     }
 

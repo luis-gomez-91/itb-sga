@@ -1,4 +1,4 @@
-package org.itb.sga.data.network
+package org.itb.sga.data.network.notificaciones
 
 import kotlinx.serialization.Serializable
 
@@ -9,5 +9,6 @@ data class Notificacion(
     val notificacion_titulo: String,
     val tipo: String,
     val urls: List<NotificacionUrl>? = null,
-    val utiliza_detalle: Boolean
+    val utiliza_detalle: Boolean,
+    var detail: NotificacionDetalle? = null
 )

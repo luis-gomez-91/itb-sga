@@ -64,9 +64,6 @@ fun ShimmerGridItem(
 ) {
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 16.dp),
         verticalArrangement = Arrangement.Center
     ) {
         repeat(rowNumber) {
@@ -79,12 +76,5 @@ fun ShimmerGridItem(
             )
             Spacer(modifier = Modifier.padding(5.dp))
         }
-        Spacer(
-            modifier = Modifier
-                .height(100.dp)
-                .clip(RoundedCornerShape(5.dp))
-                .fillMaxWidth()
-                .background(brush)
-        )
     }
 }

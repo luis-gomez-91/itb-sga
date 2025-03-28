@@ -1,18 +1,14 @@
 package org.itb.sga.ui.components.dashboard
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -34,9 +30,6 @@ import androidx.navigation.NavHostController
 import org.itb.sga.data.network.Periodo
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
-import org.itb.sga.ui.components.MyCard
-import org.itb.sga.ui.components.MyFilledTonalButton
-import org.itb.sga.ui.components.alerts.MyAlert
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,8 +42,6 @@ fun DashBoardScreen(
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val showBottomSheet by homeViewModel.showBottomSheet.collectAsState(false)
-    val notificaciones by homeViewModel.notificaciones.collectAsState(emptyList())
-    val showNotifications by homeViewModel.showNotifications.collectAsState(false)
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -109,77 +100,8 @@ fun DashBoardScreen(
                     Spacer(Modifier.height(16.dp))
                 }
             }
-
-            if (notificaciones.isNotEmpty() && showNotifications) {
-                MyAlert(
-                    title = "Notificaciones ITB",
-                    onDismiss = {
-                        homeViewModel.changeShowNotifications(false)
-                    },
-                    showAlert = showNotifications,
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                    text = {
-                        LazyColumn {
-                            items(notificaciones) { notificacion ->
-                                MyCard(
-                                    onClick = { },
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                ) {
-                                    Column(
-                                        modifier = Modifier.padding(horizontal = 8.dp)
-                                    ) {
-                                        Text(
-                                            text = notificacion.notificacion_titulo,
-                                            style = MaterialTheme.typography.titleSmall
-                                        )
-                                        Spacer(Modifier.height(4.dp))
-                                        Text(
-                                            text = notificacion.notificacion_descripcion,
-                                            style = MaterialTheme.typography.bodySmall
-                                        )
-
-                                        notificacion.urls?.takeIf { it.isNotEmpty() }?.let { urls ->
-                                            LazyRow(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                            ) {
-                                                items(urls) { url ->
-                                                    MyFilledTonalButton(
-                                                        text = url.name,
-                                                        enabled = true,
-                                                        shape = RoundedCornerShape(8.dp),
-                                                        onClickAction = {
-                                                            navController.navigate(url.url)
-                                                        },
-                                                        buttonColor = when (url.tipo) {
-                                                            "info" -> MaterialTheme.colorScheme.primaryContainer
-                                                            "success" -> MaterialTheme.colorScheme.onPrimaryContainer
-                                                            "danger" -> MaterialTheme.colorScheme.errorContainer
-                                                            "warning" -> MaterialTheme.colorScheme.tertiaryContainer
-                                                            else -> MaterialTheme.colorScheme.surfaceContainerLowest
-                                                        },
-                                                        textColor = when (url.tipo) {
-                                                            "info" -> MaterialTheme.colorScheme.primary
-                                                            "success" -> MaterialTheme.colorScheme.onPrimary
-                                                            "danger" -> MaterialTheme.colorScheme.error
-                                                            "warning" -> MaterialTheme.colorScheme.tertiary
-                                                            else -> MaterialTheme.colorScheme.onSurface
-                                                        },
-                                                    )
-                                                    Spacer(Modifier.width(4.dp))
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                Spacer(Modifier.height(8.dp))
-                            }
-                        }
-                    }
-                )
-            }
-        }
+            Notificacion(homeViewModel, navController)
+       }
     )
 }
 

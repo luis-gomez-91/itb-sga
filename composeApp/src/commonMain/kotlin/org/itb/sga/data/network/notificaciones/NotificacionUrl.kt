@@ -1,4 +1,4 @@
-package org.itb.sga.data.network
+package org.itb.sga.data.network.notificaciones
 
 import kotlinx.serialization.Serializable
 
