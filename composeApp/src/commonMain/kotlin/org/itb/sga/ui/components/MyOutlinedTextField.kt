@@ -15,15 +15,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 fun MyOutlinedTextField(
     value: String,
     placeholder: String = "",
-    label: String,
+    label: String? = null,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     enabled: Boolean = true,
     trailingIcon: @Composable (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    textStyle: TextStyle =TextStyle(
-        color = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.outlineVariant,
+    textStyle: TextStyle = TextStyle(
+        color = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.outline,
         fontSize = MaterialTheme.typography.bodyMedium.fontSize,
     )
 ) {
@@ -33,11 +33,13 @@ fun MyOutlinedTextField(
         modifier = modifier,
         placeholder = { Text(text = placeholder) },
         label = {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodyMedium,
-                color = if (enabled) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.outlineVariant
-            )
+            label?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (enabled) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.outlineVariant
+                )
+            }
         },
         keyboardOptions = keyboardOptions,
         textStyle = textStyle,
@@ -46,7 +48,8 @@ fun MyOutlinedTextField(
             unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
             disabledIndicatorColor = MaterialTheme.colorScheme.outlineVariant,
             unfocusedContainerColor = Color.Transparent,
-            focusedContainerColor = Color.Transparent
+            focusedContainerColor = Color.Transparent,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
         ),
         enabled = enabled,
         trailingIcon = trailingIcon,

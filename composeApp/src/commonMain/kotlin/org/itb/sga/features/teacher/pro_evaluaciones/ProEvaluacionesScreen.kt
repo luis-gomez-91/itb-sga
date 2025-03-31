@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import org.itb.sga.core.ModelsViewModel
 import org.itb.sga.data.network.pro_evaluaciones.ProEvaluacionesMateria
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
@@ -34,7 +35,8 @@ fun ProEvaluacionesScreen(
     navController: NavHostController,
     homeViewModel: HomeViewModel,
     loginViewModel: LoginViewModel,
-    proEvaluacionesViewModel: ProEvaluacionesViewModel
+    proEvaluacionesViewModel: ProEvaluacionesViewModel,
+    modelsViewModel: ModelsViewModel
 ) {
     DashBoardScreen(
         title = "Calificaciones",
@@ -43,7 +45,8 @@ fun ProEvaluacionesScreen(
             Screen(
                 homeViewModel,
                 proEvaluacionesViewModel,
-                navController
+                navController,
+                modelsViewModel
             )
         },
         homeViewModel = homeViewModel,
@@ -55,7 +58,8 @@ fun ProEvaluacionesScreen(
 fun Screen(
     homeViewModel: HomeViewModel,
     proEvaluacionesViewModel: ProEvaluacionesViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    modelsViewModel: ModelsViewModel
 ) {
     val data by proEvaluacionesViewModel.data.collectAsState(null)
     val isLoading by homeViewModel.isLoading.collectAsState(false)
@@ -121,7 +125,7 @@ fun Screen(
                                 .padding(horizontal = 16.dp)
                         ) {
                             items(dataFilter) { materia ->
-                                MateriaItem(materia, proEvaluacionesViewModel, navController)
+                                MateriaItem(materia, proEvaluacionesViewModel, navController, modelsViewModel)
                                 Spacer(modifier = Modifier.height(8.dp))
                             }
                         }
@@ -157,7 +161,8 @@ fun Screen(
 fun MateriaItem(
     materia: ProEvaluacionesMateria,
     proEvaluacionesViewModel: ProEvaluacionesViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    modelsViewModel: ModelsViewModel
 ) {
     MyCard (
         onClick = {

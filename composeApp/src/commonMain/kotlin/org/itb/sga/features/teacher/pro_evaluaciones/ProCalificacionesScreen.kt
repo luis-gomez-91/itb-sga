@@ -6,6 +6,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,8 +18,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.UnfoldLess
@@ -37,13 +40,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import org.itb.sga.core.ModelsViewModel
 import org.itb.sga.core.formatoText
 import org.itb.sga.data.network.pro_evaluaciones.ProEvaluacionesCalificacion
+import org.itb.sga.data.network.pro_evaluaciones.ProEvaluacionesMateria
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.ui.components.MyAssistChip
 import org.itb.sga.ui.components.MyCircularProgressIndicator
@@ -56,10 +62,11 @@ import org.itb.sga.ui.components.dashboard.DashboardScreen2
 fun ProCalificacionesScreen(
     navController: NavHostController,
     homeViewModel: HomeViewModel,
-    proEvaluacionesViewModel: ProEvaluacionesViewModel
+    proEvaluacionesViewModel: ProEvaluacionesViewModel,
+    modelsViewModel: ModelsViewModel
 ) {
     DashboardScreen2(
-        content = { Screen(proEvaluacionesViewModel, homeViewModel) },
+        content = { Screen(proEvaluacionesViewModel, homeViewModel, modelsViewModel) },
         title = "Calificaciones",
         onBack = {
             navController.navigate("pro_evaluaciones")
@@ -70,7 +77,8 @@ fun ProCalificacionesScreen(
 @Composable
 fun Screen(
     proEvaluacionesViewModel: ProEvaluacionesViewModel,
-    homeViewModel: HomeViewModel
+    homeViewModel: HomeViewModel,
+    modelsViewModel: ModelsViewModel
 ) {
     val data by proEvaluacionesViewModel.data.collectAsState(null)
     val isLoading by homeViewModel.isLoading.collectAsState(false)
@@ -99,12 +107,12 @@ fun Screen(
     if (isLoading) {
         MyCircularProgressIndicator()
     } else {
-        Column (
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-        ) {
-            materiaSelect?.let {
+        materiaSelect?.let {
+            Column (
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
                 Text(
                     text = it.nombre,
                     style = MaterialTheme.typography.titleMedium,
@@ -125,6 +133,20 @@ fun Screen(
                     horizontalArrangement = Arrangement.End
                 ) {
                     MyFilledTonalButton(
+                        text = "Descargar acta de notas",
+                        enabled = true,
+                        icon = Icons.Filled.Download,
+                        onClickAction = {
+                            proEvaluacionesViewModel.downloadActa("acta_notas", materiaSelect!!.idMateria, homeViewModel)
+                            proEvaluacionesViewModel.downloadActa("informe_acta_calificaciones", materiaSelect!!.idMateria, homeViewModel)
+                        },
+                        buttonColor = MaterialTheme.colorScheme.primaryContainer,
+                        textColor = MaterialTheme.colorScheme.primary
+                    )
+
+                    Spacer(Modifier.width(4.dp))
+
+                    MyFilledTonalButton(
                         text = if (showAll) "Colapsar" else "Desplegar",
                         enabled = true,
                         icon = if (showAll) Icons.Filled.UnfoldLess else Icons.Filled.UnfoldMore,
@@ -134,40 +156,67 @@ fun Screen(
                         buttonColor = MaterialTheme.colorScheme.tertiaryContainer,
                         textColor = MaterialTheme.colorScheme.tertiary
                     )
+
+
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-            }
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-            ) {
-                itemsIndexed(dataFilter) { index, calificacion ->
-                    HorizontalDivider()
-                    CalificacionItem(calificacion, showAll)
-                    Spacer(modifier = Modifier.height(8.dp))
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+                    itemsIndexed(dataFilter) { index, calificacion ->
+                        HorizontalDivider()
+                        CalificacionItem(calificacion, showAll, it, modelsViewModel)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
                 }
             }
         }
+    }
 
-        error?.let {
-            MyErrorAlert(
-                titulo = it.title,
-                mensaje = it.error,
-                onDismiss = {
-                    proEvaluacionesViewModel.clearError()
-                },
-                showAlert = true
-            )
-        }
+    error?.let {
+        MyErrorAlert(
+            titulo = it.title,
+            mensaje = it.error,
+            onDismiss = {
+                proEvaluacionesViewModel.clearError()
+            },
+            showAlert = true
+        )
     }
 }
 
 @Composable
 fun CalificacionItem(
     calificacion: ProEvaluacionesCalificacion,
-    showAll: Boolean
+    showAll: Boolean,
+    materiaSelect: ProEvaluacionesMateria,
+    modelsViewModel: ModelsViewModel
 ) {
     var expanded by remember { mutableStateOf(false) }
+
+    val colorMap: Map<String, Map<String, Color>> = mapOf(
+        "APROBADO" to mapOf(
+            "container" to MaterialTheme.colorScheme.onPrimaryContainer,
+            "text" to MaterialTheme.colorScheme.onPrimary
+        ),
+        "REPROBADO" to mapOf(
+            "container" to MaterialTheme.colorScheme.errorContainer,
+            "text" to MaterialTheme.colorScheme.error
+        ),
+        "EN CURSO" to mapOf(
+            "container" to MaterialTheme.colorScheme.secondaryContainer,
+            "text" to MaterialTheme.colorScheme.secondary
+        ),
+        "RECUPERACION" to mapOf(
+            "container" to MaterialTheme.colorScheme.tertiaryContainer,
+            "text" to MaterialTheme.colorScheme.tertiary
+        ),
+        "EXAMEN" to mapOf(
+            "container" to MaterialTheme.colorScheme.surfaceVariant,
+            "text" to MaterialTheme.colorScheme.onSurface
+        )
+    )
 
     Column(
         modifier = Modifier
@@ -197,8 +246,8 @@ fun CalificacionItem(
         Row {
             MyAssistChip(
                 label = calificacion.estado,
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                labelColor = MaterialTheme.colorScheme.secondary,
+                containerColor = colorMap.get(calificacion.estado)?.get("container") ?: MaterialTheme.colorScheme.surfaceVariant,
+                labelColor = colorMap.get(calificacion.estado)?.get("text") ?: MaterialTheme.colorScheme.onSurface
             )
             Spacer(Modifier.width(4.dp))
             MyAssistChip(
@@ -218,7 +267,7 @@ fun CalificacionItem(
                     .fillMaxWidth()
                     .padding(top = 4.dp)
             ) {
-                NotasAlumno(calificacion)
+                NotasAlumno(calificacion, materiaSelect, modelsViewModel)
             }
         }
 
@@ -227,72 +276,58 @@ fun CalificacionItem(
 
 @Composable
 fun NotasAlumno(
-    calificacion: ProEvaluacionesCalificacion
+    calificacion: ProEvaluacionesCalificacion,
+    materiaSelect: ProEvaluacionesMateria,
+    modelsViewModel: ModelsViewModel
 ) {
     val textStyle = TextStyle(
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        color = if (!materiaSelect.cerrado) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.secondary,
         fontSize = MaterialTheme.typography.bodyMedium.fontSize,
         textAlign = TextAlign.Center
     )
 
-    Column (
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.End
+    val tipoEstado by modelsViewModel.tipoEstado.collectAsState()
+
+    Spacer(Modifier.height(4.dp))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row (
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            MyOutlinedTextField(
-                value = "${calificacion.n1}",
-                onValueChange = {  },
-                label = "N1",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.width(60.dp),
-                enabled = true,
-                textStyle = textStyle
-            )
+        val labels = listOf("N1", "N2", "N3", "N4", "Ex", "Total")
+        val values = listOf(
+            "${calificacion.n1}",
+            "${calificacion.n2}",
+            "${calificacion.n3}",
+            "${calificacion.n4}",
+            "${calificacion.examen}",
+            "${calificacion.notafinal}"
+        )
+
+        labels.forEachIndexed { index, label ->
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.secondary,
+                    textAlign = TextAlign.Center
+                )
+                MyOutlinedTextField(
+                    value = values[index],
+                    onValueChange = { },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.width(80.dp),
+                    enabled = !materiaSelect.cerrado && index < 5 || tipoEstado.get(calificacion.estado)!!.colocarExamen,
+                    textStyle = textStyle
+                )
+            }
             Spacer(Modifier.width(4.dp))
-            MyOutlinedTextField(
-                value = "${calificacion.n2}",
-                onValueChange = {  },
-                label = "N2",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.width(60.dp),
-                enabled = true,
-                textStyle = textStyle
-            )
-            Spacer(Modifier.width(4.dp))
-            MyOutlinedTextField(
-                value = "${calificacion.n3}",
-                onValueChange = {  },
-                label = "N3",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.width(60.dp),
-                enabled = true,
-                textStyle = textStyle
-            )
-            Spacer(Modifier.width(4.dp))
-            MyOutlinedTextField(
-                value = "${calificacion.n4}",
-                onValueChange = {  },
-                label = "N4",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.width(60.dp),
-                enabled = true,
-                textStyle = textStyle
-            )
-            Spacer(Modifier.width(4.dp))
-            MyOutlinedTextField(
-                value = "${calificacion.notafinal}",
-                onValueChange = {  },
-                label = "Total",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.width(75.dp),
-                enabled = false,
-                textStyle = textStyle
-            )
         }
-        Spacer(Modifier.height(8.dp))
     }
 }

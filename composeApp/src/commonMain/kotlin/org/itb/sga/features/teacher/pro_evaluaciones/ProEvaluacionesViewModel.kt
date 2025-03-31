@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonPrimitive
 import org.itb.sga.core.createHttpClient
 import org.itb.sga.core.logInfo
 import org.itb.sga.data.network.Error
 import org.itb.sga.data.network.ProEvaluacionesResult
+import org.itb.sga.data.network.ReportForm
 import org.itb.sga.data.network.pro_evaluaciones.ProEvaluaciones
 import org.itb.sga.data.network.pro_evaluaciones.ProEvaluacionesMateria
 import org.itb.sga.features.common.home.HomeViewModel
@@ -62,6 +64,25 @@ class ProEvaluacionesViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 addError(Error(title = "Error", error = "${e.message}"))
+            } finally {
+                homeViewModel.changeLoading(false)
+            }
+        }
+    }
+
+    fun downloadActa(reportName: String, id: Int, homeViewModel: HomeViewModel) {
+        homeViewModel.changeLoading(true)
+        viewModelScope.launch {
+            try {
+                val form = ReportForm(
+                    reportName = reportName,
+                    params = mapOf(
+                        "materia" to JsonPrimitive(id)
+                    )
+                )
+                homeViewModel.onloadReport(form)
+            } catch (e: Exception) {
+                homeViewModel.addError(Error(title = "Error", error = "${e.message}"))
             } finally {
                 homeViewModel.changeLoading(false)
             }

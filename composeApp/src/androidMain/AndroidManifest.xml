@@ -12,11 +12,6 @@
 
     <uses-feature android:name="android.hardware.fingerprint" android:required="false"/>
 
-<!--    <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">-->
-<!--        <background android:drawable="@drawable/ic_launcher_background" />-->
-<!--        <foreground android:drawable="@drawable/ic_launcher_foreground" />-->
-<!--    </adaptive-icon>-->
-
     <application
         android:name=".App"
         android:networkSecurityConfig="@xml/network_security_config"
@@ -25,18 +20,13 @@
         android:icon="@drawable/ic_launcher"
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AOK"
-        android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
+        android:theme="@style/Theme.AOK">
 
-    >
-        <!--    android:theme="@android:style/Theme.Material.Light.NoActionBar"
-                android:theme="@style/Theme.AppCompat.DayNight"
-        -->
         <activity
             android:exported="true"
-            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
-            android:name=".MainActivity"
-            android:screenOrientation="portrait">
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:name=".MainActivity">
+
 <!--            android:theme="@style/Theme.Material3.NoActionBar">-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -57,5 +47,3 @@
     </application>
 
 </manifest>
-
-<!--    android:theme="@android:style/Theme.Material.Light.NoActionBar"-->
