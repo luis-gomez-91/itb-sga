@@ -140,7 +140,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.android)
     implementation(libs.androidx.ui.android)
     implementation(libs.androidx.constraintlayout.compose)
-//    implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.core)
     implementation(libs.places)
@@ -151,8 +150,6 @@ dependencies {
     commonMainApi("dev.icerock.moko:biometry-compose:0.4.0")
     commonMainApi("dev.icerock.moko:biometry:0.4.0")
     implementation(libs.kotlinx.metadata.jvm)
-
-
 }
 
 dependencies {
