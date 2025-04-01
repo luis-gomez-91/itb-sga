@@ -107,10 +107,7 @@ class ProClasesViewModel: ViewModel() {
                     idAsistencia = asistencia.asistenciaId,
                     value = newValue
                 )
-                logInfo("prueba", "${form}")
                 val response = service.updateAsistencia(client, form)
-                logInfo("prueba", "${response}")
-
                 when (response) {
                     is UpdateAsistenciaResult.Success -> {
                         _leccionGrupoData.value?.let { leccionGrupo ->

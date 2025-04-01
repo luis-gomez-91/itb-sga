@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import aok.composeapp.generated.resources.Res
 import aok.composeapp.generated.resources.logo
 import aok.composeapp.generated.resources.logo_dark
-import org.itb.sga.core.ModelsViewModel
 import org.itb.sga.core.MyNavigation
 import org.itb.sga.core.appIsLastVersion
 import org.itb.sga.core.openPlayStoreOrAppStore
@@ -59,7 +58,6 @@ fun App(
     homeViewModel : HomeViewModel,
     loginViewModel: LoginViewModel
 ) {
-    val modelsViewModel = remember { ModelsViewModel() }
     val accountViewModel = remember { AccountViewModel() }
     val inscripcionesViewModel = remember { InscripcionesViewModel() }
     val aluFinanzasViewModel = remember { AluFinanzasViewModel() }
@@ -100,7 +98,6 @@ fun App(
                     color = MaterialTheme.colorScheme.background
                 ) {
                     MyNavigation(
-                        modelsViewModel = modelsViewModel,
                         loginViewModel = loginViewModel,
                         homeViewModel = homeViewModel,
                         inscripcionesViewModel = inscripcionesViewModel,

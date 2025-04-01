@@ -21,9 +21,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.UnfoldLess
 import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material3.HorizontalDivider
@@ -46,7 +46,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import org.itb.sga.core.ModelsViewModel
 import org.itb.sga.core.formatoText
 import org.itb.sga.data.network.pro_evaluaciones.ProEvaluacionesCalificacion
 import org.itb.sga.data.network.pro_evaluaciones.ProEvaluacionesMateria
@@ -62,11 +61,10 @@ import org.itb.sga.ui.components.dashboard.DashboardScreen2
 fun ProCalificacionesScreen(
     navController: NavHostController,
     homeViewModel: HomeViewModel,
-    proEvaluacionesViewModel: ProEvaluacionesViewModel,
-    modelsViewModel: ModelsViewModel
+    proEvaluacionesViewModel: ProEvaluacionesViewModel
 ) {
     DashboardScreen2(
-        content = { Screen(proEvaluacionesViewModel, homeViewModel, modelsViewModel) },
+        content = { Screen(proEvaluacionesViewModel, homeViewModel) },
         title = "Calificaciones",
         onBack = {
             navController.navigate("pro_evaluaciones")
@@ -77,8 +75,7 @@ fun ProCalificacionesScreen(
 @Composable
 fun Screen(
     proEvaluacionesViewModel: ProEvaluacionesViewModel,
-    homeViewModel: HomeViewModel,
-    modelsViewModel: ModelsViewModel
+    homeViewModel: HomeViewModel
 ) {
     val data by proEvaluacionesViewModel.data.collectAsState(null)
     val isLoading by homeViewModel.isLoading.collectAsState(false)
@@ -128,14 +125,15 @@ fun Screen(
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.secondary
                 )
+                Spacer(Modifier.height(8.dp))
                 Row (
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
                     MyFilledTonalButton(
-                        text = "Descargar acta de notas",
+                        text = "Generar acta de notas",
                         enabled = true,
-                        icon = Icons.Filled.Download,
+                        icon = Icons.Filled.PictureAsPdf,
                         onClickAction = {
                             proEvaluacionesViewModel.downloadActa("acta_notas", materiaSelect!!.idMateria, homeViewModel)
                             proEvaluacionesViewModel.downloadActa("informe_acta_calificaciones", materiaSelect!!.idMateria, homeViewModel)
@@ -166,7 +164,7 @@ fun Screen(
                 ) {
                     itemsIndexed(dataFilter) { index, calificacion ->
                         HorizontalDivider()
-                        CalificacionItem(calificacion, showAll, it, modelsViewModel)
+                        CalificacionItem(calificacion, showAll, it, proEvaluacionesViewModel)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
@@ -191,7 +189,7 @@ fun CalificacionItem(
     calificacion: ProEvaluacionesCalificacion,
     showAll: Boolean,
     materiaSelect: ProEvaluacionesMateria,
-    modelsViewModel: ModelsViewModel
+    proEvaluacionesViewModel: ProEvaluacionesViewModel
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -205,8 +203,8 @@ fun CalificacionItem(
             "text" to MaterialTheme.colorScheme.error
         ),
         "EN CURSO" to mapOf(
-            "container" to MaterialTheme.colorScheme.secondaryContainer,
-            "text" to MaterialTheme.colorScheme.secondary
+            "container" to MaterialTheme.colorScheme.surfaceContainer,
+            "text" to MaterialTheme.colorScheme.onSurfaceVariant
         ),
         "RECUPERACION" to mapOf(
             "container" to MaterialTheme.colorScheme.tertiaryContainer,
@@ -229,7 +227,7 @@ fun CalificacionItem(
         ) {
             Text(
                 text = calificacion.alumno,
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
             Spacer(Modifier.width(8.dp))
@@ -243,17 +241,30 @@ fun CalificacionItem(
             }
         }
 
-        Row {
+        Row (
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column (
+                modifier = Modifier.fillMaxWidth().weight(1f)
+            ) {
+                Text(
+                    text = formatoText("Nota final:", "${calificacion.notafinal}").toString(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    text = formatoText("Asistencia:", "${calificacion.asistencia}%").toString(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
             MyAssistChip(
                 label = calificacion.estado,
                 containerColor = colorMap.get(calificacion.estado)?.get("container") ?: MaterialTheme.colorScheme.surfaceVariant,
                 labelColor = colorMap.get(calificacion.estado)?.get("text") ?: MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(Modifier.width(4.dp))
-            MyAssistChip(
-                label = formatoText("NOTA FINAL:", "${calificacion.notafinal} PUNTOS").toString(),
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                labelColor = MaterialTheme.colorScheme.secondary,
             )
         }
 
@@ -267,10 +278,9 @@ fun CalificacionItem(
                     .fillMaxWidth()
                     .padding(top = 4.dp)
             ) {
-                NotasAlumno(calificacion, materiaSelect, modelsViewModel)
+                NotasAlumno(calificacion, materiaSelect, proEvaluacionesViewModel)
             }
         }
-
     }
 }
 
@@ -278,15 +288,13 @@ fun CalificacionItem(
 fun NotasAlumno(
     calificacion: ProEvaluacionesCalificacion,
     materiaSelect: ProEvaluacionesMateria,
-    modelsViewModel: ModelsViewModel
+    proEvaluacionesViewModel: ProEvaluacionesViewModel
 ) {
     val textStyle = TextStyle(
         color = if (!materiaSelect.cerrado) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.secondary,
         fontSize = MaterialTheme.typography.bodyMedium.fontSize,
         textAlign = TextAlign.Center
     )
-
-    val tipoEstado by modelsViewModel.tipoEstado.collectAsState()
 
     Spacer(Modifier.height(4.dp))
     Row(
@@ -297,20 +305,21 @@ fun NotasAlumno(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val labels = listOf("N1", "N2", "N3", "N4", "Ex", "Total")
-        val values = listOf(
-            "${calificacion.n1}",
-            "${calificacion.n2}",
-            "${calificacion.n3}",
-            "${calificacion.n4}",
-            "${calificacion.examen}",
-            "${calificacion.notafinal}"
+        val calificacionesMap = mapOf(
+            "n1" to Pair("N1", "${calificacion.n1}"),
+            "n2" to Pair("N2", "${calificacion.n2}"),
+            "n3" to Pair("N3", "${calificacion.n3}"),
+            "n4" to Pair("N4", "${calificacion.n4}"),
+            "examen" to Pair("Ex", "${calificacion.examen}"),
+            "total" to Pair("Total", "${calificacion.notafinal}")
         )
 
-        labels.forEachIndexed { index, label ->
+        calificacionesMap.forEach { (key, value) ->
+            val (label, initialValue) = value
+            var notaTemp by remember { mutableStateOf(initialValue) }
+
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.weight(1f)
             ) {
                 Text(
                     text = label,
@@ -319,12 +328,25 @@ fun NotasAlumno(
                     textAlign = TextAlign.Center
                 )
                 MyOutlinedTextField(
-                    value = values[index],
-                    onValueChange = { },
+                    value = notaTemp,
+                    onValueChange = { notaTemp = it },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.width(80.dp),
-                    enabled = !materiaSelect.cerrado && index < 5 || tipoEstado.get(calificacion.estado)!!.colocarExamen,
-                    textStyle = textStyle
+                    modifier = Modifier.width(70.dp),
+                    enabled = when (key) {
+                        "examen" -> !materiaSelect.cerrado && calificacion.estado == "EXAMEN"
+                        "total" -> false
+                        else -> !materiaSelect.cerrado
+                    },
+                    textStyle = textStyle,
+                    onFocusLost = {
+                        if (notaTemp != initialValue) {
+                            proEvaluacionesViewModel.updateCalificacion(
+                                calificacion = calificacion,
+                                nota = key,
+                                valor = notaTemp.toIntOrNull() ?: 0
+                            )
+                        }
+                    }
                 )
             }
             Spacer(Modifier.width(4.dp))

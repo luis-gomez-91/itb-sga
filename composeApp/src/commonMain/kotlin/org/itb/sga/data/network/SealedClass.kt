@@ -7,6 +7,7 @@ import org.itb.sga.data.network.pro_clases.LeccionGrupo
 import org.itb.sga.data.network.pro_cronograma.ProCronograma
 import org.itb.sga.data.network.pro_entrega_actas.ProEntregaActas
 import org.itb.sga.data.network.pro_evaluaciones.ProEvaluaciones
+import org.itb.sga.data.network.pro_evaluaciones.ProEvaluacionesCalificacion
 import org.itb.sga.data.network.reportes.DjangoModel
 import org.itb.sga.data.network.reportes.ReporteCategoria
 import org.itb.sga.data.network.solicitud_becas.FichaSocioeconomica
@@ -170,4 +171,9 @@ sealed class ProEntregaActasResult {
 sealed class DjangoModelResult {
     data class Success(val data: DjangoModel) : DjangoModelResult()
     data class Failure(val error: Error) : DjangoModelResult()
+}
+
+sealed class CalificacionResult {
+    data class Success(val calificacion: ProEvaluacionesCalificacion) : CalificacionResult()
+    data class Failure(val error: Error) : CalificacionResult()
 }

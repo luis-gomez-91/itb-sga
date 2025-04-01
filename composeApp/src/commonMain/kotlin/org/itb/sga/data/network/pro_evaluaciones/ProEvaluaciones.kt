@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ProEvaluaciones(
-    val alumnos: List<ProEvaluacionesCalificacion>? = emptyList(),
+    var alumnos: MutableList<ProEvaluacionesCalificacion>? = null,
     val codigos: List<ProEvaluacionesCodigo>,
     val materias: List<ProEvaluacionesMateria>
 )

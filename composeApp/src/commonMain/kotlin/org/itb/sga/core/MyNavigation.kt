@@ -63,7 +63,6 @@ import org.itb.sga.ui.components.NotFoundScreen
 
 @Composable
 fun MyNavigation(
-    modelsViewModel: ModelsViewModel,
     loginViewModel: LoginViewModel,
     homeViewModel: HomeViewModel,
     inscripcionesViewModel: InscripcionesViewModel,
@@ -121,12 +120,12 @@ fun MyNavigation(
         composable("consultaalumno") { AluConsultaGeneralScreen(navController, homeViewModel, loginViewModel, aluConsultaGeneralViewModel) }
         composable("alu_matricula") { AluMatriculaScreen(navController, homeViewModel, loginViewModel, aluMatriculaViewModel) }
         composable("reportes") { ReportesScreen(navController, homeViewModel, loginViewModel, reportesViewModel) }
-        composable("pro_evaluaciones") { ProEvaluacionesScreen(navController, homeViewModel, loginViewModel, proEvaluacionesViewModel, modelsViewModel) }
+        composable("pro_evaluaciones") { ProEvaluacionesScreen(navController, homeViewModel, loginViewModel, proEvaluacionesViewModel) }
         composable("pro_cronograma") { ProCronogramaScreen(navController, homeViewModel, loginViewModel, proCronogramaViewModel) }
         composable("pro_entrega_acta") { ProEntregaActasScreen(navController, homeViewModel, loginViewModel, proEntregaActasViewModel) }
 
 
-        composable("pro_calificaciones") { ProCalificacionesScreen(navController, homeViewModel, proEvaluacionesViewModel, modelsViewModel) }
+        composable("pro_calificaciones") { ProCalificacionesScreen(navController, homeViewModel, proEvaluacionesViewModel) }
         composable("ver_clase") { VerClaseScreen(navController, proClasesViewModel) }
 
     }
