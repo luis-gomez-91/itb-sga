@@ -47,6 +47,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import org.itb.sga.core.formatoText
+import org.itb.sga.data.network.Error
+import org.itb.sga.data.network.pro_evaluaciones.ProEvaluaciones
 import org.itb.sga.data.network.pro_evaluaciones.ProEvaluacionesCalificacion
 import org.itb.sga.data.network.pro_evaluaciones.ProEvaluacionesMateria
 import org.itb.sga.features.common.home.HomeViewModel
@@ -164,7 +166,11 @@ fun Screen(
                 ) {
                     itemsIndexed(dataFilter) { index, calificacion ->
                         HorizontalDivider()
-                        CalificacionItem(calificacion, showAll, it, proEvaluacionesViewModel)
+                        data?.let { it1 ->
+                            CalificacionItem(calificacion, showAll, it, proEvaluacionesViewModel,
+                                it1
+                            )
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
@@ -189,7 +195,8 @@ fun CalificacionItem(
     calificacion: ProEvaluacionesCalificacion,
     showAll: Boolean,
     materiaSelect: ProEvaluacionesMateria,
-    proEvaluacionesViewModel: ProEvaluacionesViewModel
+    proEvaluacionesViewModel: ProEvaluacionesViewModel,
+    data: ProEvaluaciones
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -278,7 +285,7 @@ fun CalificacionItem(
                     .fillMaxWidth()
                     .padding(top = 4.dp)
             ) {
-                NotasAlumno(calificacion, materiaSelect, proEvaluacionesViewModel)
+                NotasAlumno(calificacion, materiaSelect, proEvaluacionesViewModel, data)
             }
         }
     }
@@ -288,7 +295,8 @@ fun CalificacionItem(
 fun NotasAlumno(
     calificacion: ProEvaluacionesCalificacion,
     materiaSelect: ProEvaluacionesMateria,
-    proEvaluacionesViewModel: ProEvaluacionesViewModel
+    proEvaluacionesViewModel: ProEvaluacionesViewModel,
+    data: ProEvaluaciones
 ) {
     val textStyle = TextStyle(
         color = if (!materiaSelect.cerrado) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.secondary,
@@ -306,16 +314,16 @@ fun NotasAlumno(
         verticalAlignment = Alignment.CenterVertically
     ) {
         val calificacionesMap = mapOf(
-            "n1" to Pair("N1", "${calificacion.n1}"),
-            "n2" to Pair("N2", "${calificacion.n2}"),
-            "n3" to Pair("N3", "${calificacion.n3}"),
-            "n4" to Pair("N4", "${calificacion.n4}"),
-            "examen" to Pair("Ex", "${calificacion.examen}"),
-            "total" to Pair("Total", "${calificacion.notafinal}")
+            "n1" to Triple("N1", "${calificacion.n1}", 0..data.rangosPuntuacion.PORCIENTO_NOTA1),
+            "n2" to Triple("N2", "${calificacion.n2}", 0..data.rangosPuntuacion.PORCIENTO_NOTA2),
+            "n3" to Triple("N3", "${calificacion.n3}", 0..data.rangosPuntuacion.PORCIENTO_NOTA3),
+            "n4" to Triple("N4", "${calificacion.n4}", 0..data.rangosPuntuacion.PORCIENTO_NOTA4),
+            "examen" to Triple("Ex", "${calificacion.examen}", 0..data.rangosPuntuacion.PORCIENTO_NOTA5),
+            "total" to Triple("Total", "${calificacion.notafinal}", 0..0)
         )
 
         calificacionesMap.forEach { (key, value) ->
-            val (label, initialValue) = value
+            val (label, initialValue, rangoNotas) = value
             var notaTemp by remember { mutableStateOf(initialValue) }
 
             Column(
@@ -333,18 +341,38 @@ fun NotasAlumno(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.width(70.dp),
                     enabled = when (key) {
-                        "examen" -> !materiaSelect.cerrado && calificacion.estado == "EXAMEN"
-                        "total" -> false
-                        else -> !materiaSelect.cerrado
+                        "examen" -> {
+                            // Condición para habilitar solo si:
+                            // - El examen no está cerrado
+                            // - El estado de la calificación no es "EN CURSO"
+                            // - La asistencia es suficiente según el rango para aprobar
+                            // - La suma de las calificaciones es mayor o igual al mínimo de aprobación
+                            !materiaSelect.cerrado &&
+                                    calificacion.estado != "EN CURSO" &&
+                                    calificacion.asistencia >= data.rangosPuntuacion.ASIST_PARA_APROBAR &&
+                                    calificacion.n1 + calificacion.n2 + calificacion.n3 + calificacion.n4 >= data.rangosPuntuacion.MIN_APROBACION_EXAMEN
+                        }
+                        "total" -> false  // El "total" siempre está deshabilitado.
+                        else -> !materiaSelect.cerrado  // Para otros casos, habilitar solo si la materia no está cerrada.
                     },
                     textStyle = textStyle,
                     onFocusLost = {
-                        if (notaTemp != initialValue) {
-                            proEvaluacionesViewModel.updateCalificacion(
-                                calificacion = calificacion,
-                                nota = key,
-                                valor = notaTemp.toIntOrNull() ?: 0
-                            )
+                        val valor = notaTemp.toIntOrNull()
+
+                        when (valor) {
+                            null -> {
+
+                            }
+                            !in rangoNotas -> {
+                                notaTemp = initialValue
+                            }
+                            else -> {
+                                proEvaluacionesViewModel.updateCalificacion(
+                                    calificacion = calificacion,
+                                    nota = key,
+                                    valor = valor
+                                )
+                            }
                         }
                     }
                 )

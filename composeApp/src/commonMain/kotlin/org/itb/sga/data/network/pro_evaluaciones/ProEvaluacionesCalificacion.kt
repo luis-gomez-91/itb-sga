@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ProEvaluacionesCalificacion(
     val alumno: String,
-    val asistencia: String?,
+    val asistencia: Double,
     val estado: String,
     val examen: Int,
     val idMateriaAsignada: Int,

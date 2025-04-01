@@ -109,6 +109,7 @@ class ProEvaluacionesViewModel : ViewModel() {
                 logInfo("prueba", "$form")
 
                 val result = service.updateCalificacion(client, form)
+
                 when (result) {
                     is CalificacionResult.Success -> {
                         val updatedCalificacion = result.calificacion
