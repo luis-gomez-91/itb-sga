@@ -177,9 +177,9 @@ fun InformacionPersonal(persona: Account) {
 //        mapOf("Identificación:" to persona.identificacion),
         mapOf("Usuario:" to persona.username),
         mapOf("Sexo:" to persona.sexo),
-        mapOf("Fecha de nacimiento:" to persona.sexo),
+        mapOf("Fecha de nacimiento:" to persona.fechaNacimiento),
         mapOf("Nacionalidad:" to persona.nacionalidad),
-        mapOf("Extranjero:" to if (persona.extranjero) "Si" else "No"),
+        mapOf("Extranjero:" to if (persona.extranjero) "SI" else "NO"),
         mapOf("Tipo de sangre:" to persona.nombreTipoSangre),
     )
     MostrarDatos("Información personal", list)

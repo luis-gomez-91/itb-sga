@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun MyCard(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.fillMaxWidth(),
     onClick: () -> Unit = {},
     borderColor : Color? = null,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
@@ -22,7 +22,7 @@ fun MyCard(
     content: @Composable () -> Unit = {}
 ) {
     Card (
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
         colors = CardDefaults.cardColors(
             containerColor = containerColor,
             contentColor = contentColor
@@ -31,8 +31,7 @@ fun MyCard(
         border = borderColor?.let { BorderStroke(2.dp, it) }
     ) {
         Box (
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = modifier
                 .padding(8.dp)
         ) {
             content()

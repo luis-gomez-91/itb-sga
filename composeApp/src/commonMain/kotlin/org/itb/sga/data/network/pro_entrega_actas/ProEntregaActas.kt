@@ -13,5 +13,7 @@ data class ProEntregaActas(
     val hasta: String,
     val idMateria: Int,
     val nivelCerrado: Boolean,
-    val nivelMalla: String
+    val nivelMalla: String,
+    val actaFile: String?,
+    val informeFile: String?
 )

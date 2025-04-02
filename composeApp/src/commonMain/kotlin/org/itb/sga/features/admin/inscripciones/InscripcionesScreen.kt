@@ -360,46 +360,46 @@ fun DropdownInscripcion(
                         }
                     ){
                         Icon(
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(16.dp),
                             imageVector = Icons.Filled.Login,
                             contentDescription = "Login",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(Modifier.width(4.dp))
                         Text(
                             text = "Login",
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     Spacer(Modifier.height(8.dp))
                     Row {
                         Icon(
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(16.dp),
                             imageVector = Icons.Filled.AttachMoney,
                             contentDescription = "Finanzas",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
                             text = "Finanzas",
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     Spacer(Modifier.height(4.dp))
                     Row {
                         Icon(
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(16.dp),
                             imageVector = Icons.Filled.HistoryEdu,
                             contentDescription = "Malla",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
                             text = "Malla",
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
