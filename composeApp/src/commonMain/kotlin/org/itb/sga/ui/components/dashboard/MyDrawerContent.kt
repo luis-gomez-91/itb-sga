@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.LockPerson
 import androidx.compose.material.icons.filled.Logout
@@ -102,7 +103,8 @@ fun MyDrawerContent(
             add(DrawerItem("Consulta general", Icons.Filled.Preview) { navHostController.navigate("consultaalumno") })
         }
         add(DrawerItem("Cambiar tema", themeIcon) { homeViewModel.changeshowThemeSetting(true) })
-        add(DrawerItem("Cerrar sesión", Icons.Filled.Logout) { loginViewModel.onLogout(navHostController) })
+//        add(DrawerItem("Opciones de biométrico", Icons.Filled.Fingerprint) { homeViewModel.changeshowThemeSetting(true) })
+        add(DrawerItem("Cerrar sesión", Icons.Filled.Logout) { loginViewModel.onLogout(navHostController, homeViewModel) })
     }
 
 

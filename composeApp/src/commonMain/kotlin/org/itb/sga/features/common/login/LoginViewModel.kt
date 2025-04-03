@@ -17,6 +17,7 @@ import org.itb.sga.core.logInfo
 import org.itb.sga.data.database.AokDatabase
 import org.itb.sga.data.network.Response
 import org.itb.sga.data.network.form.RequestPasswordRecoveryForm
+import org.itb.sga.features.common.home.HomeViewModel
 
 class LoginViewModel(
     val biometryAuthenticator: BiometryAuthenticator
@@ -92,8 +93,9 @@ class LoginViewModel(
         }
     }
 
-    fun onLogout(navController: NavHostController) {
+    fun onLogout(navController: NavHostController, homeViewModel: HomeViewModel) {
         viewModelScope.launch {
+            homeViewModel.updateHasShownAlert(false)
             _username.value = ""
             _password.value = ""
             _isLoading.value = false

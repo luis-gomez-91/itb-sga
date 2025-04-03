@@ -131,9 +131,9 @@ fun Screen(
         }
     }
 
-    val showSaveCredentials by homeViewModel.showSaveCredentials.collectAsState(false)
+    val showSaveCredentials by homeViewModel.showSaveCredentials.collectAsState(initial = false)
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(loginViewModel) {
         homeViewModel.confirmCredentialsLogin(loginViewModel)
     }
 

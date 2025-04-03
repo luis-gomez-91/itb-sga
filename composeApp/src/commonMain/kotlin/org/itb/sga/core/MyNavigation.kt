@@ -8,6 +8,7 @@ import org.itb.sga.features.admin.docentes.DocentesScreen
 import org.itb.sga.features.admin.docentes.DocentesViewModel
 import org.itb.sga.features.admin.inscripciones.InscripcionesScreen
 import org.itb.sga.features.admin.inscripciones.InscripcionesViewModel
+import org.itb.sga.features.common.account.AccountEditInfoScreen
 import org.itb.sga.features.common.account.AccountScreen
 import org.itb.sga.features.common.account.AccountViewModel
 import org.itb.sga.features.common.docBiblioteca.DocBibliotecaScreen
@@ -127,6 +128,7 @@ fun MyNavigation(
 
         composable("pro_calificaciones") { ProCalificacionesScreen(navController, homeViewModel, proEvaluacionesViewModel) }
         composable("ver_clase") { VerClaseScreen(navController, proClasesViewModel) }
+        composable("account_edit") { AccountEditInfoScreen(navController, accountViewModel, reportesViewModel) }
 
     }
 }

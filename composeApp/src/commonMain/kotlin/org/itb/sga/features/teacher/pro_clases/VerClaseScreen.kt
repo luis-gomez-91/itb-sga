@@ -59,7 +59,6 @@ fun VerClaseScreen(
         title = "Clase",
         onBack = {
             navController.navigate("pro_clases")
-//            proClasesViewModel.updateClaseSelect(null)
         }
     )
 }
@@ -115,7 +114,7 @@ fun Screen(
                     ContenidoItem(itLeccionGruopo, it, proClasesViewModel)
                     ObservacionesItem(itLeccionGruopo, it, proClasesViewModel)
                     if (it.abierta) {
-                        Spacer(Modifier.height(16.dp))
+                        Spacer(Modifier.height(8.dp))
                         MyFilledTonalButton(
                             text = "Cerrar clase",
                             enabled = true,
@@ -129,11 +128,7 @@ fun Screen(
                     }
                 }
             }
-
-
         }
-
-
     }
 }
 

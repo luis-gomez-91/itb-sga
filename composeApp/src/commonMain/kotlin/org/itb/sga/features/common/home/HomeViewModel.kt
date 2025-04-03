@@ -309,14 +309,23 @@ class HomeViewModel(
     }
 
 //    Biometric credentials
-    private val _showSaveCredentials = MutableStateFlow<Boolean>(false)
+    private val _hasShownAlert = MutableStateFlow(false)
+
+    private val _showSaveCredentials = MutableStateFlow(false)
     val showSaveCredentials: StateFlow<Boolean> = _showSaveCredentials
+
+    fun updateHasShownAlert(value: Boolean) {
+        _hasShownAlert.value = value
+    }
 
     fun updateShowSaveCredentials(value: Boolean) {
         _showSaveCredentials.value = value
+        if (!value) _hasShownAlert.value = true // Marcar la alerta como mostrada
     }
 
     suspend fun confirmCredentialsLogin(loginViewModel: LoginViewModel) {
+        if (_hasShownAlert.value) return // No ejecutar si ya se mostró la alerta
+
         val value = try {
             val user = aokDatabase.userDao().getLastUser()
             val result = user?.let {

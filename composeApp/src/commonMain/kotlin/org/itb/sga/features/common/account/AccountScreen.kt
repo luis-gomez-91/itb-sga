@@ -99,8 +99,10 @@ fun Screen(
                     MyFilledTonalButton(
                         text = "Editar información",
                         icon = Icons.Filled.EditNote,
-                        enabled = false,
-                        onClickAction = {  },
+                        enabled = true,
+                        onClickAction = {
+                            navController.navigate("account_edit")
+                        },
                         buttonColor = MaterialTheme.colorScheme.tertiaryContainer,
                         textColor = MaterialTheme.colorScheme.tertiary
                     )
