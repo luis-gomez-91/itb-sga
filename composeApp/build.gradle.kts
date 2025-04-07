@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinxSerialization)
 
@@ -40,7 +40,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
             implementation("dev.icerock.moko:biometry-compose:0.4.0")
-            implementation(libs.androidx.room.paging)
+            implementation(libs.room.paging)
             implementation("org.mindrot:jbcrypt:0.4")
         }
         commonMain.dependencies {
@@ -76,7 +76,7 @@ kotlin {
             implementation("dev.icerock.moko:mvvm-core:0.16.1")
 
 //            room
-            implementation(libs.androidx.room.runtime)
+            implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
         }
 
@@ -85,9 +85,9 @@ kotlin {
         }
     }
 
-    sourceSets.commonMain {
-        kotlin.srcDir("build/generated/ksp/metadata")
-    }
+//    sourceSets.commonMain {
+//        kotlin.srcDir("build/generated/ksp/metadata")
+//    }
 }
 
 android {
@@ -149,22 +149,33 @@ dependencies {
 
     commonMainApi("dev.icerock.moko:biometry-compose:0.4.0")
     commonMainApi("dev.icerock.moko:biometry:0.4.0")
-    implementation(libs.kotlinx.metadata.jvm)
+//    implementation(libs.kotlinx.metadata.jvm)
+
 }
 
 dependencies {
-    add("kspAndroid", libs.androidx.room.compiler)
-    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
-    add("kspIosX64", libs.androidx.room.compiler)
-    add("kspIosArm64", libs.androidx.room.compiler)
+    add("kspAndroid", libs.room.compiler)
+    add("kspIosX64", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
 }
 
 room {
+    // Applies to 'demoDebug' only
+    schemaDirectory("demoDebug", "$projectDir/schemas/demoDebug")
+
+    // Applies to 'demoDebug' and 'demoRelease'
+    schemaDirectory("demo", "$projectDir/schemas/demo")
+
+    // Applies to 'demoDebug' and 'fullDebug'
+    schemaDirectory("debug", "$projectDir/schemas/debug")
+
+    // Applies to variants that aren't matched by other configurations.
     schemaDirectory("$projectDir/schemas")
 }
-
-configurations.all {
-    resolutionStrategy {
-        force("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.7.0")
-    }
-}
+//
+//configurations.all {
+//    resolutionStrategy {
+//        force("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.7.0")
+//    }
+//}
