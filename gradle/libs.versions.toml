@@ -1,5 +1,5 @@
 [versions]
-agp = "8.7.3"
+agp = "8.3.2"
 android-compileSdk = "35"
 android-minSdk = "28"
 android-targetSdk = "35"
@@ -14,16 +14,17 @@ androidx-test-junit = "1.2.1"
 calfFilePicker = "0.5.3"
 calfFilePickerCoil = "0.5.1"
 coilCompose = "3.0.0-alpha8"
-compose-plugin = "1.7.0"
+compose-multiplatform = "1.7.3"
 coreVersion = "1.11.0"
 filekitCore = "0.8.7"
 junit = "4.13.2"
-kotlin = "2.0.0"
+kotlin = "2.1.10"
 foundationAndroid = "1.7.7"
 kotlinxDatetime = "0.6.0"
 kotlinxMetadataJvm = "0.9.0"
 kotlinxMetadataJvmVersion = "0.9.0"
 materialIconsExtended = "1.5.2"
+multiplatformSettings = "1.1.1"
 paymentezAndroid = "v1.3.5"
 runtimeAndroid = "1.7.7"
 uiGraphicsAndroid = "1.7.7"
@@ -41,15 +42,11 @@ places = "4.1.0"
 protoliteWellKnownTypes = "18.0.0"
 coreI18n = "1.0.0-beta01"
 peekaboo = "0.5.2"
-
 composeMaterial3 = "1.2.1"
 
-#ksp = "2.1.0-1.0.29"
-ksp = "2.0.0-1.0.24"
-androidx-room = "2.7.0-rc02"
-sqlite = "2.5.0-rc02"
-compiler = "3.2.0-alpha11"
-compilerVersion = "3.2.0-alpha11"
+ksp = "2.1.10-1.0.31"
+androidx-room = "2.7.0-rc03"
+sqlite = "2.5.0-rc03"
 
 [libraries]
 calf-file-picker = { module = "com.mohamedrejeb.calf:calf-file-picker", version.ref = "calfFilePicker" }
@@ -95,6 +92,7 @@ androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text
 androidx-navigation-compose = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose" }
 androidx-core = { group = "androidx.core", name = "core", version.ref = "core" }
 material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatformSettings" }
 paymentez-android = { module = "com.github.paymentez:paymentez-android", version.ref = "paymentezAndroid" }
 places = { group = "com.google.android.libraries.places", name = "places", version.ref = "places" }
 protolite-well-known-types = { group = "com.google.firebase", name = "protolite-well-known-types", version.ref = "protoliteWellKnownTypes" }
@@ -103,22 +101,17 @@ androidx-core-i18n = { group = "androidx.core", name = "core-i18n", version.ref 
 peekaboo-ui = { module = "io.github.onseok:peekaboo-ui", version.ref = "peekaboo" }
 peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", version.ref = "peekaboo" }
 
-#coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutinesVersion" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "androidx-room" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "androidx-room" }
-androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "androidx-room" }
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
-androidx-compiler = { group = "androidx.databinding", name = "compiler", version.ref = "compilerVersion" }
-
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
-jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-#androidxRoom = { id = "androidx.room", version.ref = "androidx-room" }
 room = { id = "androidx.room", version.ref = "androidx-room" }

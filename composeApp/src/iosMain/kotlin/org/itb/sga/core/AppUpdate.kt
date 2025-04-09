@@ -1,6 +1,7 @@
 package org.itb.sga.core
 
 import platform.Foundation.NSBundle
+import platform.Foundation.NSURL
 import platform.UIKit.UIApplication
 
 actual fun appIsLastVersion(lastVersion: Int): Boolean {
@@ -14,5 +15,5 @@ actual fun appIsLastVersion(lastVersion: Int): Boolean {
 actual fun openPlayStoreOrAppStore() {
     // En iOS, redirigimos a la App Store
     val appStoreUrl = "itms-apps://itunes.apple.com/app/idAPP_ID"
-    UIApplication.sharedApplication.openURL(NSURL(string = appStoreUrl)!!)
+    UIApplication.sharedApplication.openURL(NSURL(string = appStoreUrl))
 }

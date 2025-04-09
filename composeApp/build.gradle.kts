@@ -1,22 +1,21 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinxSerialization)
 
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+//    alias(libs.plugins.kotlinCompose)
 }
 
 kotlin {
     tasks.create("testClasses")
 
     androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }
@@ -40,7 +39,6 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
             implementation("dev.icerock.moko:biometry-compose:0.4.0")
-            implementation(libs.androidx.room.paging)
             implementation("org.mindrot:jbcrypt:0.4")
         }
         commonMain.dependencies {
@@ -75,7 +73,6 @@ kotlin {
             implementation(libs.filekit.compose)
             implementation("dev.icerock.moko:mvvm-core:0.16.1")
 
-//            room
             implementation(libs.androidx.room.runtime)
             implementation(libs.sqlite.bundled)
         }
@@ -84,10 +81,9 @@ kotlin {
             implementation(libs.ktor.client.darwin)
         }
     }
-
-    sourceSets.commonMain {
-        kotlin.srcDir("build/generated/ksp/metadata")
-    }
+//    sourceSets.commonMain {
+//        kotlin.srcDir("build/generated/ksp/metadata")
+//    }
 }
 
 android {
@@ -98,7 +94,7 @@ android {
         applicationId = "org.itb.sga"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 8
+        versionCode = 9
         versionName = "1.2-alpha"
     }
     packaging {
@@ -149,7 +145,6 @@ dependencies {
 
     commonMainApi("dev.icerock.moko:biometry-compose:0.4.0")
     commonMainApi("dev.icerock.moko:biometry:0.4.0")
-    implementation(libs.kotlinx.metadata.jvm)
 }
 
 dependencies {

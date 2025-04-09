@@ -3,12 +3,13 @@ package org.itb.sga.data.database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import kotlinx.cinterop.ExperimentalForeignApi
+import org.itb.sga.core.DATABASE_NAME
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
 fun getDatabaseBuilder(): RoomDatabase.Builder<AokDatabase> {
-    val dbFilePath = documentDirectory() + "/my_room.db"
+    val dbFilePath = documentDirectory() + "/$DATABASE_NAME"
     return Room.databaseBuilder<AokDatabase>(
         name = dbFilePath,
     )
