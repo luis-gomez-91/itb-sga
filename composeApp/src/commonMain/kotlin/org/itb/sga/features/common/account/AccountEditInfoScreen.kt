@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +27,7 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,9 +38,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import kotlinx.serialization.json.JsonPrimitive
+import org.itb.sga.core.LIST_ESTADO_CIVIL
+import org.itb.sga.core.LIST_ETNIA
+import org.itb.sga.core.LIST_SANGRE
+import org.itb.sga.core.LIST_SEXO
+import org.itb.sga.core.capitalizeWords
 import org.itb.sga.data.network.Account
-import org.itb.sga.features.common.reportes.ReportesViewModel
+import org.itb.sga.data.network.reportes.DjangoModelItem
 import org.itb.sga.ui.components.MyExposedDropdownMenuBox
 import org.itb.sga.ui.components.MyFilledTonalButton
 import org.itb.sga.ui.components.MyOutlinedTextField
@@ -48,10 +54,10 @@ import org.itb.sga.ui.components.dashboard.DashboardScreen2
 fun AccountEditInfoScreen(
     navController: NavHostController,
     accountViewModel: AccountViewModel,
-    reportesViewModel: ReportesViewModel
+    idInscripcion: Int?
 ) {
     DashboardScreen2(
-        content = { Screen(accountViewModel, reportesViewModel) },
+        content = { Screen(accountViewModel, idInscripcion) },
         title = "Actualización de datos",
         onBack = {
             navController.navigate("account")
@@ -62,18 +68,22 @@ fun AccountEditInfoScreen(
 @Composable
 fun Screen(
     accountViewModel: AccountViewModel,
-    reportesViewModel: ReportesViewModel
+    idInscripcion: Int?
 ) {
     val data by accountViewModel.data.collectAsState(null)
-    val pagerState = rememberPagerState { 3 }
+    val pagerState = rememberPagerState { 4 }
     var selectedTabIndex by remember { mutableStateOf(0) }
 
-    // Sincroniza el cambio de datos con el índice del tab y la animación de la página
     LaunchedEffect(selectedTabIndex) {
         pagerState.animateScrollToPage(selectedTabIndex)
     }
 
     data?.let { account ->
+        var selectedSexo = remember { mutableStateOf(LIST_SEXO.find { it.id == account.idSexo }) }
+        var selectedSangre = remember { mutableStateOf(LIST_SANGRE.find { it.id == account.idTipoSangre }) }
+        var selectedEstadoCivil = remember { mutableStateOf(LIST_ESTADO_CIVIL.find { it.id == account.idEstadoCivil }) }
+        var selectedEtnia = remember { mutableStateOf(LIST_ETNIA.find { it.id == account.idEtnia }) }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -99,6 +109,7 @@ fun Screen(
                     }
                 ) {
                     listOf(
+                        "Personal" to Icons.Filled.Contacts,
                         "Contacto" to Icons.Filled.Contacts,
                         "Residencia" to Icons.Filled.MyLocation,
                         "Adicional" to Icons.Filled.Info
@@ -133,13 +144,13 @@ fun Screen(
                     modifier = Modifier.fillMaxWidth()
                 ) { page ->
                     when (page) {
-                        0 -> ContactoInfo(account)
-                        1 -> ResidenciaInfo(account, reportesViewModel)
-                        2 -> AdicionalInfo(account)
+                        0 -> PersonalInfo(account, idInscripcion, selectedSexo, selectedSangre, selectedEstadoCivil, selectedEtnia)
+                        1 -> ContactoInfo(account)
+                        2 -> ResidenciaInfo(account, accountViewModel)
+                        3 -> AdicionalInfo(account)
                     }
                 }
 
-                // Sincroniza `selectedTabIndex` cuando cambia el pagerState
                 LaunchedEffect(pagerState) {
                     snapshotFlow { pagerState.currentPage }.collect { page ->
                         selectedTabIndex = page
@@ -155,17 +166,146 @@ fun Screen(
                     text = "Enviar",
                     buttonColor = MaterialTheme.colorScheme.primaryContainer,
                     textColor = MaterialTheme.colorScheme.primary,
-                    icon = Icons.Filled.Send,
-                    onClickAction = { },
-                    iconSize = 32.dp,
+                    icon = Icons.Filled.Save,
+                    onClickAction = {
+                        selectedSexo.value?.let {
+                            selectedSangre.value?.let { it1 ->
+                                selectedEstadoCivil.value?.let { it2 ->
+                                    accountViewModel.updateAccount(
+                                        it.id,
+                                        it1.id,
+                                        it2.id,
+                                        12,12,"12", 12, 12, 12, 12, "",
+                                        "", 12, "", ""
+                                    )
+                                }
+                            }
+                        }
+                    },
+                    iconSize = 24.dp,
                     textStyle = MaterialTheme.typography.bodyLarge,
-                    enabled = false
+                    enabled = true
                 )
             }
         }
     }
 }
 
+@Composable
+fun PersonalInfo (
+    data: Account,
+    idInscripcion: Int?,
+    selectedSexo: MutableState<DjangoModelItem?>,
+    selectedSangre: MutableState<DjangoModelItem?>,
+    selectedEstadoCivil: MutableState<DjangoModelItem?>,
+    selectedEtnia: MutableState<DjangoModelItem?>
+) {
+    var expandedSexo by remember { mutableStateOf(false) }
+    var expandedSangre by remember { mutableStateOf(false) }
+    var expandedEstadoCivil by remember { mutableStateOf(false) }
+    var expandedEtnia by remember { mutableStateOf(false) }
+
+    LazyColumn (
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item {
+            DisableTextField(data.nombre, "Nombre")
+            Spacer(Modifier.height(8.dp))
+            DisableTextField(data.identificacion, data.tipoIdentificacion.capitalizeWords())
+            Spacer(Modifier.height(8.dp))
+            DisableTextField(data.username, "Usuario")
+            Spacer(Modifier.height(8.dp))
+            data.nacionalidad?.let { DisableTextField(it, "Nacionalidad") }
+        }
+
+        item {
+            MyExposedDropdownMenuBox(
+                expanded = expandedSexo,
+                onExpandedChange = { expandedSexo = it },
+                label = "Sexo",
+                selectedOption = selectedSexo.value,
+                options = LIST_SEXO,
+                onOptionSelected = { selectedOption ->
+                    expandedSexo = false
+                    selectedSexo.value = selectedOption
+                },
+                getOptionDescription = { it.name },
+                enabled = true,
+                onSearchTextChange = { }
+            )
+        }
+
+        item {
+            MyExposedDropdownMenuBox(
+                expanded = expandedSangre,
+                onExpandedChange = { expandedSangre = it },
+                label = "Tipo de sangre",
+                selectedOption = selectedSangre.value,
+                options = LIST_SANGRE,
+                onOptionSelected = { selectedOption ->
+                    expandedSangre = false
+                    selectedSangre.value = selectedOption
+                },
+                getOptionDescription = { it.name },
+                enabled = true,
+                onSearchTextChange = { }
+            )
+        }
+
+        item {
+            MyExposedDropdownMenuBox(
+                expanded = expandedEstadoCivil,
+                onExpandedChange = { expandedEstadoCivil = it },
+                label = "Estado civil",
+                selectedOption = selectedEstadoCivil.value,
+                options = LIST_ESTADO_CIVIL,
+                onOptionSelected = { selectedOption ->
+                    expandedEstadoCivil = false
+                    selectedEstadoCivil.value = selectedOption
+                },
+                getOptionDescription = { it.name },
+                enabled = true,
+                onSearchTextChange = { }
+            )
+        }
+
+        idInscripcion?.let {
+            item {
+                MyExposedDropdownMenuBox(
+                    expanded = expandedEtnia,
+                    onExpandedChange = { expandedEtnia = it },
+                    label = "Etnia",
+                    selectedOption = selectedEstadoCivil.value,
+                    options = LIST_ETNIA,
+                    onOptionSelected = { selectedOption ->
+                        expandedEtnia = false
+                        selectedEtnia.value = selectedOption
+                    },
+                    getOptionDescription = { it.name },
+                    enabled = true,
+                    onSearchTextChange = { }
+                )
+            }
+        }
+
+    }
+}
+
+@Composable
+fun DisableTextField(
+    value: String,
+    label: String
+) {
+    MyOutlinedTextField(
+        value = value,
+        onValueChange = { },
+        label = label,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+        modifier = Modifier.fillMaxWidth(),
+        enabled = false
+    )
+}
 
 
 @Composable
@@ -179,7 +319,7 @@ fun ContactoInfo (
 
     LazyColumn (
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         item {
             MyOutlinedTextField(
@@ -225,48 +365,104 @@ fun ContactoInfo (
 }
 
 @Composable
-fun ResidenciaInfo (
+fun ResidenciaInfo(
     data: Account,
-    reportesViewModel: ReportesViewModel
+    accountViewModel: AccountViewModel
 ) {
-    val provincia = remember { mutableStateOf(JsonPrimitive("")) }
-    val canton = remember { mutableStateOf(data.nombreCantonResidencia ?: "") }
-    val parroquia = remember { mutableStateOf(data.nombreParroquia ?: "") }
-    val sector = remember { mutableStateOf(data.sector ?: "") }
     val calle1 = remember { mutableStateOf(data.domicilioCallePrincipal ?: "") }
     val calle2 = remember { mutableStateOf(data.domicilioCalleSecundaria ?: "") }
     val numero = remember { mutableStateOf(data.domicilio_numero ?: "") }
 
-    var expandedDropDown by remember { mutableStateOf(false) }
-    val djangoModelData by reportesViewModel.djangoModelData.collectAsState(emptyList())
+    val provincias by accountViewModel.provincias.collectAsState(emptyList())
+    val cantones by accountViewModel.cantones.collectAsState(emptyList())
+    val parroquias by accountViewModel.parroquias.collectAsState(emptyList())
+    val sectores by accountViewModel.sectores.collectAsState(emptyList())
 
+    val selectedProvincia by accountViewModel.selectedProvincia.collectAsState()
+    val selectedCanton by accountViewModel.selectedCanton.collectAsState()
+    val selectedParroquia by accountViewModel.selectedParroquia.collectAsState()
+    val selectedSector by accountViewModel.selectedSector.collectAsState()
 
-    LazyColumn (
+    var expandedProvincia by remember { mutableStateOf(false) }
+    var expandedCanton by remember { mutableStateOf(false) }
+    var expandedParroquia by remember { mutableStateOf(false) }
+    var expandedSector by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        accountViewModel.setInitialData(data)
+    }
+
+    LazyColumn(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         item {
             MyExposedDropdownMenuBox(
-                expanded = expandedDropDown,
-                onExpandedChange = { expandedDropDown = it },
+                expanded = expandedProvincia,
+                onExpandedChange = { expandedProvincia = it },
                 label = "Provincia de residencia",
-                selectedOption = reportesViewModel.djangoModelSelect.value,
-                options = djangoModelData,
+                selectedOption = selectedProvincia,
+                options = provincias,
                 onOptionSelected = { selectedOption ->
-                    reportesViewModel.updateDangoModelSelect(selectedOption) // Actualiza el estado en el ViewModel
-                    expandedDropDown = false // Cierra el Dropdown
-                    // Asumimos que `selectedOption` tiene un `id` y `name` que quieres almacenar
-                    provincia.value = JsonPrimitive(selectedOption.id) // Almacena el ID de la provincia
+                    expandedProvincia = false
+                    accountViewModel.selectProvincia(selectedOption)
                 },
-                getOptionDescription = { it.name }, // Proporciona la descripción de cada opción en el Dropdown
-                enabled = true, // Asegura que el Dropdown esté habilitado
-                onSearchTextChange = { query ->
-                    // Filtra las opciones basadas en el texto de búsqueda
-                    reportesViewModel.fetchDjangoModel("Provincia", query)
-                }
+                getOptionDescription = { it.name },
+                enabled = true,
+                onSearchTextChange = {}
             )
         }
 
+        item {
+            MyExposedDropdownMenuBox(
+                expanded = expandedCanton,
+                onExpandedChange = { expandedCanton = it },
+                label = "Cantón de residencia",
+                selectedOption = selectedCanton,
+                options = cantones,
+                onOptionSelected = { selectedOption ->
+                    expandedCanton = false
+                    accountViewModel.selectCanton(selectedOption)
+                },
+                getOptionDescription = { it.name },
+                enabled = selectedProvincia != null,
+                onSearchTextChange = {}
+            )
+        }
+
+        item {
+            MyExposedDropdownMenuBox(
+                expanded = expandedParroquia,
+                onExpandedChange = { expandedParroquia = it },
+                label = "Parroquia de residencia",
+                selectedOption = selectedParroquia,
+                options = parroquias,
+                onOptionSelected = { selectedOption ->
+                    expandedParroquia = false
+                    accountViewModel.selectParroquia(selectedOption)
+                },
+                getOptionDescription = { it.name },
+                enabled = selectedCanton != null,
+                onSearchTextChange = {}
+            )
+        }
+
+        item {
+            MyExposedDropdownMenuBox(
+                expanded = expandedSector,
+                onExpandedChange = { expandedSector = it },
+                label = "Sector de residencia",
+                selectedOption = selectedSector,
+                options = sectores,
+                onOptionSelected = { selectedOption ->
+                    expandedSector = false
+                    accountViewModel.selectSector(selectedOption)
+                },
+                getOptionDescription = { it.name },
+                enabled = selectedParroquia != null,
+                onSearchTextChange = {}
+            )
+        }
 
         item {
             MyOutlinedTextField(
@@ -314,7 +510,7 @@ fun AdicionalInfo(
 
     LazyColumn (
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         item {
             MyOutlinedTextField(

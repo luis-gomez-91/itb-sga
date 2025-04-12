@@ -28,7 +28,7 @@ fun MyOutlinedTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onFocusLost: () -> Unit = {},
     textStyle: TextStyle = TextStyle(
-        color = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.outline,
+        color = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.outlineVariant,
         fontSize = MaterialTheme.typography.bodyMedium.fontSize,
     )
 ) {
@@ -61,7 +61,7 @@ fun MyOutlinedTextField(
             disabledIndicatorColor = MaterialTheme.colorScheme.outlineVariant,
             unfocusedContainerColor = Color.Transparent,
             focusedContainerColor = Color.Transparent,
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+            disabledContainerColor = Color.Transparent
         ),
         enabled = enabled,
         trailingIcon = trailingIcon,

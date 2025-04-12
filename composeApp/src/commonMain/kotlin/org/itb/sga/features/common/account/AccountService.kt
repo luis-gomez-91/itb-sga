@@ -8,6 +8,7 @@ import org.itb.sga.core.SERVER_URL
 import org.itb.sga.data.network.Account
 import org.itb.sga.data.network.AccountResult
 import org.itb.sga.data.network.Error
+import org.itb.sga.data.network.reportes.DjangoModelItem
 
 class AccountService(
     private val client: HttpClient
@@ -28,5 +29,11 @@ class AccountService(
             val error = Error("Error","Error inesperado: ${e.message}")
             AccountResult.Failure(error)
         }
+    }
+
+    suspend fun fetchResidencia(id: Int?, action: String): List<DjangoModelItem> {
+        val response = client.get("${SERVER_URL}api_rest?action=$action&id=$id")
+        return response.body<List<DjangoModelItem>>()
+
     }
 }

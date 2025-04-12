@@ -16,7 +16,8 @@ data class Account(
     var fechaNacimiento: String? = null,
     val foto: String,
     val idCantonResidencia: Int? = null,
-    var idParroquia: Int? = null,
+    var idParroquiaResidencia: Int? = null,
+    var idSectorResidencia: Int? = null,
     var idPersona: Int? = null,
     val idProvinciaResidencia: Int? = null,
     var idTipoSangre: Int? = null,
@@ -32,6 +33,9 @@ data class Account(
     val sector: String? = null,
     var provinciaNacimiento: String? = null,
     val sexo: String? = null,
+    val idSexo: Int? = null,
     val username: String,
-    val tipoIdentificacion: String
+    val tipoIdentificacion: String,
+    val idEstadoCivil: Int? = null,
+    val idEtnia: Int? = null
 )

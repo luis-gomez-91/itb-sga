@@ -76,7 +76,7 @@ fun <T> MyExposedDropdownMenuBox(
                 IconButton(
                     onClick = {
                         if (enabled) {
-                            onExpandedChange(!expanded) // Alternar el estado del menú
+                            onExpandedChange(!expanded)
                         }
                     }
                 ) {
@@ -135,7 +135,7 @@ fun <T> MyExposedDropdownMenuBox(
                         onClick = {
                             searchText = getOptionDescription(option)
                             onOptionSelected(option)
-                            onExpandedChange(false) // Cierra el menú después de seleccionar la opción
+                            onExpandedChange(false)
                         }
                     )
                 }
