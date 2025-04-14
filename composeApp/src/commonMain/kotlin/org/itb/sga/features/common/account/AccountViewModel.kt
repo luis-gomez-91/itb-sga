@@ -11,6 +11,7 @@ import org.itb.sga.core.logInfo
 import org.itb.sga.data.network.Account
 import org.itb.sga.data.network.AccountResult
 import org.itb.sga.data.network.Error
+import org.itb.sga.data.network.Response
 import org.itb.sga.data.network.form.AccountForm
 import org.itb.sga.data.network.reportes.DjangoModelItem
 import org.itb.sga.features.common.home.HomeViewModel
@@ -21,6 +22,20 @@ class AccountViewModel: ViewModel() {
 
     private val _data = MutableStateFlow<Account?>(null)
     val data: StateFlow<Account?> = _data
+
+    private val _tab = MutableStateFlow(0)
+    val tab: StateFlow<Int> = _tab
+
+    private val _response = MutableStateFlow<Response?>(null)
+    val response: StateFlow<Response?> = _response
+
+    fun updateResponse(newValue: Response?) {
+        _response.value = newValue
+    }
+
+    fun updateTab(newValue: Int) {
+        _tab.value = newValue
+    }
 
     fun onloadAccount(id: Int, homeViewModel: HomeViewModel) {
         homeViewModel.changeLoading(true)
@@ -163,27 +178,34 @@ class AccountViewModel: ViewModel() {
         calleSecundaria: String,
         numeroDomicilio: Int,
         nombrePadre: String,
-        nombreMadre: String
+        nombreMadre: String,
+        idPersona: Int
     ) {
-        val form = AccountForm(
-            action = "updateAccount",
-            idSexo = idSexo,
-            idTipoSangre = idTipoSangre,
-            idEstadoCivil = idEstadoCivil,
-            celular = celular,
-            convencional = convencional,
-            email = email,
-            idProvincia = idProvincia,
-            idCanton = idCanton,
-            idParroquia = idParroquia,
-            idSector = idSector,
-            callePrincipal = callePrincipal,
-            calleSecundaria = calleSecundaria,
-            numeroDomicilio = numeroDomicilio,
-            nombrePadre = nombrePadre,
-            nombreMadre = nombreMadre
-        )
+        viewModelScope.launch {
+            val form = AccountForm(
+                action = "updateAccount",
+                idSexo = idSexo,
+                idTipoSangre = idTipoSangre,
+                idEstadoCivil = idEstadoCivil,
+                celular = celular,
+                convencional = convencional,
+                email = email,
+                idProvincia = idProvincia,
+                idCanton = idCanton,
+                idParroquia = idParroquia,
+                idSector = idSector,
+                callePrincipal = callePrincipal,
+                calleSecundaria = calleSecundaria,
+                numeroDomicilio = numeroDomicilio,
+                nombrePadre = nombrePadre,
+                nombreMadre = nombreMadre,
+                idPersona = idPersona
+            )
 
-        logInfo("prueba", "$form")
+            val result = accountService.updateAccount(client, form)
+            _response.value = result
+
+            logInfo("prueba", "$result")
+        }
     }
 }

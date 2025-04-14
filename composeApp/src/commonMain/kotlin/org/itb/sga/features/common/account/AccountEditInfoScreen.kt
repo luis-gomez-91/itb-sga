@@ -45,19 +45,22 @@ import org.itb.sga.core.LIST_SEXO
 import org.itb.sga.core.capitalizeWords
 import org.itb.sga.data.network.Account
 import org.itb.sga.data.network.reportes.DjangoModelItem
+import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.ui.components.MyExposedDropdownMenuBox
 import org.itb.sga.ui.components.MyFilledTonalButton
 import org.itb.sga.ui.components.MyOutlinedTextField
+import org.itb.sga.ui.components.alerts.MyInfoAlert
+import org.itb.sga.ui.components.alerts.MyWarningAlert
 import org.itb.sga.ui.components.dashboard.DashboardScreen2
 
 @Composable
 fun AccountEditInfoScreen(
     navController: NavHostController,
     accountViewModel: AccountViewModel,
-    idInscripcion: Int?
+    homeViewModel: HomeViewModel
 ) {
     DashboardScreen2(
-        content = { Screen(accountViewModel, idInscripcion) },
+        content = { Screen(accountViewModel, homeViewModel) },
         title = "Actualización de datos",
         onBack = {
             navController.navigate("account")
@@ -68,11 +71,15 @@ fun AccountEditInfoScreen(
 @Composable
 fun Screen(
     accountViewModel: AccountViewModel,
-    idInscripcion: Int?
+    homeViewModel: HomeViewModel
 ) {
     val data by accountViewModel.data.collectAsState(null)
     val pagerState = rememberPagerState { 4 }
-    var selectedTabIndex by remember { mutableStateOf(0) }
+    val selectedTabIndex by accountViewModel.tab.collectAsState(0)
+    var showWarningAlert by remember { mutableStateOf(false) }
+    val response by accountViewModel.response.collectAsState(null)
+
+    val idInscripcion = homeViewModel.homeData.value?.persona?.idInscripcion
 
     LaunchedEffect(selectedTabIndex) {
         pagerState.animateScrollToPage(selectedTabIndex)
@@ -83,6 +90,44 @@ fun Screen(
         var selectedSangre = remember { mutableStateOf(LIST_SANGRE.find { it.id == account.idTipoSangre }) }
         var selectedEstadoCivil = remember { mutableStateOf(LIST_ESTADO_CIVIL.find { it.id == account.idEstadoCivil }) }
         var selectedEtnia = remember { mutableStateOf(LIST_ETNIA.find { it.id == account.idEtnia }) }
+
+        val celular = remember { mutableStateOf(account.celular ?: "") }
+        val convencional = remember { mutableStateOf(account.convencional ?: "") }
+        val email = remember { mutableStateOf(account.email ?: "") }
+        val emailInst = remember { mutableStateOf(account.emailinst ?: "") }
+
+        val provincia = remember { mutableStateOf(account.nombreProvinciaResidencia ?: "") }
+        val canton = remember { mutableStateOf(account.nombreCantonResidencia ?: "") }
+        val madre = remember { mutableStateOf(account.madre ?: "") }
+        val padre = remember { mutableStateOf(account.padre ?: "") }
+
+        val selectedProvincia by accountViewModel.selectedProvincia.collectAsState()
+        val selectedCanton by accountViewModel.selectedCanton.collectAsState()
+        val selectedParroquia by accountViewModel.selectedParroquia.collectAsState()
+        val selectedSector by accountViewModel.selectedSector.collectAsState()
+
+        val calle1 = remember { mutableStateOf(account.domicilioCallePrincipal ?: "") }
+        val calle2 = remember { mutableStateOf(account.domicilioCalleSecundaria ?: "") }
+        val numero = remember { mutableStateOf(account.domicilio_numero ?: "") }
+
+        val missingFields = mutableListOf<String>()
+
+        if (selectedSexo.value == null) missingFields.add("Sexo")
+        if (selectedSangre.value == null) missingFields.add("Tipo de sangre")
+        if (selectedEstadoCivil.value == null) missingFields.add("Estado civil")
+        if (selectedEtnia.value == null && idInscripcion != null) missingFields.add("Etnia")
+        if (celular.value.isNullOrBlank()) missingFields.add("Teléfono celular")
+        if (convencional.value.isNullOrBlank()) missingFields.add("Teléfono convencional")
+        if (email.value.isNullOrBlank()) missingFields.add("Email personal")
+        if (madre.value.isNullOrBlank()) missingFields.add("Nombre de madre")
+        if (padre.value.isNullOrBlank()) missingFields.add("Nombre de padre")
+        if (selectedProvincia == null) missingFields.add("Provincia de residencia")
+        if (selectedCanton == null) missingFields.add("Cantón de residencia")
+        if (selectedParroquia == null) missingFields.add("Parroquia de residencia")
+        if (selectedSector == null) missingFields.add("Sector de residencia")
+        if (calle1.value.isNullOrBlank()) missingFields.add("Calle principal")
+        if (calle2.value.isNullOrBlank()) missingFields.add("Calle secundaria")
+        if (numero.value.isNullOrBlank()) missingFields.add("Número de domicilio")
 
         Column(
             modifier = Modifier
@@ -117,7 +162,7 @@ fun Screen(
                         Tab(
                             selected = selectedTabIndex == index,
                             onClick = {
-                                selectedTabIndex = index // Cambia el índice seleccionado
+                                accountViewModel.updateTab(index)
                             },
                             text = {
                                 Text(
@@ -145,15 +190,15 @@ fun Screen(
                 ) { page ->
                     when (page) {
                         0 -> PersonalInfo(account, idInscripcion, selectedSexo, selectedSangre, selectedEstadoCivil, selectedEtnia)
-                        1 -> ContactoInfo(account)
-                        2 -> ResidenciaInfo(account, accountViewModel)
-                        3 -> AdicionalInfo(account)
+                        1 -> ContactoInfo(celular, convencional, email, emailInst)
+                        2 -> ResidenciaInfo(account, accountViewModel, calle1, calle2, numero)
+                        3 -> AdicionalInfo(provincia, canton, madre, padre)
                     }
                 }
 
                 LaunchedEffect(pagerState) {
                     snapshotFlow { pagerState.currentPage }.collect { page ->
-                        selectedTabIndex = page
+                        accountViewModel.updateTab(page)
                     }
                 }
             }
@@ -163,23 +208,34 @@ fun Screen(
                 horizontalArrangement = Arrangement.End
             ) {
                 MyFilledTonalButton(
-                    text = "Enviar",
+                    text = "Guardar cambios",
                     buttonColor = MaterialTheme.colorScheme.primaryContainer,
                     textColor = MaterialTheme.colorScheme.primary,
                     icon = Icons.Filled.Save,
                     onClickAction = {
-                        selectedSexo.value?.let {
-                            selectedSangre.value?.let { it1 ->
-                                selectedEstadoCivil.value?.let { it2 ->
-                                    accountViewModel.updateAccount(
-                                        it.id,
-                                        it1.id,
-                                        it2.id,
-                                        12,12,"12", 12, 12, 12, 12, "",
-                                        "", 12, "", ""
-                                    )
-                                }
+                        if (missingFields.isEmpty()) {
+                            homeViewModel.homeData.value?.persona?.let {
+                                accountViewModel.updateAccount(
+                                    selectedSexo.value!!.id,
+                                    selectedSangre.value!!.id,
+                                    selectedEstadoCivil.value!!.id,
+                                    celular.value.toInt(),
+                                    convencional.value.toInt(),
+                                    email.value,
+                                    selectedProvincia!!.id,
+                                    selectedCanton!!.id,
+                                    selectedParroquia!!.id,
+                                    selectedSector!!.id,
+                                    calle1.value,
+                                    calle2.value,
+                                    numero.value.toInt(),
+                                    padre.value,
+                                    madre.value,
+                                    it.idPersona
+                                )
                             }
+                        } else {
+                            showWarningAlert = true
                         }
                     },
                     iconSize = 24.dp,
@@ -188,6 +244,21 @@ fun Screen(
                 )
             }
         }
+        MyWarningAlert(
+            titulo = "Datos incompletos",
+            mensaje = "Falta por completar:\n${missingFields.joinToString("\n") { "- $it" }}",
+            onDismiss = { showWarningAlert = false },
+            showAlert = showWarningAlert
+        )
+    }
+
+    response?.let {
+        MyInfoAlert(
+            titulo = it.status,
+            mensaje = it.message,
+            onDismiss = { accountViewModel.updateResponse(null) },
+            showAlert = true
+        )
     }
 }
 
@@ -310,13 +381,11 @@ fun DisableTextField(
 
 @Composable
 fun ContactoInfo (
-    data: Account
+    celular: MutableState<String>,
+    convencional: MutableState<String>,
+    email: MutableState<String>,
+    emailInst: MutableState<String>
 ) {
-    val celular = remember { mutableStateOf(data.celular ?: "") }
-    val convencional = remember { mutableStateOf(data.convencional ?: "") }
-    val email = remember { mutableStateOf(data.email ?: "") }
-    val emailInst = remember { mutableStateOf(data.emailinst ?: "") }
-
     LazyColumn (
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -367,12 +436,11 @@ fun ContactoInfo (
 @Composable
 fun ResidenciaInfo(
     data: Account,
-    accountViewModel: AccountViewModel
+    accountViewModel: AccountViewModel,
+    calle1: MutableState<String>,
+    calle2: MutableState<String>,
+    numero: MutableState<String>
 ) {
-    val calle1 = remember { mutableStateOf(data.domicilioCallePrincipal ?: "") }
-    val calle2 = remember { mutableStateOf(data.domicilioCalleSecundaria ?: "") }
-    val numero = remember { mutableStateOf(data.domicilio_numero ?: "") }
-
     val provincias by accountViewModel.provincias.collectAsState(emptyList())
     val cantones by accountViewModel.cantones.collectAsState(emptyList())
     val parroquias by accountViewModel.parroquias.collectAsState(emptyList())
@@ -501,13 +569,11 @@ fun ResidenciaInfo(
 
 @Composable
 fun AdicionalInfo(
-    data: Account
+    provincia: MutableState<String>,
+    canton: MutableState<String>,
+    madre: MutableState<String>,
+    padre: MutableState<String>
 ) {
-    val provincia = remember { mutableStateOf(data.nombreProvinciaResidencia ?: "") }
-    val canton = remember { mutableStateOf(data.nombreCantonResidencia ?: "") }
-    val madre = remember { mutableStateOf(data.madre ?: "") }
-    val padre = remember { mutableStateOf(data.padre ?: "") }
-
     LazyColumn (
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)

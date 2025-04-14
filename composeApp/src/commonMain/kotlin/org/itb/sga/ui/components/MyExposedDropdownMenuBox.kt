@@ -120,6 +120,7 @@ fun <T> MyExposedDropdownMenuBox(
         // Mostrar el menú desplegable solo si hay opciones
         if (options.isNotEmpty()) {
             ExposedDropdownMenu(
+                modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerLowest),
                 expanded = expanded,
                 onDismissRequest = { onExpandedChange(false) }
             ) {

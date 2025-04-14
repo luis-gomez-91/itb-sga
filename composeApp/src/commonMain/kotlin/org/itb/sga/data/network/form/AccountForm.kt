@@ -19,5 +19,6 @@ data class AccountForm(
     val calleSecundaria: String,
     val numeroDomicilio: Int,
     val nombrePadre: String,
-    val nombreMadre: String
+    val nombreMadre: String,
+    val idPersona: Int
 )

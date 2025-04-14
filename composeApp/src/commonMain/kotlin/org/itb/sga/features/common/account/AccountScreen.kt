@@ -87,7 +87,7 @@ fun Screen(
                 Column (
                     modifier = Modifier.fillMaxWidth().weight(1f)
                 ) {
-                    dataPersona(persona)
+                    dataPersona(persona, accountViewModel, navController)
                 }
 
                 Spacer(Modifier.height(4.dp))
@@ -126,6 +126,8 @@ fun Screen(
 @Composable
 fun dataPersona(
     persona: Account,
+    accountViewModel: AccountViewModel,
+    navController: NavHostController
 ) {
 
         Row (
@@ -165,16 +167,16 @@ fun dataPersona(
                 .padding(top = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            item { InformacionPersonal(persona) }
-            item { InformacionContacto(persona) }
-            item { InformacionDomicilio(persona) }
-            item { InformacionAdicional(persona) }
+            item { InformacionPersonal(persona, accountViewModel, navController) }
+            item { InformacionContacto(persona, accountViewModel, navController) }
+            item { InformacionDomicilio(persona, accountViewModel, navController) }
+            item { InformacionAdicional(persona, accountViewModel, navController) }
         }
 
 }
 
 @Composable
-fun InformacionPersonal(persona: Account) {
+fun InformacionPersonal(persona: Account, accountViewModel: AccountViewModel, navController: NavHostController) {
     val list: List<Map<String, String?>> = listOf(
 //        mapOf("Identificación:" to persona.identificacion),
         mapOf("Usuario:" to persona.username),
@@ -184,22 +186,36 @@ fun InformacionPersonal(persona: Account) {
         mapOf("Extranjero:" to if (persona.extranjero) "SI" else "NO"),
         mapOf("Tipo de sangre:" to persona.nombreTipoSangre),
     )
-    MostrarDatos("Información personal", list)
+    MostrarDatos(
+        "Información personal",
+        list,
+        {
+            accountViewModel.updateTab(0)
+            navController.navigate("account_edit")
+        }
+    )
 }
 
 @Composable
-fun InformacionContacto(persona: Account) {
+fun InformacionContacto(persona: Account, accountViewModel: AccountViewModel, navController: NavHostController) {
     val list: List<Map<String, String?>> = listOf(
         mapOf("Celular:" to persona.celular),
         mapOf("Convencional:" to persona.convencional),
         mapOf("Correo institucional:" to persona.emailinst),
         mapOf("Correo personal:" to persona.email),
     )
-    MostrarDatos("Información de contacto:", list)
+    MostrarDatos(
+        "Información de contacto:",
+        list,
+        {
+            accountViewModel.updateTab(1)
+            navController.navigate("account_edit")
+        }
+    )
 }
 
 @Composable
-fun InformacionDomicilio(persona: Account) {
+fun InformacionDomicilio(persona: Account, accountViewModel: AccountViewModel, navController: NavHostController) {
     val list: List<Map<String, String?>> = listOf(
         mapOf("Provincia:" to persona.nombreProvinciaResidencia),
         mapOf("Canton:" to persona.nombreCantonResidencia),
@@ -209,26 +225,45 @@ fun InformacionDomicilio(persona: Account) {
         mapOf("Calle secundaria:" to persona.domicilioCalleSecundaria),
         mapOf("Número de domicilio:" to persona.domicilio_numero),
     )
-    MostrarDatos("Lugar  de residencia", list)
+    MostrarDatos(
+        "Lugar  de residencia",
+        list,
+        {
+            accountViewModel.updateTab(2)
+            navController.navigate("account_edit")
+        }
+    )
 }
 
 @Composable
-fun InformacionAdicional(persona: Account) {
+fun InformacionAdicional(persona: Account, accountViewModel: AccountViewModel, navController: NavHostController) {
     val list: List<Map<String, String?>> = listOf(
         mapOf("Provincia de nacimiento:" to persona.provinciaNacimiento),
         mapOf("Cantón de nacimiento:" to persona.cantonNacimiento),
         mapOf("Madre:" to persona.madre),
         mapOf("Padre:" to persona.padre),
     )
-    MostrarDatos("Información adicional", list)
+    MostrarDatos(
+        "Información adicional",
+        list,
+        {
+            accountViewModel.updateTab(3)
+            navController.navigate("account_edit")
+        }
+    )
 }
 
 @Composable
 fun MostrarDatos(
     titulo: String,
-    list: List<Map<String, String?>>
+    list: List<Map<String, String?>>,
+    onclick: () -> Unit
 ) {
-    MyCard {
+    MyCard (
+        onClick = {
+            onclick()
+        }
+    ) {
         Column (
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(4.dp)

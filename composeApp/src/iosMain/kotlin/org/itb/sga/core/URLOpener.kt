@@ -7,7 +7,13 @@ class PDFOpenerIOS : URLOpener {
     override fun openURL(url: String) {
         val nsUrl = NSURL.URLWithString(url)
         if (nsUrl != null) {
-            UIApplication.sharedApplication.openURL(nsUrl)
+            UIApplication.sharedApplication.openURL(
+                nsUrl,
+                options = emptyMap<Any?, Any>(),
+                completionHandler = { success ->
+//                    println("URL opened: $success")
+                }
+            )
         }
     }
 }
