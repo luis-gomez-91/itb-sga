@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
@@ -46,6 +45,7 @@ import org.itb.sga.core.capitalizeWords
 import org.itb.sga.data.network.Account
 import org.itb.sga.data.network.reportes.DjangoModelItem
 import org.itb.sga.features.common.home.HomeViewModel
+import org.itb.sga.ui.components.MyCircularProgressIndicator
 import org.itb.sga.ui.components.MyExposedDropdownMenuBox
 import org.itb.sga.ui.components.MyFilledTonalButton
 import org.itb.sga.ui.components.MyOutlinedTextField
@@ -60,7 +60,7 @@ fun AccountEditInfoScreen(
     homeViewModel: HomeViewModel
 ) {
     DashboardScreen2(
-        content = { Screen(accountViewModel, homeViewModel) },
+        content = { Screen(accountViewModel, homeViewModel, navController) },
         title = "Actualización de datos",
         onBack = {
             navController.navigate("account")
@@ -71,13 +71,15 @@ fun AccountEditInfoScreen(
 @Composable
 fun Screen(
     accountViewModel: AccountViewModel,
-    homeViewModel: HomeViewModel
+    homeViewModel: HomeViewModel,
+    navController: NavHostController
 ) {
     val data by accountViewModel.data.collectAsState(null)
     val pagerState = rememberPagerState { 4 }
     val selectedTabIndex by accountViewModel.tab.collectAsState(0)
     var showWarningAlert by remember { mutableStateOf(false) }
     val response by accountViewModel.response.collectAsState(null)
+    val updateAccountLoading by accountViewModel.updateAccountLoading.collectAsState(false)
 
     val idInscripcion = homeViewModel.homeData.value?.persona?.idInscripcion
 
@@ -86,15 +88,15 @@ fun Screen(
     }
 
     data?.let { account ->
-        var selectedSexo = remember { mutableStateOf(LIST_SEXO.find { it.id == account.idSexo }) }
-        var selectedSangre = remember { mutableStateOf(LIST_SANGRE.find { it.id == account.idTipoSangre }) }
-        var selectedEstadoCivil = remember { mutableStateOf(LIST_ESTADO_CIVIL.find { it.id == account.idEstadoCivil }) }
-        var selectedEtnia = remember { mutableStateOf(LIST_ETNIA.find { it.id == account.idEtnia }) }
+        val selectedSexo = remember { mutableStateOf(LIST_SEXO.find { it.id == account.idSexo }) }
+        val selectedSangre = remember { mutableStateOf(LIST_SANGRE.find { it.id == account.idTipoSangre }) }
+        val selectedEstadoCivil = remember { mutableStateOf(LIST_ESTADO_CIVIL.find { it.id == account.idEstadoCivil }) }
+        val selectedEtnia = remember { mutableStateOf(LIST_ETNIA.find { it.id == account.idEtnia }) }
 
         val celular = remember { mutableStateOf(account.celular ?: "") }
         val convencional = remember { mutableStateOf(account.convencional ?: "") }
         val email = remember { mutableStateOf(account.email ?: "") }
-        val emailInst = remember { mutableStateOf(account.emailinst ?: "") }
+        val emailInst = remember { mutableStateOf(account.emailinst) }
 
         val provincia = remember { mutableStateOf(account.nombreProvinciaResidencia ?: "") }
         val canton = remember { mutableStateOf(account.nombreCantonResidencia ?: "") }
@@ -116,18 +118,18 @@ fun Screen(
         if (selectedSangre.value == null) missingFields.add("Tipo de sangre")
         if (selectedEstadoCivil.value == null) missingFields.add("Estado civil")
         if (selectedEtnia.value == null && idInscripcion != null) missingFields.add("Etnia")
-        if (celular.value.isNullOrBlank()) missingFields.add("Teléfono celular")
-        if (convencional.value.isNullOrBlank()) missingFields.add("Teléfono convencional")
-        if (email.value.isNullOrBlank()) missingFields.add("Email personal")
-        if (madre.value.isNullOrBlank()) missingFields.add("Nombre de madre")
-        if (padre.value.isNullOrBlank()) missingFields.add("Nombre de padre")
+        if (celular.value.isBlank()) missingFields.add("Teléfono celular")
+        if (convencional.value.isBlank()) missingFields.add("Teléfono convencional")
+        if (email.value.isBlank()) missingFields.add("Email personal")
+        if (madre.value.isBlank()) missingFields.add("Nombre de madre")
+        if (padre.value.isBlank()) missingFields.add("Nombre de padre")
         if (selectedProvincia == null) missingFields.add("Provincia de residencia")
         if (selectedCanton == null) missingFields.add("Cantón de residencia")
         if (selectedParroquia == null) missingFields.add("Parroquia de residencia")
         if (selectedSector == null) missingFields.add("Sector de residencia")
-        if (calle1.value.isNullOrBlank()) missingFields.add("Calle principal")
-        if (calle2.value.isNullOrBlank()) missingFields.add("Calle secundaria")
-        if (numero.value.isNullOrBlank()) missingFields.add("Número de domicilio")
+        if (calle1.value.isBlank()) missingFields.add("Calle principal")
+        if (calle2.value.isBlank()) missingFields.add("Calle secundaria")
+        if (numero.value.isBlank()) missingFields.add("Número de domicilio")
 
         Column(
             modifier = Modifier
@@ -140,7 +142,6 @@ fun Screen(
                     .fillMaxWidth()
                     .weight(1f)
             ) {
-                // Los tabs estarán dentro de una función composable válida
                 ScrollableTabRow(
                     selectedTabIndex = selectedTabIndex,
                     modifier = Modifier.fillMaxWidth(),
@@ -207,41 +208,45 @@ fun Screen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
-                MyFilledTonalButton(
-                    text = "Guardar cambios",
-                    buttonColor = MaterialTheme.colorScheme.primaryContainer,
-                    textColor = MaterialTheme.colorScheme.primary,
-                    icon = Icons.Filled.Save,
-                    onClickAction = {
-                        if (missingFields.isEmpty()) {
-                            homeViewModel.homeData.value?.persona?.let {
-                                accountViewModel.updateAccount(
-                                    selectedSexo.value!!.id,
-                                    selectedSangre.value!!.id,
-                                    selectedEstadoCivil.value!!.id,
-                                    celular.value.toInt(),
-                                    convencional.value.toInt(),
-                                    email.value,
-                                    selectedProvincia!!.id,
-                                    selectedCanton!!.id,
-                                    selectedParroquia!!.id,
-                                    selectedSector!!.id,
-                                    calle1.value,
-                                    calle2.value,
-                                    numero.value.toInt(),
-                                    padre.value,
-                                    madre.value,
-                                    it.idPersona
-                                )
+                if (updateAccountLoading) {
+                    MyCircularProgressIndicator()
+                } else {
+                    MyFilledTonalButton(
+                        text = "Guardar cambios",
+                        buttonColor = MaterialTheme.colorScheme.primaryContainer,
+                        textColor = MaterialTheme.colorScheme.primary,
+                        icon = Icons.Filled.Save,
+                        onClickAction = {
+                            if (missingFields.isEmpty()) {
+                                homeViewModel.homeData.value?.persona?.let {
+                                    accountViewModel.updateAccount(
+                                        selectedSexo.value!!.id,
+                                        selectedSangre.value!!.id,
+                                        selectedEstadoCivil.value!!.id,
+                                        celular.value.toInt(),
+                                        convencional.value.toInt(),
+                                        email.value,
+                                        selectedProvincia!!.id,
+                                        selectedCanton!!.id,
+                                        selectedParroquia!!.id,
+                                        selectedSector!!.id,
+                                        calle1.value,
+                                        calle2.value,
+                                        numero.value.toInt(),
+                                        padre.value,
+                                        madre.value,
+                                        it.idPersona
+                                    )
+                                }
+                            } else {
+                                showWarningAlert = true
                             }
-                        } else {
-                            showWarningAlert = true
-                        }
-                    },
-                    iconSize = 24.dp,
-                    textStyle = MaterialTheme.typography.bodyLarge,
-                    enabled = true
-                )
+                        },
+                        iconSize = 24.dp,
+                        textStyle = MaterialTheme.typography.bodyLarge,
+                        enabled = true
+                    )
+                }
             }
         }
         MyWarningAlert(
@@ -256,7 +261,12 @@ fun Screen(
         MyInfoAlert(
             titulo = it.status,
             mensaje = it.message,
-            onDismiss = { accountViewModel.updateResponse(null) },
+            onDismiss = {
+                accountViewModel.updateResponse(null)
+                if (it.status == "success") {
+                    navController.navigate("account")
+                }
+            },
             showAlert = true
         )
     }

@@ -128,7 +128,7 @@ fun MyNavigation(
 
         composable("pro_calificaciones") { ProCalificacionesScreen(navController, homeViewModel, proEvaluacionesViewModel) }
         composable("ver_clase") { VerClaseScreen(navController, proClasesViewModel) }
-        composable("account_edit") { AccountEditInfoScreen(navController, accountViewModel, homeViewModel.homeData.value?.persona?.idInscripcion) }
+        composable("account_edit") { AccountEditInfoScreen(navController, accountViewModel, homeViewModel) }
 
     }
 }

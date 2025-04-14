@@ -29,6 +29,9 @@ class AccountViewModel: ViewModel() {
     private val _response = MutableStateFlow<Response?>(null)
     val response: StateFlow<Response?> = _response
 
+    private val _updateAccountLoading = MutableStateFlow(false)
+    val updateAccountLoading: StateFlow<Boolean> = _updateAccountLoading
+
     fun updateResponse(newValue: Response?) {
         _response.value = newValue
     }
@@ -157,7 +160,7 @@ class AccountViewModel: ViewModel() {
                     "parroquias" -> { _parroquias.value = result }
                     "sectores" -> { _sectores.value = result }
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
 
             }
         }

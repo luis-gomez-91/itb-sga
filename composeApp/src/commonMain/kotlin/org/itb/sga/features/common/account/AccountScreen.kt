@@ -129,56 +129,53 @@ fun dataPersona(
     accountViewModel: AccountViewModel,
     navController: NavHostController
 ) {
-
-        Row (
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            AsyncImage(
-                model = persona.foto,
-                contentDescription = "Foto perfil",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .width(80.dp)
-                    .aspectRatio(1 / 1f)
-                    .padding(8.dp)
-                    .clip(CircleShape)
-            )
-            Column (
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = persona.nombre,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = formatoText("${persona.tipoIdentificacion}:", persona.identificacion),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            }
-        }
-
-        LazyColumn(
+    Row (
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        AsyncImage(
+            model = persona.foto,
+            contentDescription = "Foto perfil",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .width(80.dp)
+                .aspectRatio(1 / 1f)
+                .padding(8.dp)
+                .clip(CircleShape)
+        )
+        Column (
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            item { InformacionPersonal(persona, accountViewModel, navController) }
-            item { InformacionContacto(persona, accountViewModel, navController) }
-            item { InformacionDomicilio(persona, accountViewModel, navController) }
-            item { InformacionAdicional(persona, accountViewModel, navController) }
+            Text(
+                text = persona.nombre,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = formatoText("${persona.tipoIdentificacion}:", persona.identificacion),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.secondary
+            )
         }
+    }
 
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item { InformacionPersonal(persona, accountViewModel, navController) }
+        item { InformacionContacto(persona, accountViewModel, navController) }
+        item { InformacionDomicilio(persona, accountViewModel, navController) }
+        item { InformacionAdicional(persona, accountViewModel, navController) }
+    }
 }
 
 @Composable
 fun InformacionPersonal(persona: Account, accountViewModel: AccountViewModel, navController: NavHostController) {
     val list: List<Map<String, String?>> = listOf(
-//        mapOf("Identificación:" to persona.identificacion),
         mapOf("Usuario:" to persona.username),
         mapOf("Sexo:" to persona.sexo),
         mapOf("Fecha de nacimiento:" to persona.fechaNacimiento),
