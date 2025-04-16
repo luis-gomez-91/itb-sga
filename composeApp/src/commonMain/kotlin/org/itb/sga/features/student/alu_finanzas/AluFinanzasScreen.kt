@@ -162,7 +162,7 @@ fun CardAluFinanza(
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary
             )
-
+            Spacer(Modifier.height(8.dp))
             Row() {
                 MyAssistChip(
                     label = formatoText("Fecha vencimiento:", rubro.fechaVencimiento).toString(),
@@ -179,27 +179,26 @@ fun CardAluFinanza(
                     icon = cardStyle.icono
                 )
             }
-
+            Spacer(Modifier.height(8.dp))
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
                     text = formatoText("Valor:", "$${rubro.valor}"),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.labelSmall
                 )
                 Text(text = formatoText("Abono:", "$${rubro.pagado}"),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.labelSmall
                 )
                 Text(text = formatoText("Saldo:", "$${rubro.porPagar}"),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.labelSmall
                 )
             }
         }
-
     }
 }
 

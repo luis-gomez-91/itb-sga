@@ -113,9 +113,10 @@ class PagoOnlineViewModel : ViewModel() {
             val result = requestPostDispatcher(client, form)
             logInfo("prueba", "RESULT: $result")
             _response.value = result
-            if (result.status == "success") {
-                homeViewModel.openURL(result.message)
-            }
+            _linkToPay.value = result.message
+//            if (result.status == "success") {
+//            homeViewModel.openURL(result.message)
+//            }
             logInfo("prueba", "RESPUESTA: ${_response.value}")
         }
     }

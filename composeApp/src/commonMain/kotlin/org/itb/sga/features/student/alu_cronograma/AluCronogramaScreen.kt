@@ -6,6 +6,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,11 +18,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.Person2
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -48,7 +46,6 @@ import org.itb.sga.data.network.Profesor
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
 import org.itb.sga.ui.components.alerts.MyErrorAlert
-import org.itb.sga.ui.components.MyAssistChip
 import org.itb.sga.ui.components.MyCard
 import org.itb.sga.ui.components.MyCircularProgressIndicator
 import org.itb.sga.ui.components.dashboard.DashBoardScreen
@@ -101,27 +98,28 @@ fun Screen(
     if (isLoading) {
         MyCircularProgressIndicator()
     } else {
-        LazyColumn(modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 16.dp)
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(dataFiltada) { data ->
                 AluCronogramaItem(data)
-                Spacer(modifier = Modifier.height(8.dp))
             }
         }
+    }
 
-        if (error != null) {
-            MyErrorAlert(
-                titulo = error!!.title,
-                mensaje = error!!.error,
-                onDismiss = {
-                    homeViewModel.clearError()
-                    navController.popBackStack()
-                },
-                showAlert = true
-            )
-        }
+    if (error != null) {
+        MyErrorAlert(
+            titulo = error!!.title,
+            mensaje = error!!.error,
+            onDismiss = {
+                homeViewModel.clearError()
+                navController.popBackStack()
+            },
+            showAlert = true
+        )
     }
 }
 
@@ -130,13 +128,8 @@ fun AluCronogramaItem(
     data: AluCronograma
 ) {
     var expanded by remember { mutableStateOf(false) }
-    MyCard(
-        modifier = Modifier.padding(bottom = 4.dp),
-        onClick = { },
-        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        contentColor = MaterialTheme.colorScheme.primary,
-        borderColor = MaterialTheme.colorScheme.surfaceContainer,
-    ) {
+
+    MyCard {
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -145,7 +138,7 @@ fun AluCronogramaItem(
             ) {
                 Text(
                     text = data.asignatura,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.weight(1f)
                 )
@@ -159,27 +152,23 @@ fun AluCronogramaItem(
                 }
             }
 
-            MyAssistChip(
-                label = formatoText("", "${data.inicio} - ${data.fin}").toString(),
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                labelColor = MaterialTheme.colorScheme.primary,
-                icon = Icons.Filled.CalendarMonth
+            Text(
+                text = formatoText("Fecha:", "${data.inicio} al ${data.fin}"),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
-            Row() {
-                MyAssistChip(
-                    label = "${data.horas} horas",
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    labelColor = MaterialTheme.colorScheme.secondary
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                MyAssistChip(
-                    label = "${data.creditos} créditos",
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    labelColor = MaterialTheme.colorScheme.secondary
-                )
-            }
-
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = formatoText("Horas:", "${data.horas}"),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = formatoText("Créditos:", "${data.creditos}"),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
 
             AnimatedVisibility(
                 visible = expanded,
@@ -191,7 +180,6 @@ fun AluCronogramaItem(
                     HorizontalDivider()
                     Spacer(modifier = Modifier.height(8.dp))
                     Profesores(data.profesores)
-
                     Spacer(modifier = Modifier.height(8.dp))
                     HorizontalDivider()
                     Spacer(modifier = Modifier.height(8.dp))
@@ -209,7 +197,7 @@ fun Profesores(profesores: List<Profesor>) {
         Text(
             text = "Profesores",
             color = MaterialTheme.colorScheme.secondary,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleSmall,
         )
         LazyRow(
             modifier = Modifier
@@ -234,36 +222,30 @@ fun ProfesorItem(profesor: Profesor) {
     ) {
         Column (
             modifier = Modifier
-                .padding(8.dp)
+                .padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         )
         {
             Text(
-                text = profesor.profesor,
-                style = MaterialTheme.typography.titleSmall,
+                text = formatoText("Docente:", profesor.profesor),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            MyAssistChip(
-                label = formatoText("", "${profesor.desde} - ${profesor.hasta}").toString(),
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                labelColor = MaterialTheme.colorScheme.secondary,
-                icon = Icons.Filled.Person2
+            Text(
+                text = formatoText("Fecha:", "${profesor.desde} - ${profesor.hasta}"),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                MyAssistChip(
-                    label = if (profesor.auxiliar) "Auxiliar" else "Titular",
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    labelColor = MaterialTheme.colorScheme.tertiary,
-                    icon = Icons.Filled.Person2
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                MyAssistChip(
-                    label = profesor.segmento.capitalizeWords(),
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    labelColor = MaterialTheme.colorScheme.tertiary,
-                    icon = Icons.Default.Book
-                )
-            }
+            Text(
+                text = formatoText("Tipo:", if (profesor.auxiliar) "Auxiliar" else "Titular"),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = formatoText("Segmento:", profesor.segmento.capitalizeWords()),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
@@ -274,7 +256,7 @@ fun Horarios(horarios: List<Horario>) {
         Text(
             text = "Horarios",
             color = MaterialTheme.colorScheme.secondary,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleSmall,
         )
         LazyRow(
             modifier = Modifier
@@ -297,30 +279,32 @@ fun HorarioItem(horario: Horario) {
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         )
     ) {
-        Column(
-            modifier = Modifier.padding(8.dp)
+        Column (
+            modifier = Modifier
+                .padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         )
         {
             Text(
-                text = horario.dia,
-                style = MaterialTheme.typography.titleSmall,
+                text = formatoText("Día:", horario.dia),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            MyAssistChip(
-                label = "${horario.turnoComienza} - ${horario.turnoTermina}",
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                labelColor = MaterialTheme.colorScheme.secondary
+            Text(
+                text = formatoText("Turno:", "${horario.turnoComienza} - ${horario.turnoTermina}"),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            MyAssistChip(
-                label = "Aula ${horario.aula}",
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                labelColor = MaterialTheme.colorScheme.tertiary
+            Text(
+                text = formatoText("Aula:", horario.aula),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            MyAssistChip(
-                label = if (horario.claseVirtual) "Clase virtual" else "Clase presencial",
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                labelColor = MaterialTheme.colorScheme.tertiary
+            Text(
+                text = formatoText("Tipo:", if (horario.claseVirtual) "Clase virtual" else "Clase presencial"),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
         }
     }
 }

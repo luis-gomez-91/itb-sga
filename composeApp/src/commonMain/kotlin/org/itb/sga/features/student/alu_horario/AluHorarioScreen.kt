@@ -26,7 +26,6 @@ import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -143,64 +142,62 @@ fun HorarioItem(
     var expanded by remember { mutableStateOf(false) }
 
     MyCard (
-        modifier = Modifier.padding(bottom = 4.dp),
         onClick = { }
     ) {
-        Row (
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ){
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = horario.materiaNombre,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.outlineVariant
-                )
-
-                Row() {
-                    MyAssistChip(
-                        label = "${horario.materiaInicio} - ${horario.materiaFin}",
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        labelColor = MaterialTheme.colorScheme.secondary,
-                        icon = Icons.Filled.DateRange
+        Column (
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row (
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ){
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = horario.materiaNombre,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    MyAssistChip(
-                        label = "${horario.paralelo} - ${horario.nivelMalla}",
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        labelColor = MaterialTheme.colorScheme.secondary
-//                        icon = Icons.Filled.GroupWork
-                    )
+                    Spacer(Modifier.height(8.dp))
+                    Row() {
+                        MyAssistChip(
+                            label = "${horario.materiaInicio} - ${horario.materiaFin}",
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            labelColor = MaterialTheme.colorScheme.secondary,
+                            icon = Icons.Filled.DateRange
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        MyAssistChip(
+                            label = "${horario.paralelo} - ${horario.nivelMalla}",
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            labelColor = MaterialTheme.colorScheme.secondary
+                        )
+                    }
                 }
 
-                AnimatedVisibility(
-                    visible = expanded,
-                    enter = fadeIn() + expandVertically(),
-                    exit = fadeOut() + shrinkVertically()
-                ) {
-                    Column {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        HorizontalDivider()
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Clases(horario.clases)
+                AnimatedContent(targetState = expanded) { isExpanded ->
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(
+                            imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            contentDescription = if (expanded) "Collapse" else "Expand"
+                        )
                     }
                 }
             }
 
-
-            AnimatedContent(targetState = expanded) { isExpanded ->
-                IconButton(onClick = { expanded = !expanded }) {
-                    Icon(
-                        imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = if (expanded) "Collapse" else "Expand"
-                    )
+            AnimatedVisibility(
+                visible = expanded,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                Column {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Clases(horario.clases)
                 }
             }
         }
-
-
     }
 }
 
@@ -238,21 +235,28 @@ fun ClaseItem(
         {
             Text(
                 text = clase.dia,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.secondary
             )
+            Spacer(Modifier.height(8.dp))
             Text(
                 text = formatoText("Docente:", clase.profesor),
-                color = MaterialTheme.colorScheme.outlineVariant
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            Spacer(Modifier.height(4.dp))
             Text(
                 text = formatoText("Aula:", "${clase.aula} ${clase.sede}"),
-                color = MaterialTheme.colorScheme.outlineVariant
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            Spacer(Modifier.height(4.dp))
             Text(
                 text = formatoText("Sesión:", clase.sesion),
-                color = MaterialTheme.colorScheme.outlineVariant
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
+            Spacer(Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {

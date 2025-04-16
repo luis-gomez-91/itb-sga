@@ -195,7 +195,7 @@ fun CardAluFinanza(
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-
+                    Spacer(Modifier.height(8.dp))
                     Row() {
                         MyAssistChip(
                             label = solicitud.fecha,
@@ -251,11 +251,13 @@ fun MoreInfo(
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
+    Spacer(Modifier.height(4.dp))
     Text(
         text = formatoText("Departamento:", solicitud.departamento),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
+    Spacer(Modifier.height(4.dp))
     Text(
         text = formatoText("Asignado a:", "${solicitud.usuarioAsignado}"),
         style = MaterialTheme.typography.labelSmall,
@@ -271,21 +273,25 @@ fun MoreInfo(
 //        style = MaterialTheme.typography.labelSmall,
 //        color = MaterialTheme.colorScheme.onSurface
 //    )
+    Spacer(Modifier.height(4.dp))
     Text(
         text = formatoText("Autorizado:", "${solicitud.autorizado}"),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
+    Spacer(Modifier.height(4.dp))
     Text(
         text = formatoText("Resolución:", "${solicitud.resolucion}"),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
+    Spacer(Modifier.height(4.dp))
     Text(
         text = formatoText("Respuesta:", "${solicitud.respuesta}"),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface
     )
+    Spacer(Modifier.height(4.dp))
     Text(
         text = formatoText("Respuesta docente:", "${solicitud.respuestaDocente}"),
         style = MaterialTheme.typography.labelSmall,

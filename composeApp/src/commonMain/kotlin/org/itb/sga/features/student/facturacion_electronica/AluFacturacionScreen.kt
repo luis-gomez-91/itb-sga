@@ -139,6 +139,7 @@ fun CardItem(
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary
             )
+            Spacer(Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -157,14 +158,13 @@ fun CardItem(
                     icon = Icons.Filled.DateRange
                 )
             }
-
+            Spacer(Modifier.height(8.dp))
             Text(
                 text = data.numeroAutorizacion,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
-
-
+            Spacer(Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -178,7 +178,9 @@ fun CardItem(
                         homeViewModel.openURL("https://sga.itb.edu.ec/${data.xml}")
                     },
                     buttonColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    textColor = MaterialTheme.colorScheme.onPrimary
+                    textColor = MaterialTheme.colorScheme.onPrimary,
+                    iconSize = 16.dp,
+                    textStyle = MaterialTheme.typography.labelSmall
                 )
                 Spacer(modifier = Modifier.width(4.dp))
 
@@ -190,7 +192,9 @@ fun CardItem(
                         aluFacturacionViewModel.downloadRIDE("factura_sri", data.id, homeViewModel)
                     },
                     buttonColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    textColor = MaterialTheme.colorScheme.tertiary
+                    textColor = MaterialTheme.colorScheme.tertiary,
+                    iconSize = 16.dp,
+                    textStyle = MaterialTheme.typography.labelSmall
                 )
             }
 

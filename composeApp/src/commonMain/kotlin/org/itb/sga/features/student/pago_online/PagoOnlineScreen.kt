@@ -154,6 +154,16 @@ fun Screen(
             )
         }
     }
+    
+    val linkToPay by pagoOnlineViewModel.linkToPay.collectAsState(null)
+
+    linkToPay?.let {
+//        MyWebView(
+//            htmlContent = it,
+//            isLoading = {  },
+//            onUrlClicked = { url -> homeViewModel.openURL(url) }
+//        )
+    }
 }
 
 @Composable

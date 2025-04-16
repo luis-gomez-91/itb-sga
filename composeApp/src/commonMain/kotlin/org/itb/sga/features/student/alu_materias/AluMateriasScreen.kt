@@ -273,10 +273,13 @@ fun AluMateriaItem(
 
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize().background(color = MaterialTheme.colorScheme.surfaceContainer)
+                .fillMaxSize()
+//                .background(color = MaterialTheme.colorScheme.surfaceContainer)
         ) {
             items(materia.lecciones) { leccion ->
                 LeccionItem(leccion)
+                Spacer(modifier = Modifier.height(8.dp))
+                HorizontalDivider()
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
@@ -300,6 +303,7 @@ fun LeccionItem(
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.primary
         )
+        Spacer(Modifier.height(4.dp))
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -318,5 +322,4 @@ fun LeccionItem(
             )
         }
     }
-    HorizontalDivider()
 }

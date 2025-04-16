@@ -145,6 +145,7 @@ dependencies {
 
     commonMainApi("dev.icerock.moko:biometry-compose:0.4.0")
     commonMainApi("dev.icerock.moko:biometry:0.4.0")
+    implementation("io.github.shadmanadman:kmp-webview:1.8.3")
 }
 
 dependencies {

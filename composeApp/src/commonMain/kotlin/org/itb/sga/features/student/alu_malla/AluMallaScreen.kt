@@ -2,6 +2,7 @@ package org.itb.sga.features.student.alu_malla
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,18 +10,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.GroupWork
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Pending
 import androidx.compose.material.icons.filled.School
@@ -280,26 +278,23 @@ fun AsignaturaItem(
         ) {
             Text(
                 text = asignatura.asignaturaNombre,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary
             )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = formatoText("Identificación:", asignatura.asignaturaMallaIdent),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = formatoText("Eje formativo:", asignatura.ejeFormativo),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(4.dp))
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
             ) {
-                MyAssistChip(
-                    label = asignatura.asignaturaMallaIdent,
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    labelColor = MaterialTheme.colorScheme.secondary,
-                    icon = Icons.Filled.GroupWork
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                MyAssistChip(
-                    label = asignatura.ejeFormativo,
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    labelColor = MaterialTheme.colorScheme.secondary,
-                    icon = Icons.Filled.Category
-                )
-                Spacer(modifier = Modifier.width(4.dp))
                 MyAssistChip(
                     label = cardStyle.estado,
                     containerColor = cardStyle.containerColor,
@@ -307,7 +302,7 @@ fun AsignaturaItem(
                     icon = cardStyle.icono
                 )
             }
-
+            Spacer(Modifier.height(4.dp))
             if (asignatura.record) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -320,7 +315,7 @@ fun AsignaturaItem(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = formatoText("Asistencia:", asignatura.asistencia),
+                        text = formatoText("Asistencia:", "${asignatura.asistencia}%"),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.secondary
                     )
