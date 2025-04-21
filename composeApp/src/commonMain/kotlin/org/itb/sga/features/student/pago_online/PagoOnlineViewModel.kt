@@ -27,14 +27,20 @@ class PagoOnlineViewModel : ViewModel() {
     private val _data = MutableStateFlow<PagoOnline?>(null)
     val data: StateFlow<PagoOnline?> = _data
 
+    private val _isLoading = MutableStateFlow<Boolean>(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     private val _searchQuery = MutableStateFlow<String>("")
     val searchQuery: StateFlow<String> get() = _searchQuery
 
     private val _total = MutableStateFlow<Double>(0.00)
     val total: StateFlow<Double> = _total
 
-    private val _linkToPay = MutableStateFlow<String?>("https://github.com/KevinnZou/compose-webview-multiplatform")
+    private val _linkToPay = MutableStateFlow<String?>(null)
     val linkToPay: StateFlow<String?> = _linkToPay
+
+    private val _referencia = MutableStateFlow<String?>(null)
+    val referencia: StateFlow<String?> = _referencia
 
     private val _selectedRubros = MutableStateFlow<List<RubroX>>(emptyList())
     val selectedRubros: StateFlow<List<RubroX>> = _selectedRubros
@@ -65,7 +71,7 @@ class PagoOnlineViewModel : ViewModel() {
 
     fun onloadPagoOnline(id: Int, homeViewModel: HomeViewModel) {
         viewModelScope.launch {
-            homeViewModel.changeLoading(true)
+            _isLoading.value = true
             try {
                 when (val result = service.fetchPagoOnline(id)) {
                     is PagoOnlineResult.Success -> {
@@ -87,7 +93,7 @@ class PagoOnlineViewModel : ViewModel() {
             } catch (e: Exception) {
                 homeViewModel.addError(Error(title = "Error", error = "${e.message}"))
             } finally {
-                homeViewModel.changeLoading(false)
+                _isLoading.value = false
             }
         }
     }
@@ -96,29 +102,38 @@ class PagoOnlineViewModel : ViewModel() {
         idInscripcion: Int,
         homeViewModel: HomeViewModel
     ) {
-        viewModelScope.launch {
-            val form = PagoOnlineForm(
-                action = "onloadPaymentLink",
-                inscripcion = idInscripcion,
-                valor = _total.value,
-                correo = _payData.value.email,
-                nombre = _payData.value.name,
-                ruc = _payData.value.ruc,
-                telefono = _payData.value.phone,
-                direccion = _payData.value.address,
-                rubros = _selectedRubros.value.map { it.id }
-            )
-            logInfo("prueba", "FORM: $form")
+        try {
+            viewModelScope.launch {
+                _isLoading.value = true
+                val form = PagoOnlineForm(
+                    action = "onloadPaymentLink",
+                    inscripcion = idInscripcion,
+                    valor = _total.value,
+                    correo = _payData.value.email,
+                    nombre = _payData.value.name,
+                    ruc = _payData.value.ruc,
+                    telefono = _payData.value.phone,
+                    direccion = _payData.value.address,
+                    rubros = _selectedRubros.value.map { it.id }
+                )
+                logInfo("prueba", "FORM: $form")
 
-            val result = requestPostDispatcher(client, form)
-            logInfo("prueba", "RESULT: $result")
-            _response.value = result
-            _linkToPay.value = result.message
+                val result = requestPostDispatcher(client, form)
+                logInfo("prueba", "RESULT: $result")
+                _response.value = result
+                _linkToPay.value = result.message
+                _referencia.value = result.status
 //            if (result.status == "success") {
 //            homeViewModel.openURL(result.message)
 //            }
-            logInfo("prueba", "RESPUESTA: ${_response.value}")
+                logInfo("prueba", "RESPUESTA: ${_response.value}")
+            }
+        } catch (e: Exception) {
+            homeViewModel.addError(Error(title = "Error", error = "${e.message}"))
+        } finally {
+            _isLoading.value = false
         }
+
     }
 
     private val _showDiferirPago = MutableStateFlow<Boolean>(false)

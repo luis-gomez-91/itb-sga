@@ -73,14 +73,14 @@ fun PagoOnlineScreen(
     loginViewModel: LoginViewModel,
     pagoOnlineViewModel: PagoOnlineViewModel
 ) {
-    val linkToPay by pagoOnlineViewModel.linkToPay.collectAsState("https://github.com/KevinnZou/compose-webview-multiplatform")
+    val linkToPay by pagoOnlineViewModel.linkToPay.collectAsState(null)
 
     DashBoardScreen(
         title = "Pago en línea",
         navController = navController,
         content = {
-            linkToPay?.let { url ->
-                val webViewState = rememberWebViewState(url)
+            if (linkToPay != null) {
+                val webViewState = rememberWebViewState(linkToPay!!)
 
 //                IconButton(
 //                    onClick = { pagoOnlineViewModel.setLinkToPay(null) }
@@ -104,7 +104,7 @@ fun PagoOnlineScreen(
                 )
                 Spacer(Modifier.height(8.dp))
                 WebView(state = webViewState)
-            }.run {
+            } else {
                 Screen(
                     homeViewModel,
                     pagoOnlineViewModel,
@@ -125,7 +125,7 @@ fun Screen(
     navController: NavHostController
 ) {
     val data by pagoOnlineViewModel.data.collectAsState(null)
-    val isLoading by homeViewModel.isLoading.collectAsState(false)
+    val isLoading by pagoOnlineViewModel.isLoading.collectAsState(false)
     var selectedTabIndex: Int by remember { mutableStateOf(0) }
     val pagerState = rememberPagerState { 2 }
     val error by homeViewModel.error.collectAsState(null)
