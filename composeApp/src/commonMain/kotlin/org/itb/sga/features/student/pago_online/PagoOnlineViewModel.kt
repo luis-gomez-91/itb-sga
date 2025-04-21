@@ -33,7 +33,7 @@ class PagoOnlineViewModel : ViewModel() {
     private val _total = MutableStateFlow<Double>(0.00)
     val total: StateFlow<Double> = _total
 
-    private val _linkToPay = MutableStateFlow<String?>(null)
+    private val _linkToPay = MutableStateFlow<String?>("https://github.com/KevinnZou/compose-webview-multiplatform")
     val linkToPay: StateFlow<String?> = _linkToPay
 
     private val _selectedRubros = MutableStateFlow<List<RubroX>>(emptyList())
@@ -162,5 +162,11 @@ class PagoOnlineViewModel : ViewModel() {
 
     fun updatePayData(update: PayData.() -> PayData) {
         _payData.value = _payData.value.update()
+    }
+
+    fun payConfirm() {
+        viewModelScope.launch {
+            _linkToPay.value = null
+        }
     }
 }

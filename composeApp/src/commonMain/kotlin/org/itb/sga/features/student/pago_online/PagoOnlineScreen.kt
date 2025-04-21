@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,11 +24,13 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIos
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.MoneyOff
 import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -48,6 +51,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.multiplatform.webview.web.WebView
+import com.multiplatform.webview.web.rememberWebViewState
 import org.itb.sga.data.network.RubroX
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
@@ -68,15 +73,45 @@ fun PagoOnlineScreen(
     loginViewModel: LoginViewModel,
     pagoOnlineViewModel: PagoOnlineViewModel
 ) {
+    val linkToPay by pagoOnlineViewModel.linkToPay.collectAsState("https://github.com/KevinnZou/compose-webview-multiplatform")
+
     DashBoardScreen(
         title = "Pago en línea",
         navController = navController,
         content = {
-            Screen(
-                homeViewModel,
-                pagoOnlineViewModel,
-                navController
-            )
+            linkToPay?.let { url ->
+                val webViewState = rememberWebViewState(url)
+
+//                IconButton(
+//                    onClick = { pagoOnlineViewModel.setLinkToPay(null) }
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Filled.ArrowBackIos,
+//                        contentDescription = "Back",
+//                        tint = MaterialTheme.colorScheme.primary,
+//                        modifier = Modifier.size(24.dp)
+//                    )
+//                }
+                MyFilledTonalButton(
+                    text = "Regresar",
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    buttonColor = MaterialTheme.colorScheme.primaryContainer,
+                    textColor = MaterialTheme.colorScheme.primary,
+                    icon = Icons.Filled.ArrowBackIos,
+                    onClickAction = { pagoOnlineViewModel.payConfirm() },
+                    iconSize = 16.dp,
+                    textStyle = MaterialTheme.typography.labelSmall
+                )
+                Spacer(Modifier.height(8.dp))
+                WebView(state = webViewState)
+            }.run {
+                Screen(
+                    homeViewModel,
+                    pagoOnlineViewModel,
+                    navController
+                )
+            }
+
         },
         homeViewModel = homeViewModel,
         loginViewModel = loginViewModel
@@ -153,16 +188,6 @@ fun Screen(
                 showAlert = true
             )
         }
-    }
-    
-    val linkToPay by pagoOnlineViewModel.linkToPay.collectAsState(null)
-
-    linkToPay?.let {
-//        MyWebView(
-//            htmlContent = it,
-//            isLoading = {  },
-//            onUrlClicked = { url -> homeViewModel.openURL(url) }
-//        )
     }
 }
 

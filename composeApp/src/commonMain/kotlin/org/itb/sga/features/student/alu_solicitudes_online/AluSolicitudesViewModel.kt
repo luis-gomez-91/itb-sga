@@ -88,15 +88,15 @@ class AluSolicitudesViewModel: ViewModel() {
         _selectedDepartamento.value = departamentos
     }
 
-    fun changeSelectedTipoEspecie(tipoEspecie: TipoEspecie) {
+    fun changeSelectedTipoEspecie(tipoEspecie: TipoEspecie?) {
         _selectedTipoSolicitud.value = tipoEspecie
     }
 
-    fun changeSelectedMateria(materia: TipoEspecieAsignatura) {
+    fun changeSelectedMateria(materia: TipoEspecieAsignatura?) {
         _selectedMateria.value = materia
     }
 
-    fun changeSelectedDocente(docente: TipoEspecieDocente) {
+    fun changeSelectedDocente(docente: TipoEspecieDocente?) {
         _selectedDocente.value = docente
     }
 

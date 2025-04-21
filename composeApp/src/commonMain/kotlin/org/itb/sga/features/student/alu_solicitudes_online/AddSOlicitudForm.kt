@@ -122,7 +122,6 @@ fun FormScreen(
                 }
             }
         }
-
     }
 }
 
@@ -142,6 +141,9 @@ fun Departamentos(
         options = departamentos,
         onOptionSelected = { selectedOption ->
             aluSolicitudesViewModel.changeSelectedDepartamento(selectedOption)
+            aluSolicitudesViewModel.changeSelectedTipoEspecie(null)
+            aluSolicitudesViewModel.changeSelectedMateria(null)
+            aluSolicitudesViewModel.changeSelectedDocente(null)
             expandedDepartamento = false
         },
         getOptionDescription = { it.nombre },
@@ -170,6 +172,8 @@ fun Especies(
             options = departamento.especies,
             onOptionSelected = { selectedOption ->
                 aluSolicitudesViewModel.changeSelectedTipoEspecie(selectedOption)
+                aluSolicitudesViewModel.changeSelectedMateria(null)
+                aluSolicitudesViewModel.changeSelectedDocente(null)
                 expandedTipoSolicitud = false
             },
             getOptionDescription = { it.nombre },
@@ -267,6 +271,7 @@ fun Materias(
         options = materias!!,
         onOptionSelected = { selectedOption ->
             aluSolicitudesViewModel.changeSelectedMateria(selectedOption)
+            aluSolicitudesViewModel.changeSelectedDocente(null)
             expanded = false
         },
         getOptionDescription = { it.nombre },

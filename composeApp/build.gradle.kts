@@ -75,6 +75,8 @@ kotlin {
 
             implementation(libs.androidx.room.runtime)
             implementation(libs.sqlite.bundled)
+            implementation("io.github.kevinnzou:compose-webview-multiplatform:1.9.40")
+
         }
 
         iosMain.dependencies {
@@ -145,7 +147,8 @@ dependencies {
 
     commonMainApi("dev.icerock.moko:biometry-compose:0.4.0")
     commonMainApi("dev.icerock.moko:biometry:0.4.0")
-    implementation("io.github.shadmanadman:kmp-webview:1.8.3")
+
+
 }
 
 dependencies {
