@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 import org.itb.sga.core.createHttpClient
 import org.itb.sga.core.logInfo
 import org.itb.sga.core.requestPostDispatcher
@@ -14,11 +15,8 @@ import org.itb.sga.data.network.PagoOnline
 import org.itb.sga.data.network.PagoOnlineResult
 import org.itb.sga.data.network.Response
 import org.itb.sga.data.network.RubroX
-import org.itb.sga.data.network.UpdateAsistenciaResult
-import org.itb.sga.data.network.form.FormField
 import org.itb.sga.data.network.form.PagoOnlineForm
-import org.itb.sga.data.network.form.UpdateAsistencia
-import org.itb.sga.data.network.pro_clases.Asistencia
+import org.itb.sga.data.network.nuvei.PaymentezResponse
 import org.itb.sga.features.common.home.HomeViewModel
 
 class PagoOnlineViewModel : ViewModel() {
@@ -40,11 +38,14 @@ class PagoOnlineViewModel : ViewModel() {
     private val _total = MutableStateFlow<Double>(0.00)
     val total: StateFlow<Double> = _total
 
-    private val _linkToPay = MutableStateFlow<String?>(null)
-    val linkToPay: StateFlow<String?> = _linkToPay
+    private val _idPagoPymentez = MutableStateFlow<Int?>(null)
+    val idPagoPymentez: StateFlow<Int?> = _idPagoPymentez
 
     private val _referencia = MutableStateFlow<String?>(null)
     val referencia: StateFlow<String?> = _referencia
+
+    private val _showModalNuvei = MutableStateFlow(false)
+    val showModalNuvei: StateFlow<Boolean> = _showModalNuvei
 
     private val _selectedRubros = MutableStateFlow<List<RubroX>>(emptyList())
     val selectedRubros: StateFlow<List<RubroX>> = _selectedRubros
@@ -52,12 +53,27 @@ class PagoOnlineViewModel : ViewModel() {
     private val _switchStates = MutableStateFlow<Map<RubroX, Boolean>>(emptyMap())
     val switchStates: StateFlow<Map<RubroX, Boolean>> = _switchStates
 
+    private val _diferido = MutableStateFlow(0)
+    val diferido: StateFlow<Int> = _diferido
+
+    fun setDiferido(newValue: Int) {
+        _diferido.value = newValue
+    }
+
     fun updateSwitchState(rubro: RubroX, isChecked: Boolean) {
         if (isChecked) {
-            val rubrosAnteriores = _data.value?.rubros!!.filter { it.id < rubro.id }
+            val rubroFecha: LocalDate = LocalDate.parse(rubro.fecha)
+
+            val rubrosAnteriores = _data.value?.rubros!!.filter {
+                val rubroFechaAnterior: LocalDate = LocalDate.parse(it.fecha)
+
+                rubroFechaAnterior < rubroFecha
+            }
+
             if (rubrosAnteriores.any { !_switchStates.value[it]!! }) {
                 return
             }
+
             _switchStates.value = _switchStates.value.toMutableMap().apply {
                 this[rubro] = true
             }
@@ -82,6 +98,9 @@ class PagoOnlineViewModel : ViewModel() {
                         _switchStates.value = result.pagoOnline.rubros.associate { rubro ->
                             rubro to false
                         }
+
+                        logInfo("prueba", "${_switchStates.value}")
+
                         _data.value = result.pagoOnline
                         updatePayData { copy(email = result.pagoOnline.datosFacturacion.correo) }
                         updatePayData { copy(name = result.pagoOnline.datosFacturacion.nombre) }
@@ -102,7 +121,7 @@ class PagoOnlineViewModel : ViewModel() {
         }
     }
 
-    fun onloadPaymentLink(
+    fun generateReference(
         idInscripcion: Int,
         homeViewModel: HomeViewModel
     ) {
@@ -110,7 +129,7 @@ class PagoOnlineViewModel : ViewModel() {
             viewModelScope.launch {
                 _isLoading.value = true
                 val form = PagoOnlineForm(
-                    action = "onloadPaymentLink",
+                    action = "generateReference",
                     inscripcion = idInscripcion,
                     valor = _total.value,
                     correo = _payData.value.email,
@@ -118,7 +137,8 @@ class PagoOnlineViewModel : ViewModel() {
                     ruc = _payData.value.ruc,
                     telefono = _payData.value.phone,
                     direccion = _payData.value.address,
-                    rubros = _selectedRubros.value.map { it.id }
+                    rubros = _selectedRubros.value.map { it.id },
+                    diferido = _diferido.value
                 )
 
                 val result = requestPostDispatcher(
@@ -126,9 +146,9 @@ class PagoOnlineViewModel : ViewModel() {
                     form = form,
                     action = "online"
                 )
-                _response.value = result
-                _linkToPay.value = result.message
+                _idPagoPymentez.value = result.message.toInt()
                 _referencia.value = result.status
+                _showModalNuvei.value = true
 
                 logInfo("prueba", "RESPUESTA: ${_response.value}")
             }
@@ -137,7 +157,6 @@ class PagoOnlineViewModel : ViewModel() {
         } finally {
             _isLoading.value = false
         }
-
     }
 
     private val _showDiferirPago = MutableStateFlow<Boolean>(false)
@@ -145,6 +164,13 @@ class PagoOnlineViewModel : ViewModel() {
 
     fun updateShowDiferirPago(value: Boolean) {
         _showDiferirPago.value = value
+    }
+
+    private val _showTipoDiferido = MutableStateFlow<Boolean>(false)
+    val showTipoDiferido: StateFlow<Boolean> = _showTipoDiferido
+
+    fun updateShowTipoDiferido(value: Boolean) {
+        _showTipoDiferido.value = value
     }
 
     private val _showTerminosCondiciones = MutableStateFlow<Boolean>(false)
@@ -183,31 +209,44 @@ class PagoOnlineViewModel : ViewModel() {
         _payData.value = _payData.value.update()
     }
 
-    fun payConfirm() {
-        viewModelScope.launch {
-            _linkToPay.value = null
+    fun setResponse(newValue: Response?) {
+        _response.value = newValue
+    }
+
+    fun checkPaymentStatus(
+        response: PaymentezResponse
+    ): String {
+        try {
+            viewModelScope.launch {
+                response.action = "checkPaymentStatus"
+                response.id = _idPagoPymentez.value
+
+                val result = requestPostDispatcher(
+                    client = client,
+                    form = response,
+                    action = "online"
+                )
+
+                logInfo("prueba", "RESPONSE: $result")
+
+                _response.value = result
+                clearData()
+
+            }
+        } catch (e: Exception) {
+            logInfo("prueba", e.toString())
+        } finally {
+            _isLoading.value = false
+            return  "ok"
         }
     }
 
-    fun checkPaymentStatus(): String {
-        viewModelScope.launch {
-            try {
-                val form = FormField(
-                    action = "checkPaymentStatus",
-                    id = null,
-                    value = _referencia.value
-                )
-                val result = requestPostDispatcher(
-                    client = client,
-                    form = form,
-                    action = "online"
-                )
-                logInfo("prueba", "RESULTADO: $result")
-
-            } catch (e: Exception) {
-                logInfo("prueba", "${e}")
-            }
-        }
-        return "OKAS"
+    fun clearData() {
+        _referencia.value = null
+        _idPagoPymentez.value = null
+        _showModalNuvei.value = false
+        _selectedRubros.value = emptyList()
+        _switchStates.value = emptyMap()
+        _total.value = 0.00
     }
 }

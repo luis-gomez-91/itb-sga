@@ -13,4 +13,5 @@ data class PagoOnlineForm(
     val nombre: String,
     val ruc: String,
     val telefono: String,
+    val diferido: Int
 )

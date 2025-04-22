@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,14 +23,11 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIos
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.MoneyOff
 import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
@@ -45,7 +41,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,15 +53,14 @@ import com.multiplatform.webview.jsbridge.IJsMessageHandler
 import com.multiplatform.webview.jsbridge.JsMessage
 import com.multiplatform.webview.jsbridge.rememberWebViewJsBridge
 import com.multiplatform.webview.web.LoadingState
-import com.multiplatform.webview.web.WebContent
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.WebViewNavigator
-import com.multiplatform.webview.web.WebViewState
 import com.multiplatform.webview.web.rememberWebViewNavigator
-import com.multiplatform.webview.web.rememberWebViewState
-import kotlinx.coroutines.delay
+import com.multiplatform.webview.web.rememberWebViewStateWithHTMLData
+import kotlinx.serialization.json.Json
 import org.itb.sga.core.logInfo
 import org.itb.sga.data.network.RubroX
+import org.itb.sga.data.network.nuvei.PaymentezResponse
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
 import org.itb.sga.ui.components.MyAssistChip
@@ -79,6 +73,16 @@ import org.itb.sga.ui.components.alerts.MyConfirmAlert
 import org.itb.sga.ui.components.alerts.MyInfoAlert
 import org.itb.sga.ui.components.dashboard.DashBoardScreen
 
+inline fun <reified T> processParams(message: JsMessage): T {
+    val json = Json { ignoreUnknownKeys = true }
+    return try {
+        json.decodeFromString<T>(message.params)
+    } catch (e: Exception) {
+        logInfo("prueba", "Error during deserialization: ${e.stackTraceToString()}")
+        throw e
+    }
+}
+
 class PaymentHandler(private val viewModel: PagoOnlineViewModel) : IJsMessageHandler {
     override fun methodName(): String { return "ConfirmarPago" }
 
@@ -87,9 +91,27 @@ class PaymentHandler(private val viewModel: PagoOnlineViewModel) : IJsMessageHan
         navigator: WebViewNavigator?,
         callback: (String) -> Unit
     ) {
-        logInfo("prueba", "JS handler triggered")
-        viewModel.checkPaymentStatus()
-        callback("\"OK\"")
+        try {
+            val data = processParams<PaymentezResponse>(message)
+            viewModel.checkPaymentStatus(data)
+            callback("""{"status":"OK"}""")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            callback("""{"status":"ERROR", "message": "${e.message}"}""")
+        }
+    }
+}
+
+class CloseHandler(private val viewModel: PagoOnlineViewModel) : IJsMessageHandler {
+    override fun methodName(): String { return "closeNuveiModal" }
+
+    override fun handle(
+        message: JsMessage,
+        navigator: WebViewNavigator?,
+        callback: (String) -> Unit
+    ) {
+        logInfo("prueba", "ENTRO AQUI POSI")
+        viewModel.clearData()
     }
 }
 
@@ -100,37 +122,68 @@ fun PagoOnlineScreen(
     loginViewModel: LoginViewModel,
     pagoOnlineViewModel: PagoOnlineViewModel
 ) {
-    val linkToPay by pagoOnlineViewModel.linkToPay.collectAsState(null)
     val referencia by pagoOnlineViewModel.referencia.collectAsState(null)
+    val showModalNuvei by pagoOnlineViewModel.showModalNuvei.collectAsState(false)
 
     DashBoardScreen(
         title = "Pago en línea",
         navController = navController,
         content = {
-            if (linkToPay != null) {
+            if (showModalNuvei) {
+                val htmlContent = """
+                    <html>
+                    <head>
+                        <script src="https://cdn.paymentez.com/ccapi/sdk/payment_checkout_3.0.0.min.js"></script>
+                    </head>
+                    <body>
+                    </body>
+                    </html>
+                """.trimIndent()
 
-                val webViewState = rememberWebViewState(linkToPay!!)
+                val webViewState = rememberWebViewStateWithHTMLData(data = htmlContent)
                 val navigator = rememberWebViewNavigator()
                 val jsBridge = rememberWebViewJsBridge().apply {
                     register(PaymentHandler(pagoOnlineViewModel))
+                    register(CloseHandler(pagoOnlineViewModel))
                 }
 
                 val jsScript = """
-                    document.querySelector('.payment-button-popup').addEventListener('click', function() {
-                        let phone = document.querySelector('#phone').value.trim();
-                        let name = document.querySelector('.name').value.trim();
-                        let cardNumber = document.querySelector('.card-number').value.trim();
-                        let expiryMonth = document.querySelector('.expiry-month').value.trim();
-                        let expiryYear = document.querySelector('.expiry-year').value.trim();
-                        let cvc = document.querySelector('.cvc').value.trim();
-                    
-                        if (!phone || !name || !cardNumber || !expiryMonth || !expiryYear || !cvc) {
-                            alert("Por favor, completa todos los campos del formulario.");
-                            return;
-                        }
+                    window.addEventListener('load', () => {
+                        let respuesta = "{}";
+                        let intervalId = setInterval(function() {
+                            let btnClose = document.querySelector('.payment-checkout-modal__close');
+                            if (btnClose) {
+                                clearInterval(intervalId);
+                                btnClose.addEventListener('click', function() {
+                                    window.kmpJsBridge.callNative("closeNuveiModal", "{}", function () {});
+                                });
+                            }
+                        }, 500);
                         
-                        window.kmpJsBridge.callNative("ConfirmarPago", JSON.stringify({}), function (data) {
-                            alert("Respuesta desde Kotlin: " + data);
+                        var paymentCheckout = new PaymentCheckout.modal({
+                            env_mode: 'stg',
+                            onOpen: function() {
+                                console.log('modal open');
+                            },
+                            onClose: function() {
+                                console.log('modal closed');
+                            },
+                            onResponse: function(response) {
+                                console.log('modal response');
+                                respuesta = JSON.stringify(response);
+                                
+                                window.kmpJsBridge.callNative("ConfirmarPago", respuesta, function (data) {
+                                
+                                });
+                            }
+                        });
+                    
+                        paymentCheckout.open({
+                            reference: '$referencia'
+                        });
+                    
+                        window.addEventListener('popstate', function() {
+                            paymentCheckout.close();
                         });
                     });
                 """
@@ -157,26 +210,9 @@ fun PagoOnlineScreen(
                     LaunchedEffect(webViewState.loadingState) {
                         if (webViewState.loadingState !is LoadingState.Loading) {
                             navigator.evaluateJavaScript(jsScript) { result ->
-                                logInfo("prueba", "RESULT: $result")
+//                                logInfo("prueba", "RESULT: $result")
                             }
                         }
-                    }
-
-                    Spacer(Modifier.height(8.dp))
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp),
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        MyFilledTonalButton(
-                            text = "Terminar pago en línea",
-                            onClickAction = { pagoOnlineViewModel.payConfirm() },
-                            icon = Icons.Filled.ArrowBackIosNew,
-                            iconSize = 24.dp,
-                            textStyle = MaterialTheme.typography.labelLarge
-                        )
                     }
                 }
             } else {
@@ -186,7 +222,6 @@ fun PagoOnlineScreen(
                     navController
                 )
             }
-
         },
         homeViewModel = homeViewModel,
         loginViewModel = loginViewModel
@@ -204,8 +239,9 @@ fun Screen(
     var selectedTabIndex: Int by remember { mutableStateOf(0) }
     val pagerState = rememberPagerState { 2 }
     val error by homeViewModel.error.collectAsState(null)
+    val response by pagoOnlineViewModel.response.collectAsState(null)
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(response) {
         homeViewModel.clearSearchQuery()
         homeViewModel.homeData.value!!.persona.idInscripcion?.let {
             pagoOnlineViewModel.onloadPagoOnline(
@@ -251,18 +287,29 @@ fun Screen(
                 }
             }
         }
+    }
 
-        if (error != null) {
-            MyInfoAlert(
-                titulo = error!!.title,
-                mensaje = error!!.error,
-                onDismiss = {
-                    homeViewModel.clearError()
-                    navController.popBackStack()
-                },
-                showAlert = true
-            )
-        }
+    error?.let {
+        MyInfoAlert(
+            titulo = it.title,
+            mensaje = it.error,
+            onDismiss = {
+                homeViewModel.clearError()
+                navController.popBackStack()
+            },
+            showAlert = true
+        )
+    }
+
+    response?.let {
+        MyInfoAlert(
+            titulo = it.status,
+            mensaje = it.message,
+            onDismiss = {
+                pagoOnlineViewModel.setResponse(null)
+            },
+            showAlert = true
+        )
     }
 }
 
@@ -391,6 +438,7 @@ fun CardRubros(
 
     val showDiferirPago by pagoOnlineViewModel.showDiferirPago.collectAsState(false)
     val showTerminosCondiciones by pagoOnlineViewModel.showTerminosCondiciones.collectAsState(false)
+    val showTipoDiferido by pagoOnlineViewModel.showTipoDiferido.collectAsState(false)
     val terminosCondiciones by pagoOnlineViewModel.terminosCondiciones.collectAsState(false)
 
     if (showDiferirPago) {
@@ -401,10 +449,32 @@ fun CardRubros(
             cancelText = "Si",
             onCancel = {
                 pagoOnlineViewModel.updateShowDiferirPago(false)
+                pagoOnlineViewModel.updateShowTipoDiferido(true)
             },
             onConfirm = {
                 pagoOnlineViewModel.updateShowDiferirPago(false)
                 pagoOnlineViewModel.updateShowTerminosCondiciones(true)
+                pagoOnlineViewModel.setDiferido(0)
+            },
+            showAlert = true
+        )
+    }
+
+    if (showTipoDiferido) {
+        MyConfirmAlert(
+            titulo = "Seleccione una opción",
+            mensaje = "",
+            confirmText = "Sin intereses",
+            cancelText = "Con intereses",
+            onCancel = {
+                pagoOnlineViewModel.updateShowTipoDiferido(false)
+                pagoOnlineViewModel.updateShowTerminosCondiciones(true)
+                pagoOnlineViewModel.setDiferido(2)
+            },
+            onConfirm = {
+                pagoOnlineViewModel.updateShowTipoDiferido(false)
+                pagoOnlineViewModel.updateShowTerminosCondiciones(true)
+                pagoOnlineViewModel.setDiferido(3)
             },
             showAlert = true
         )
@@ -422,7 +492,7 @@ fun CardRubros(
                 pagoOnlineViewModel.updateShowTerminosCondiciones(false)
 //                pagoOnlineViewModel.updateShowPayAlert(true)
                 homeViewModel.homeData.value!!.persona.idInscripcion?.let {
-                    pagoOnlineViewModel.onloadPaymentLink(
+                    pagoOnlineViewModel.generateReference(
                         idInscripcion = it,
                         homeViewModel = homeViewModel
                     )
@@ -453,91 +523,9 @@ fun CardRubros(
         )
     }
 
-//    if (showPayAlert) {
-//        MyConfirmAlert(
-//            titulo = "Pago con tarjeta",
-//            icon = null,
-//            mensaje = null,
-//            confirmText = "Pagar $${total}",
-//            cancelText = "Cancelar",
-//            onCancel = {
-//                pagoOnlineViewModel.updateShowPayAlert(false)
-//            },
-//            onConfirm = {
-//                pagoOnlineViewModel.updateShowPayAlert(false)
-//            },
-//            showAlert = true,
-//            extra = {
-//                Column (
-//                    modifier = Modifier.fillMaxWidth()
-//                ) {
-//                    MyOutlinedTextField(
-//                        value = "${payData.email}",
-//                        onValueChange = { pagoOnlineViewModel.updatePayData { copy(email = it) } },
-//                        label = "E-mail",
-//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-//                        modifier = Modifier.fillMaxWidth()
-//                    )
-//                    Spacer(Modifier.height(8.dp))
-//                    MyOutlinedTextField(
-//                        value = "${payData.phone}",
-//                        onValueChange = { pagoOnlineViewModel.updatePayData { copy(phone = it) } },
-//                        label = "Celular",
-//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//                        modifier = Modifier.fillMaxWidth()
-//                    )
-//                    Spacer(Modifier.height(8.dp))
-//                    MyOutlinedTextField(
-//                        value = "${payData.cardHolderName}",
-//                        onValueChange = { pagoOnlineViewModel.updatePayData { copy(cardHolderName = it) } },
-//                        label = "Nombre del titular",
-//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-//                        modifier = Modifier.fillMaxWidth()
-//                    )
-//                    Spacer(Modifier.height(8.dp))
-//                    MyOutlinedTextField(
-//                        value = "${payData.cardNumber}",
-//                        onValueChange = { pagoOnlineViewModel.updatePayData { copy(cardNumber = it) } },
-//                        label = "Número de tarjeta",
-//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//                        modifier = Modifier.fillMaxWidth()
-//                    )
-//                    Spacer(Modifier.height(8.dp))
-//                    Row (
-//                        modifier = Modifier.fillMaxWidth(),
-//                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-//                    ) {
-//                        MyOutlinedTextField(
-//                            value = "${payData.expiryMonth}",
-//                            onValueChange = { pagoOnlineViewModel.updatePayData { copy(expiryMonth = it) } },
-//                            label = "MM",
-//                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//                            modifier = Modifier.weight(1f)
-//                        )
-//                        MyOutlinedTextField(
-//                            value = "${payData.expiryYear}",
-//                            onValueChange = { pagoOnlineViewModel.updatePayData { copy(expiryYear = it) } },
-//                            label = "YY",
-//                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//                            modifier = Modifier.weight(1f)
-//                        )
-//                        MyOutlinedTextField(
-//                            value = "${payData.cvc}",
-//                            onValueChange = { pagoOnlineViewModel.updatePayData { copy(cvc = it) } },
-//                            label = "CVC",
-//                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//                            modifier = Modifier.weight(1f)
-//                        )
-//                    }
-//                }
-//            }
-//        )
-//    }
-
     if (terminosCondiciones) {
         TerminosCondicionesDetail(pagoOnlineViewModel)
     }
-
 }
 
 @Composable
