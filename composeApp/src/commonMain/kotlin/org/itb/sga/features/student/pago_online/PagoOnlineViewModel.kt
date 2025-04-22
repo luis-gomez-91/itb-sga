@@ -14,7 +14,11 @@ import org.itb.sga.data.network.PagoOnline
 import org.itb.sga.data.network.PagoOnlineResult
 import org.itb.sga.data.network.Response
 import org.itb.sga.data.network.RubroX
+import org.itb.sga.data.network.UpdateAsistenciaResult
+import org.itb.sga.data.network.form.FormField
 import org.itb.sga.data.network.form.PagoOnlineForm
+import org.itb.sga.data.network.form.UpdateAsistencia
+import org.itb.sga.data.network.pro_clases.Asistencia
 import org.itb.sga.features.common.home.HomeViewModel
 
 class PagoOnlineViewModel : ViewModel() {
@@ -116,16 +120,16 @@ class PagoOnlineViewModel : ViewModel() {
                     direccion = _payData.value.address,
                     rubros = _selectedRubros.value.map { it.id }
                 )
-                logInfo("prueba", "FORM: $form")
 
-                val result = requestPostDispatcher(client, form)
-                logInfo("prueba", "RESULT: $result")
+                val result = requestPostDispatcher(
+                    client = client,
+                    form = form,
+                    action = "online"
+                )
                 _response.value = result
                 _linkToPay.value = result.message
                 _referencia.value = result.status
-//            if (result.status == "success") {
-//            homeViewModel.openURL(result.message)
-//            }
+
                 logInfo("prueba", "RESPUESTA: ${_response.value}")
             }
         } catch (e: Exception) {
@@ -183,5 +187,27 @@ class PagoOnlineViewModel : ViewModel() {
         viewModelScope.launch {
             _linkToPay.value = null
         }
+    }
+
+    fun checkPaymentStatus(): String {
+        viewModelScope.launch {
+            try {
+                val form = FormField(
+                    action = "checkPaymentStatus",
+                    id = null,
+                    value = _referencia.value
+                )
+                val result = requestPostDispatcher(
+                    client = client,
+                    form = form,
+                    action = "online"
+                )
+                logInfo("prueba", "RESULTADO: $result")
+
+            } catch (e: Exception) {
+                logInfo("prueba", "${e}")
+            }
+        }
+        return "OKAS"
     }
 }

@@ -13,7 +13,10 @@ import org.itb.sga.core.SERVER_URL
 import org.itb.sga.data.network.Error
 import org.itb.sga.data.network.PagoOnline
 import org.itb.sga.data.network.PagoOnlineResult
+import org.itb.sga.data.network.Response
+import org.itb.sga.data.network.form.FormField
 import org.itb.sga.data.network.form.PagoOnlineForm
+import org.itb.sga.data.network.form.UpdateValue
 
 class PagoOnlineRepository(
     private val client: HttpClient
@@ -43,13 +46,6 @@ class PagoOnlineService(
         } catch (e: Exception) {
             val error = Error("Error", "Error inesperado: ${e.message}")
             PagoOnlineResult.Failure(error)
-        }
-    }
-
-    suspend fun sendPagoOnline(pagoOnlieForm: PagoOnlineForm): HttpResponse {
-        return client.post("${SERVER_URL}api_rest?action=facturarPagoOnline") {
-            contentType(ContentType.Application.Json)
-            setBody(pagoOnlieForm)
         }
     }
 }

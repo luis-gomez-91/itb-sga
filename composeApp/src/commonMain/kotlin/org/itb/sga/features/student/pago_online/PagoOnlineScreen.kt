@@ -25,12 +25,14 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIos
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.MoneyOff
 import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -43,6 +45,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,8 +54,18 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.multiplatform.webview.jsbridge.IJsMessageHandler
+import com.multiplatform.webview.jsbridge.JsMessage
+import com.multiplatform.webview.jsbridge.rememberWebViewJsBridge
+import com.multiplatform.webview.web.LoadingState
+import com.multiplatform.webview.web.WebContent
 import com.multiplatform.webview.web.WebView
+import com.multiplatform.webview.web.WebViewNavigator
+import com.multiplatform.webview.web.WebViewState
+import com.multiplatform.webview.web.rememberWebViewNavigator
 import com.multiplatform.webview.web.rememberWebViewState
+import kotlinx.coroutines.delay
+import org.itb.sga.core.logInfo
 import org.itb.sga.data.network.RubroX
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
@@ -66,6 +79,20 @@ import org.itb.sga.ui.components.alerts.MyConfirmAlert
 import org.itb.sga.ui.components.alerts.MyInfoAlert
 import org.itb.sga.ui.components.dashboard.DashBoardScreen
 
+class PaymentHandler(private val viewModel: PagoOnlineViewModel) : IJsMessageHandler {
+    override fun methodName(): String { return "ConfirmarPago" }
+
+    override fun handle(
+        message: JsMessage,
+        navigator: WebViewNavigator?,
+        callback: (String) -> Unit
+    ) {
+        logInfo("prueba", "JS handler triggered")
+        viewModel.checkPaymentStatus()
+        callback("\"OK\"")
+    }
+}
+
 @Composable
 fun PagoOnlineScreen(
     navController: NavHostController,
@@ -74,36 +101,84 @@ fun PagoOnlineScreen(
     pagoOnlineViewModel: PagoOnlineViewModel
 ) {
     val linkToPay by pagoOnlineViewModel.linkToPay.collectAsState(null)
+    val referencia by pagoOnlineViewModel.referencia.collectAsState(null)
 
     DashBoardScreen(
         title = "Pago en línea",
         navController = navController,
         content = {
             if (linkToPay != null) {
-                val webViewState = rememberWebViewState(linkToPay!!)
 
-//                IconButton(
-//                    onClick = { pagoOnlineViewModel.setLinkToPay(null) }
-//                ) {
-//                    Icon(
-//                        imageVector = Icons.Filled.ArrowBackIos,
-//                        contentDescription = "Back",
-//                        tint = MaterialTheme.colorScheme.primary,
-//                        modifier = Modifier.size(24.dp)
-//                    )
-//                }
-                MyFilledTonalButton(
-                    text = "Regresar",
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    buttonColor = MaterialTheme.colorScheme.primaryContainer,
-                    textColor = MaterialTheme.colorScheme.primary,
-                    icon = Icons.Filled.ArrowBackIos,
-                    onClickAction = { pagoOnlineViewModel.payConfirm() },
-                    iconSize = 16.dp,
-                    textStyle = MaterialTheme.typography.labelSmall
-                )
-                Spacer(Modifier.height(8.dp))
-                WebView(state = webViewState)
+                val webViewState = rememberWebViewState(linkToPay!!)
+                val navigator = rememberWebViewNavigator()
+                val jsBridge = rememberWebViewJsBridge().apply {
+                    register(PaymentHandler(pagoOnlineViewModel))
+                }
+
+                val jsScript = """
+                    document.querySelector('.payment-button-popup').addEventListener('click', function() {
+                        let phone = document.querySelector('#phone').value.trim();
+                        let name = document.querySelector('.name').value.trim();
+                        let cardNumber = document.querySelector('.card-number').value.trim();
+                        let expiryMonth = document.querySelector('.expiry-month').value.trim();
+                        let expiryYear = document.querySelector('.expiry-year').value.trim();
+                        let cvc = document.querySelector('.cvc').value.trim();
+                    
+                        if (!phone || !name || !cardNumber || !expiryMonth || !expiryYear || !cvc) {
+                            alert("Por favor, completa todos los campos del formulario.");
+                            return;
+                        }
+                        
+                        window.kmpJsBridge.callNative("ConfirmarPago", JSON.stringify({}), function (data) {
+                            alert("Respuesta desde Kotlin: " + data);
+                        });
+                    });
+                """
+
+                Column (
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    val loadingState = webViewState.loadingState
+                    if (loadingState is LoadingState.Loading) {
+                        LinearProgressIndicator(
+                            progress = { loadingState.progress },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+
+                    WebView(
+                        state = webViewState,
+                        modifier = Modifier.weight(1f),
+                        navigator = navigator,
+                        webViewJsBridge = jsBridge,
+                    )
+
+                    LaunchedEffect(webViewState.loadingState) {
+                        if (webViewState.loadingState !is LoadingState.Loading) {
+                            navigator.evaluateJavaScript(jsScript) { result ->
+                                logInfo("prueba", "RESULT: $result")
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(8.dp))
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        MyFilledTonalButton(
+                            text = "Terminar pago en línea",
+                            onClickAction = { pagoOnlineViewModel.payConfirm() },
+                            icon = Icons.Filled.ArrowBackIosNew,
+                            iconSize = 24.dp,
+                            textStyle = MaterialTheme.typography.labelLarge
+                        )
+                    }
+                }
             } else {
                 Screen(
                     homeViewModel,
@@ -307,7 +382,7 @@ fun CardRubros(
                         pagoOnlineViewModel.updateShowDiferirPago(true)
                     },
                     icon = Icons.Filled.Payment,
-                    iconSize = 36.dp,
+                    iconSize = 24.dp,
                     textStyle = MaterialTheme.typography.labelLarge
                 )
             }

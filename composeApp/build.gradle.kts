@@ -40,6 +40,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation("dev.icerock.moko:biometry-compose:0.4.0")
             implementation("org.mindrot:jbcrypt:0.4")
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)
