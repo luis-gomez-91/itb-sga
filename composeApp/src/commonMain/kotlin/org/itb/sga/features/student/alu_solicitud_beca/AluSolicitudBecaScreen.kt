@@ -97,17 +97,17 @@ fun Screen(
             buttonColor = MaterialTheme.colorScheme.secondaryContainer,
             textColor = MaterialTheme.colorScheme.secondary
         )
-        Spacer(Modifier.height(16.dp))
-
-        MyFilledTonalButton(
-            text = "Ficha Socioeconómica DOBE",
-            enabled = true,
-            onClickAction = {
-                homeViewModel.changeScreenSelect("ficha")
-            },
-            buttonColor = MaterialTheme.colorScheme.secondaryContainer,
-            textColor = MaterialTheme.colorScheme.secondary
-        )
+//        Spacer(Modifier.height(16.dp))
+//
+//        MyFilledTonalButton(
+//            text = "Ficha Socioeconómica DOBE",
+//            enabled = true,
+//            onClickAction = {
+//                homeViewModel.changeScreenSelect("ficha")
+//            },
+//            buttonColor = MaterialTheme.colorScheme.secondaryContainer,
+//            textColor = MaterialTheme.colorScheme.secondary
+//        )
     }
 
     if (showRequisitos) {
