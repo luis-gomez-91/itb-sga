@@ -28,6 +28,7 @@ import org.itb.sga.data.network.notificaciones.Notificacion
 import org.itb.sga.data.network.Response
 import org.itb.sga.data.network.form.RequestPasswordChangeForm
 import org.itb.sga.features.common.login.LoginViewModel
+import kotlin.math.log
 
 class HomeViewModel(
     private val pdfOpener: URLOpener,
@@ -48,7 +49,6 @@ class HomeViewModel(
             _isLoading.value = true
             try {
                 val result = service.fetchHome(id)
-                logInfo("home", "$result")
 
                 when (result) {
                     is HomeResult.Success -> {

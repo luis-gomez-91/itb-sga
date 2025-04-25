@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
@@ -37,10 +38,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import org.itb.sga.core.ROUTES
 import org.itb.sga.core.formatoText
 import org.itb.sga.data.network.notificaciones.Notificacion
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.ui.components.MyCard
+import org.itb.sga.ui.components.MyFilledTonalButton
 import org.itb.sga.ui.components.alerts.MyAlert
 import org.itb.sga.ui.components.shimmer.ShimmerFormLoadingAnimation
 
@@ -169,53 +172,61 @@ fun NotificationItem(
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 itemsIndexed(urls) { index, url ->
-//                    MyFilledTonalButton(
-//                        text = url.name,
-//                        enabled = true,
-//                        shape = RoundedCornerShape(8.dp),
-//                        onClickAction = {
-//                            navController.navigate(url.url)
-//                        },
-//                        buttonColor = when (url.tipo) {
-//                            "info" -> MaterialTheme.colorScheme.primaryContainer
-//                            "success" -> MaterialTheme.colorScheme.onPrimaryContainer
-//                            "danger" -> MaterialTheme.colorScheme.errorContainer
-//                            "warning" -> MaterialTheme.colorScheme.tertiaryContainer
-//                            else -> MaterialTheme.colorScheme.surfaceContainerLowest
-//                        },
-//                        textColor = when (url.tipo) {
-//                            "info" -> MaterialTheme.colorScheme.primary
-//                            "success" -> MaterialTheme.colorScheme.onPrimary
-//                            "danger" -> MaterialTheme.colorScheme.error
-//                            "warning" -> MaterialTheme.colorScheme.tertiary
-//                            else -> MaterialTheme.colorScheme.onSurface
-//                        },
-//                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextButton(
-                            onClick = {
-                                navController.navigate(url.url)
-                            }
-                        ) {
-                            Text(
-                                text = url.name,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.tertiary
-                            )
-                        }
-                        if (index < urls.lastIndex) {
-                            Spacer(Modifier.width(4.dp))
-                            VerticalDivider(
-                                modifier = Modifier
-                                    .height(24.dp)
-                                    .width(1.dp)
-                                    .align(Alignment.CenterVertically),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(Modifier.width(4.dp))
-                        }
+                    val path = url.url
+                    val cleanPath = if (path.startsWith("/")) path.substring(1) else path
+                    if (cleanPath in ROUTES) {
+                        MyFilledTonalButton(
+                            text = url.name,
+                            enabled = true,
+                            shape = RoundedCornerShape(8.dp),
+                            textStyle = MaterialTheme.typography.labelSmall,
+                            onClickAction = {
+                                navController.navigate(cleanPath)
+                            },
+                            buttonColor = when (url.tipo) {
+                                "info" -> MaterialTheme.colorScheme.primaryContainer
+                                "success" -> MaterialTheme.colorScheme.onPrimaryContainer
+                                "danger" -> MaterialTheme.colorScheme.errorContainer
+                                "warning" -> MaterialTheme.colorScheme.tertiaryContainer
+                                else -> MaterialTheme.colorScheme.surfaceContainer
+                            },
+                            textColor = when (url.tipo) {
+                                "info" -> MaterialTheme.colorScheme.primary
+                                "success" -> MaterialTheme.colorScheme.onPrimary
+                                "danger" -> MaterialTheme.colorScheme.error
+                                "warning" -> MaterialTheme.colorScheme.tertiary
+                                else -> MaterialTheme.colorScheme.onSurface
+                            },
+                        )
+//
+//
+//                        Row(
+//                            verticalAlignment = Alignment.CenterVertically
+//                        ) {
+//                            TextButton(
+//                                onClick = {
+//
+//                                    navController.navigate(cleanPath)
+//                                }
+//                            ) {
+//                                Text(
+//                                    text = url.name,
+//                                    style = MaterialTheme.typography.labelSmall,
+//                                    color = MaterialTheme.colorScheme.tertiary
+//                                )
+//                            }
+//                            if (index < urls.lastIndex) {
+//                                Spacer(Modifier.width(4.dp))
+//                                VerticalDivider(
+//                                    modifier = Modifier
+//                                        .height(24.dp)
+//                                        .width(1.dp)
+//                                        .align(Alignment.CenterVertically),
+//                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+//                                )
+//                                Spacer(Modifier.width(4.dp))
+//                            }
+//                        }
                     }
                 }
             }

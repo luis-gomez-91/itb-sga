@@ -9,7 +9,6 @@ plugins {
 
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
-//    alias(libs.plugins.kotlinCompose)
 }
 
 kotlin {
@@ -84,9 +83,6 @@ kotlin {
             implementation(libs.ktor.client.darwin)
         }
     }
-//    sourceSets.commonMain {
-//        kotlin.srcDir("build/generated/ksp/metadata")
-//    }
 }
 
 android {
@@ -97,7 +93,7 @@ android {
         applicationId = "org.itb.sga"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 12
+        versionCode = 14
         versionName = "1.0.0"
     }
     packaging {
@@ -108,6 +104,7 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {

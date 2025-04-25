@@ -70,6 +70,7 @@ import org.itb.sga.ui.components.MyFilledTonalButton
 import org.itb.sga.ui.components.MyOutlinedTextField
 import org.itb.sga.ui.components.MySwitch
 import org.itb.sga.ui.components.alerts.MyConfirmAlert
+import org.itb.sga.ui.components.alerts.MyErrorAlert
 import org.itb.sga.ui.components.alerts.MyInfoAlert
 import org.itb.sga.ui.components.dashboard.DashBoardScreen
 
@@ -161,7 +162,7 @@ fun PagoOnlineScreen(
                         }, 500);
                         
                         var paymentCheckout = new PaymentCheckout.modal({
-                            env_mode: 'stg',
+                            env_mode: 'prod',
                             onOpen: function() {
                                 console.log('modal open');
                             },
@@ -238,7 +239,7 @@ fun Screen(
     val isLoading by pagoOnlineViewModel.isLoading.collectAsState(false)
     var selectedTabIndex: Int by remember { mutableStateOf(0) }
     val pagerState = rememberPagerState { 2 }
-    val error by homeViewModel.error.collectAsState(null)
+    val error by pagoOnlineViewModel.error.collectAsState(null)
     val response by pagoOnlineViewModel.response.collectAsState(null)
 
     LaunchedEffect(response) {
@@ -290,12 +291,11 @@ fun Screen(
     }
 
     error?.let {
-        MyInfoAlert(
+        MyErrorAlert(
             titulo = it.title,
             mensaje = it.error,
             onDismiss = {
-                homeViewModel.clearError()
-                navController.popBackStack()
+                pagoOnlineViewModel.setError(null)
             },
             showAlert = true
         )

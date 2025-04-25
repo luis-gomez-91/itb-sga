@@ -82,6 +82,28 @@ fun App(
     val proCronogramaViewModel = remember { ProCronogramaViewModel() }
     val proEntregaActasViewModel = remember { ProEntregaActasViewModel() }
 
+//    Generar el SHA-256 en terminal para deep links
+//    keytool -list -v -keystore C:\Users\lagomez\.android\debug.keystore -alias androiddebugkey -storepass android -keypass android
+
+//    PS C:\Users\lagomez\AndroidStudioProjects\app-ITB-KMM2> keytool -list -v -keystore C:\Users\lagomez\.android\debug.keystore -alias androiddebugkey -storepass android -keypass android
+//    Alias name: androiddebugkey
+//            Creation date: 6 ene. 2025
+//    Entry type: PrivateKeyEntry
+//            Certificate chain length: 1
+//    Certificate[1]:
+//    Owner: C=US, O=Android, CN=Android Debug
+//    Issuer: C=US, O=Android, CN=Android Debug
+//    Serial number: 1
+//    Valid from: Mon Jan 06 11:15:03 ECT 2025 until: Wed Dec 30 11:15:03 ECT 2054
+//    Certificate fingerprints:
+//    SHA1: 5A:20:E1:48:36:29:8F:BB:34:1B:92:98:D0:C3:51:74:7C:20:85:F4
+//    SHA256: C9:B7:18:E4:BF:43:F8:5C:D8:2C:DD:91:CF:57:D3:5F:89:90:E9:04:A6:EC:32:4E:05:0E:18:8E:CE:14:18:9E
+//    Signature algorithm name: SHA256withRSA
+//    Subject Public Key Algorithm: 2048-bit RSA key
+//    Version: 1
+
+
+
     AppTheme(
         homeViewModel = homeViewModel
     ) {

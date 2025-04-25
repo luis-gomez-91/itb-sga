@@ -26,6 +26,9 @@ class PagoOnlineViewModel : ViewModel() {
     private val _response = MutableStateFlow<Response?>(null)
     val response: StateFlow<Response?> = _response
 
+    private val _error = MutableStateFlow<Error?>(null)
+    val error: StateFlow<Error?> = _error
+
     private val _data = MutableStateFlow<PagoOnline?>(null)
     val data: StateFlow<PagoOnline?> = _data
 
@@ -146,11 +149,17 @@ class PagoOnlineViewModel : ViewModel() {
                     form = form,
                     action = "online"
                 )
-                _idPagoPymentez.value = result.message.toInt()
-                _referencia.value = result.status
-                _showModalNuvei.value = true
 
-                logInfo("prueba", "RESPUESTA: ${_response.value}")
+                if (result.status == "error") {
+                    _error.value = Error(result.status, result.message)
+                } else {
+                    _idPagoPymentez.value = result.message.toInt()
+                    _referencia.value = result.status
+                    _showModalNuvei.value = true
+                }
+
+
+                logInfo("prueba", "RESPUESTA: $result")
             }
         } catch (e: Exception) {
             homeViewModel.addError(Error(title = "Error", error = "${e.message}"))
@@ -211,6 +220,10 @@ class PagoOnlineViewModel : ViewModel() {
 
     fun setResponse(newValue: Response?) {
         _response.value = newValue
+    }
+
+    fun setError(newValue: Error?) {
+        _error.value = newValue
     }
 
     fun checkPaymentStatus(
