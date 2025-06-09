@@ -8,6 +8,7 @@ import org.itb.sga.features.admin.docentes.DocentesScreen
 import org.itb.sga.features.admin.docentes.DocentesViewModel
 import org.itb.sga.features.admin.inscripciones.InscripcionesScreen
 import org.itb.sga.features.admin.inscripciones.InscripcionesViewModel
+import org.itb.sga.features.common.login.MainScreen
 import org.itb.sga.features.common.account.AccountEditInfoScreen
 import org.itb.sga.features.common.account.AccountScreen
 import org.itb.sga.features.common.account.AccountViewModel
@@ -20,6 +21,7 @@ import org.itb.sga.features.common.login.LoginScreen
 import org.itb.sga.features.common.login.LoginViewModel
 import org.itb.sga.features.common.reportes.ReportesScreen
 import org.itb.sga.features.common.reportes.ReportesViewModel
+import org.itb.sga.features.payroll.PayrollScreen
 import org.itb.sga.features.student.alu_ayuda_financiera.AluAyudaFinancieraScreen
 import org.itb.sga.features.student.alu_consulta_general.AluConsultaGeneralScreen
 import org.itb.sga.features.student.alu_consulta_general.AluConsultaGeneralViewModel
@@ -93,9 +95,11 @@ fun MyNavigation(
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = "login"
+        startDestination = "main"
     ) {
         composable("404") { NotFoundScreen(onNavigateBack = { navController.popBackStack() }) }
+        composable("main") { MainScreen(navController, homeViewModel) }
+        composable("payroll") { PayrollScreen() }
         composable("login") { LoginScreen(navController, loginViewModel, homeViewModel) }
         composable("home") { HomeScreen(navController, homeViewModel, loginViewModel) }
         composable("inscripciones") { InscripcionesScreen(navController, homeViewModel, loginViewModel, inscripcionesViewModel) }

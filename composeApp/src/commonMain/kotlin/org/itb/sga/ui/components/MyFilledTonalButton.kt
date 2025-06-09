@@ -3,6 +3,7 @@ package org.itb.sga.ui.components
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
@@ -28,7 +29,7 @@ fun MyFilledTonalButton(
     iconSize: Dp = 24.dp,
     textStyle: TextStyle = MaterialTheme.typography.labelMedium,
     modifier: Modifier = Modifier,
-    shape: RoundedCornerShape = RoundedCornerShape(24.dp)
+    shape: CornerBasedShape = MaterialTheme.shapes.small
 ) {
     FilledTonalButton(
         onClick = onClickAction,

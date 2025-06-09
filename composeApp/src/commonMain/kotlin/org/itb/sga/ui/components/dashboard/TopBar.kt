@@ -82,10 +82,7 @@ fun MyTopBar(
                             TextField(
                                 value = searchQuery,
                                 onValueChange = { newQuery ->
-                                    searchQuery = newQuery
-                                    if (homeViewModel.fastSearch.value) {
-                                        homeViewModel.onSearchQueryChanged(newQuery)
-                                    }
+
                                 },
                                 textStyle = MaterialTheme.typography.bodyMedium,
                                 colors = TextFieldDefaults.colors(
@@ -94,20 +91,18 @@ fun MyTopBar(
                                     focusedContainerColor = Color.Transparent,
                                     unfocusedContainerColor = Color.Transparent,
                                 ),
-//                                placeholder = { Text("Ingrese texto aqui...") },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .focusRequester(focusRequester),
                                 label = { Text("Buscar") },
+                                singleLine = true,
                                 keyboardOptions = KeyboardOptions.Default.copy(
                                     imeAction = ImeAction.Search,
                                     keyboardType = KeyboardType.Text
                                 ),
                                 keyboardActions = KeyboardActions(
                                     onSearch = {
-                                        homeViewModel.actualPageRestart()
-                                        homeViewModel.onSearchQueryChanged(searchQuery)
-                                        focusRequester.freeFocus()
+                                        focusRequester.freeFocus() // esto libera el foco
                                     }
                                 )
                             )

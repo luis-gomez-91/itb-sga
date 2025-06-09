@@ -37,7 +37,6 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
-            implementation("dev.icerock.moko:biometry-compose:0.4.0")
             implementation("org.mindrot:jbcrypt:0.4")
 
         }
@@ -61,24 +60,17 @@ kotlin {
             implementation(libs.calf.file.picker)
             implementation(libs.calf.file.picker.coil)
             implementation(libs.coil.compose.v300alpha8)
-
-            // peekaboo-ui
             implementation(libs.peekaboo.ui)
-
-            // peekaboo-image-picker
             implementation(libs.peekaboo.image.picker)
-
-//            filekit
             implementation(libs.filekit.core)
             implementation(libs.filekit.compose)
-            implementation("dev.icerock.moko:mvvm-core:0.16.1")
-
+            implementation(libs.moko.mvvm)
             implementation(libs.androidx.room.runtime)
             implementation(libs.sqlite.bundled)
-            implementation("io.github.kevinnzou:compose-webview-multiplatform:1.9.40")
-
+            implementation(libs.kevinnzou.webview)
+            implementation(libs.moko.biometry)
+            implementation(libs.moko.biometry.compose)
         }
-
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
@@ -93,8 +85,8 @@ android {
         applicationId = "org.itb.sga"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 14
-        versionName = "1.0.0"
+        versionCode = 15
+        versionName = "1.0.1"
     }
     packaging {
         resources {
@@ -142,11 +134,6 @@ dependencies {
     implementation(libs.protolite.well.known.types)
     implementation(libs.androidx.core.i18n)
     implementation(libs.androidx.appcompat)
-
-    commonMainApi("dev.icerock.moko:biometry-compose:0.4.0")
-    commonMainApi("dev.icerock.moko:biometry:0.4.0")
-
-
 }
 
 dependencies {
