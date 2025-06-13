@@ -6,11 +6,13 @@ import kotlinx.serialization.Serializable
 data class AluMateria(
     val asistencias: String,
     val estado: String,
-    val lecciones: List<AluMateriaLeccion>,
     val materiaFin: String,
     val materiaInicio: String,
     val materiaNombre: String,
     val numAsistencias: Int,
     val numLecciones: Int,
-    val profesores: List<AluMateriaProfesor>
+    val profesores: List<AluMateriaProfesor>?,
+    val lecciones: List<AluMateriaLeccion>?,
+    val calificaciones:AluMateriaCalificacion?,
+    val notaFinal: Double
 )

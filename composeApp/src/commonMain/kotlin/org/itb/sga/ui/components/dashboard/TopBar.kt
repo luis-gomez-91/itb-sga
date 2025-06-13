@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -38,7 +36,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.itb.sga.features.common.home.HomeViewModel
 
@@ -60,20 +57,19 @@ fun MyTopBar(
     }
 
     TopAppBar(
-//        modifier = Modifier.padding(top = 48.dp),
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(68.dp)
+//                    .height(68.dp)
             ) {
                 Crossfade(targetState = onSearch) { isSearch ->
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
+                            .fillMaxWidth(),
+//                            .padding(8.dp),
                         contentAlignment = Alignment.CenterStart
                     ) {
                         if (!isSearch) {
@@ -82,7 +78,10 @@ fun MyTopBar(
                             TextField(
                                 value = searchQuery,
                                 onValueChange = { newQuery ->
-
+                                    searchQuery = newQuery
+                                    if (homeViewModel.fastSearch.value) {
+                                        homeViewModel.onSearchQueryChanged(newQuery)
+                                    }
                                 },
                                 textStyle = MaterialTheme.typography.bodyMedium,
                                 colors = TextFieldDefaults.colors(
@@ -102,7 +101,9 @@ fun MyTopBar(
                                 ),
                                 keyboardActions = KeyboardActions(
                                     onSearch = {
-                                        focusRequester.freeFocus() // esto libera el foco
+                                        homeViewModel.actualPageRestart()
+                                        homeViewModel.onSearchQueryChanged(searchQuery)
+                                        focusRequester.freeFocus()
                                     }
                                 )
                             )

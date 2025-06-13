@@ -1,5 +1,11 @@
 package org.itb.sga.features.student.alu_materias
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,19 +18,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Pending
-import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
@@ -38,18 +48,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import org.itb.sga.data.network.AluMateria
+import org.itb.sga.data.network.AluMateriaCalificacion
 import org.itb.sga.data.network.AluMateriaLeccion
+import org.itb.sga.data.network.AluMateriaProfesor
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
 import org.itb.sga.features.student.alu_malla.CardStyle
 import org.itb.sga.ui.components.MyAssistChip
+import org.itb.sga.ui.components.MyCard
 import org.itb.sga.ui.components.MyCircularProgressIndicator
+import org.itb.sga.ui.components.MyOutlinedTextField
 import org.itb.sga.ui.components.alerts.MyErrorAlert
 import org.itb.sga.ui.components.dashboard.DashBoardScreen
 
@@ -190,7 +208,7 @@ fun ScrollableTabRowAluMateria(
                 text = {
                     Text(
                         text = aluMateria.materiaNombre,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                         color = if (selectedTabIndex == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
                         modifier = Modifier.padding(horizontal = 16.dp),
                         maxLines = 2,
@@ -242,7 +260,7 @@ fun AluMateriaItem(
 
 
         Column (
-            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
         ) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
@@ -251,40 +269,282 @@ fun AluMateriaItem(
                 color = MaterialTheme.colorScheme.secondary,
                 style = MaterialTheme.typography.labelMedium
             )
+            Spacer(Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
                 MyAssistChip(
-                    label = "Estado: ${aluMateria.estado}",
+                    label = aluMateria.estado,
                     containerColor = estadoStyle.containerColor,
                     labelColor = estadoStyle.color,
                     icon = estadoStyle.icono
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 MyAssistChip(
-                    label = "${aluMateria.numAsistencias} de ${aluMateria.numLecciones} asistencias: ${aluMateria.asistencias}%",
+                    label = "${aluMateria.notaFinal} puntos",
+                    containerColor = estadoStyle.containerColor,
+                    labelColor = estadoStyle.color
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                MyAssistChip(
+                    label = "${aluMateria.asistencias}% de asistencia",
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    labelColor = MaterialTheme.colorScheme.secondary,
-                    icon = Icons.Filled.School
+                    labelColor = MaterialTheme.colorScheme.secondary
                 )
             }
         }
 
-        LazyColumn(
+        Column (
             modifier = Modifier
-                .fillMaxSize()
-//                .background(color = MaterialTheme.colorScheme.surfaceContainer)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         ) {
-            items(materia.lecciones) { leccion ->
-                LeccionItem(leccion)
-                Spacer(modifier = Modifier.height(8.dp))
-                HorizontalDivider()
-                Spacer(modifier = Modifier.height(8.dp))
+            DocentesItem(materia.profesores)
+
+            materia.calificaciones?.let { calificaciones ->
+                Spacer(Modifier.height(8.dp))
+                CalificacionesItem(calificaciones)
+            }
+            materia.lecciones?.let { lecciones ->
+                Spacer(Modifier.height(8.dp))
+                LeccionesItem(lecciones)
             }
         }
+
     } ?: run {
         Text(text = "No hay asignaturas disponibles", style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+@Composable
+fun DocentesItem(
+    docentes: List<AluMateriaProfesor>?
+) {
+    var expanded by remember { mutableStateOf(true) }
+
+    MyCard (
+        modifier = Modifier.fillMaxWidth(),
+        onClick = { expanded = !expanded },
+    ) {
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Docentes asignados",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(Modifier.width(8.dp))
+                AnimatedContent(targetState = expanded) { isExpanded ->
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(
+                            imageVector = Icons.Default.ExpandMore,
+                            contentDescription = if (expanded) "Collapse" else "Expand",
+                            modifier = Modifier.rotate(if (expanded) 180f else 0f),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+
+            AnimatedVisibility(
+                visible = expanded,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                Spacer(Modifier.height(8.dp))
+                if (docentes != null) {
+                    LazyColumn (
+                        modifier = Modifier.fillMaxWidth().padding(start = 16.dp)
+                    ) {
+                        items(docentes) { docente ->
+                            Row (
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = docente.profesorNombre,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+
+                                Spacer(Modifier.width(8.dp))
+
+                                MyAssistChip(
+                                    label = docente.rol,
+                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                    labelColor = MaterialTheme.colorScheme.secondary
+                                )
+                            }
+                            Spacer(Modifier.height(4.dp))
+                        }
+                    }
+                } else {
+                    Text(
+                        text = "Por definir",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Spacer(Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun CalificacionesItem(
+    calificacion: AluMateriaCalificacion
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    val calificacionesMap = mapOf(
+        "n1" to ("N1" to (calificacion.n1.toString())),
+        "n2" to ("N2" to (calificacion.n2.toString())),
+        "n3" to ("N3" to (calificacion.n3.toString())),
+        "n4" to ("N4" to (calificacion.n4.toString())),
+//        "parcial" to ("Parc." to (calificacion.parcial?.toString() ?: "")),
+        "examen" to ("Ex." to (calificacion.examen.toString())),
+        "recuperacion" to ("Recup." to (calificacion.recuperacion.toString())),
+        "total" to ("Tot." to (calificacion.total?.toString() ?: ""))
+    )
+
+    val textStyle = TextStyle(
+        color = MaterialTheme.colorScheme.secondary,
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        textAlign = TextAlign.Center
+    )
+
+    MyCard (
+        modifier = Modifier.fillMaxWidth(),
+        onClick = { expanded = !expanded },
+    ) {
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Calificaciones",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(Modifier.width(8.dp))
+
+                AnimatedContent(targetState = expanded) { isExpanded ->
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(
+                            imageVector = Icons.Default.ExpandMore,
+                            contentDescription = if (expanded) "Collapse" else "Expand",
+                            modifier = Modifier.rotate(if (expanded) 180f else 0f),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+
+            AnimatedVisibility(
+                visible = expanded,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                Spacer(Modifier.height(16.dp))
+
+                LazyRow (
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(calificacionesMap.toList()) { (_, calificacion) ->
+                        val (label, nota) = calificacion
+
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = label,
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.secondary,
+                                textAlign = TextAlign.Center
+                            )
+                            MyOutlinedTextField(
+                                value = nota,
+                                onValueChange = {},
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                modifier = Modifier.width(70.dp),
+                                enabled = false,
+                                textStyle = textStyle
+                            )
+                        }
+                        Spacer(Modifier.width(4.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun LeccionesItem(
+    lecciones: List<AluMateriaLeccion>
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    MyCard (
+        modifier = Modifier.fillMaxWidth(),
+        onClick = { expanded = !expanded },
+    ) {
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Listado de asistencias",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(Modifier.width(8.dp))
+
+                AnimatedContent(targetState = expanded) { isExpanded ->
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(
+                            imageVector = Icons.Default.ExpandMore,
+                            contentDescription = if (expanded) "Collapse" else "Expand",
+                            modifier = Modifier.rotate(if (expanded) 180f else 0f),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+
+            AnimatedVisibility(
+                visible = expanded,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                Spacer(Modifier.height(16.dp))
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f)
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(lecciones) { leccion ->
+                        LeccionItem(leccion)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        HorizontalDivider()
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -292,34 +552,27 @@ fun AluMateriaItem(
 fun LeccionItem(
     leccion: AluMateriaLeccion
 ) {
-    Column (
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 4.dp),
-        verticalArrangement = Arrangement.Top,
-    ){
-        Text(
-            text = leccion.fecha,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.primary
+    Text(
+        text = leccion.fecha,
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.primary
+    )
+    Spacer(Modifier.height(4.dp))
+    Row(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        MyAssistChip(
+            label = "${leccion.horaEntrada} - ${leccion.horaSalida}",
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            labelColor = MaterialTheme.colorScheme.secondary,
+            icon = Icons.Filled.Timer
         )
-        Spacer(Modifier.height(4.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            MyAssistChip(
-                label = "${leccion.horaEntrada} - ${leccion.horaSalida}",
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                labelColor = MaterialTheme.colorScheme.secondary,
-                icon = Icons.Filled.Timer
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            MyAssistChip(
-                label = "Asistencia",
-                containerColor = if (leccion.asistio) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.errorContainer,
-                labelColor = if (leccion.asistio) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.error,
-                icon = if (leccion.asistio) Icons.Filled.Check else Icons.Filled.Close
-            )
-        }
+        Spacer(modifier = Modifier.width(4.dp))
+        MyAssistChip(
+            label = "Asistencia",
+            containerColor = if (leccion.asistio) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.errorContainer,
+            labelColor = if (leccion.asistio) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.error,
+            icon = if (leccion.asistio) Icons.Filled.Check else Icons.Filled.Close
+        )
     }
 }

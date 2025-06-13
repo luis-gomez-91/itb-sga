@@ -5,5 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AluMateriaProfesor(
     val numClases: Int,
-    val profesorNombre: String
+    val profesorNombre: String,
+    val rol: String
 )

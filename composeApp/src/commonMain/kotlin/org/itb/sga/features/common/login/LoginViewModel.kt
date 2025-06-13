@@ -25,10 +25,10 @@ class LoginViewModel(
     val client = createHttpClient()
     val loginService = LoginService(client)
 
-    private val _username = MutableStateFlow("")
+    private val _username = MutableStateFlow("lagomez5")
     val username: StateFlow<String> = _username
 
-    private val _password = MutableStateFlow("")
+    private val _password = MutableStateFlow("Mariajose1994$")
     val password: StateFlow<String> = _password
 
     private val _isLoading = MutableStateFlow(false)

@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinxSerialization)
-
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
 }
@@ -85,8 +84,8 @@ android {
         applicationId = "org.itb.sga"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 15
-        versionName = "1.0.1"
+        versionCode = 16
+        versionName = "1.0.2"
     }
     packaging {
         resources {
