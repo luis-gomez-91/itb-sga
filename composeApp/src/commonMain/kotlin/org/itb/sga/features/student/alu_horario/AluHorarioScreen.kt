@@ -87,7 +87,7 @@ fun Screen(
     LaunchedEffect(Unit) {
         homeViewModel.clearError()
         homeViewModel.clearSearchQuery()
-        homeViewModel.homeData.value!!.persona.idInscripcion?.let {
+        homeViewModel.homeData.value?.persona?.idInscripcion?.let {
             aluHorarioViewModel.onloadAluHorario(
                 it, homeViewModel
             )
@@ -121,10 +121,10 @@ fun Screen(
             }
         }
 
-        if (error != null) {
+        error?.let {
             MyErrorAlert(
-                titulo = error!!.title,
-                mensaje = error!!.error,
+                titulo = it.title,
+                mensaje = it.error,
                 onDismiss = {
                     homeViewModel.clearError()
                     navController.popBackStack()

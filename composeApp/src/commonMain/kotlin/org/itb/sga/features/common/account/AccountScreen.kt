@@ -72,7 +72,9 @@ fun Screen(
     LaunchedEffect(Unit) {
         homeViewModel.clearError()
         homeViewModel.clearSearchQuery()
-        accountViewModel.onloadAccount(homeViewModel.homeData.value!!.persona.idPersona, homeViewModel)
+        homeViewModel.homeData.value?.persona?.idPersona?.let {
+            accountViewModel.onloadAccount(it, homeViewModel)
+        }
     }
 
     if (isLoading) {
@@ -110,10 +112,10 @@ fun Screen(
             }
         }
     }
-    if (error != null) {
+    error?.let {
         MyErrorAlert(
-            titulo = error!!.title,
-            mensaje = error!!.error,
+            titulo = it.title,
+            mensaje = it.error,
             onDismiss = {
                 homeViewModel.clearError()
                 navController.popBackStack()
@@ -278,7 +280,7 @@ fun MostrarDatos(
 
                     value?.let {
                         Text(
-                            text = formatoText(key, "$value"),
+                            text = formatoText(key, value),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

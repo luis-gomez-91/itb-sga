@@ -219,8 +219,7 @@ fun PagoOnlineScreen(
             } else {
                 Screen(
                     homeViewModel,
-                    pagoOnlineViewModel,
-                    navController
+                    pagoOnlineViewModel
                 )
             }
         },
@@ -233,7 +232,6 @@ fun PagoOnlineScreen(
 fun Screen(
     homeViewModel: HomeViewModel,
     pagoOnlineViewModel: PagoOnlineViewModel,
-    navController: NavHostController
 ) {
     val data by pagoOnlineViewModel.data.collectAsState(null)
     val isLoading by pagoOnlineViewModel.isLoading.collectAsState(false)
@@ -244,7 +242,7 @@ fun Screen(
 
     LaunchedEffect(response) {
         homeViewModel.clearSearchQuery()
-        homeViewModel.homeData.value!!.persona.idInscripcion?.let {
+        homeViewModel.homeData.value?.persona?.idInscripcion?.let {
             pagoOnlineViewModel.onloadPagoOnline(
                 it, homeViewModel
             )
@@ -490,8 +488,7 @@ fun CardRubros(
             },
             onConfirm = {
                 pagoOnlineViewModel.updateShowTerminosCondiciones(false)
-//                pagoOnlineViewModel.updateShowPayAlert(true)
-                homeViewModel.homeData.value!!.persona.idInscripcion?.let {
+                homeViewModel.homeData.value?.persona?.idInscripcion?.let {
                     pagoOnlineViewModel.generateReference(
                         idInscripcion = it,
                         homeViewModel = homeViewModel

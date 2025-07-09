@@ -45,7 +45,7 @@ fun Screen(
     LaunchedEffect(Unit) {
         homeViewModel.clearError()
         homeViewModel.clearSearchQuery()
-        homeViewModel.homeData.value!!.persona.idInscripcion?.let {
+        homeViewModel.homeData.value?.persona?.idInscripcion?.let {
             aluMatriculaViewModel.onloadAluMatricula(
                 it, homeViewModel
             )
@@ -54,14 +54,12 @@ fun Screen(
 
     if (isLoading) {
         MyCircularProgressIndicator()
-    } else {
-
     }
 
-    if (error != null) {
+    error?.let {
         MyErrorAlert(
-            titulo = error!!.title,
-            mensaje = error!!.error,
+            titulo = it.title,
+            mensaje = it.error,
             onDismiss = {
                 homeViewModel.clearError()
                 navController.popBackStack()

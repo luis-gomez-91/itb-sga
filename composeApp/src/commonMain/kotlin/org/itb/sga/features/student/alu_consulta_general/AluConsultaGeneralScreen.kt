@@ -36,6 +36,7 @@ import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
 import org.itb.sga.ui.components.MyCard
 import org.itb.sga.ui.components.MyCircularProgressIndicator
+import org.itb.sga.ui.components.alerts.MyErrorAlert
 import org.itb.sga.ui.components.dashboard.DashBoardScreen
 import org.itb.sga.ui.components.text.MyMediumParagraphFormat
 import org.itb.sga.ui.components.text.MyMediumTitle
@@ -78,7 +79,7 @@ fun Screen(
     LaunchedEffect(Unit) {
         homeViewModel.clearError()
         homeViewModel.clearSearchQuery()
-        homeViewModel.homeData.value!!.persona.idInscripcion?.let {
+        homeViewModel.homeData.value?.persona?.idInscripcion?.let {
             aluConsultaGeneralViewModel.onloadAluConsultaGeneral(
                 it, homeViewModel)
         }
@@ -95,6 +96,18 @@ fun Screen(
             item { data?.let { it.matricula?.let { matricula -> dataMatricula(matricula, navController) } } }
             item { data?.let { it.cronogramas?.let { cronograma -> dataCronograma(cronograma, navController) } } }
         }
+    }
+
+    error?.let {
+        MyErrorAlert(
+            titulo = it.title,
+            mensaje = it.error,
+            onDismiss = {
+                homeViewModel.clearError()
+                navController.popBackStack()
+            },
+            showAlert = true
+        )
     }
 }
 
@@ -123,7 +136,7 @@ fun dataCronograma(
                             Spacer(Modifier.height(8.dp))
                             MySmallParagraphFormat("Fecha: ", "${materia.fechaInicio} al ${materia.fechaFin}")
                             Spacer(Modifier.height(4.dp))
-                            MySmallParagraphFormat("Docente: ", materia.docente?.let { it } ?: "Sin asignar")
+                            MySmallParagraphFormat("Docente: ", materia.docente ?: "Sin asignar")
                             Spacer(Modifier.height(4.dp))
                         }
                     }
@@ -168,7 +181,7 @@ fun dataFinanzas(
                             ) {
                                 MySmallTitle(rubro.nombre)
                                 Spacer(Modifier.height(8.dp))
-                                MySmallParagraphFormat("Fecha Vencimiento: ", "${rubro.fechaVence}")
+                                MySmallParagraphFormat("Fecha Vencimiento: ", rubro.fechaVence)
                                 Spacer(Modifier.height(4.dp))
                                 MySmallParagraphFormat("Valor: ", "$${rubro.valor}")
                                 Spacer(Modifier.height(4.dp))

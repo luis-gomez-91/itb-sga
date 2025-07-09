@@ -94,7 +94,7 @@ fun Screen(
     LaunchedEffect(Unit) {
         homeViewModel.clearError()
         homeViewModel.clearSearchQuery()
-        homeViewModel.homeData.value!!.persona.idInscripcion?.let {
+        homeViewModel.homeData.value?.persona?.idInscripcion?.let {
             aluMallaViewModel.onloadAluMalla(
                 it, homeViewModel
             )

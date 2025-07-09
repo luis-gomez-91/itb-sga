@@ -111,15 +111,13 @@ fun PeriodoItem(
     homeViewModel: HomeViewModel
 ) {
     val periodoSelect by homeViewModel.periodoSelect.collectAsState(null)
-    val data by homeViewModel.homeData.collectAsState(null)
-    data?.let {
-
+    periodoSelect?.let { select ->
         TextButton(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp)
                 .background(
-                    color = if (periodoSelect!!.id == periodo.id)
+                    color = if (select.id == periodo.id)
                         MaterialTheme.colorScheme.secondaryContainer
                     else Color.Transparent
                 ),
@@ -134,7 +132,7 @@ fun PeriodoItem(
                 text = periodo.nombre,
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
-                color = if (periodoSelect!!.id == periodo.id)
+                color = if (select.id == periodo.id)
                     MaterialTheme.colorScheme.secondary
                 else MaterialTheme.colorScheme.outline
             )

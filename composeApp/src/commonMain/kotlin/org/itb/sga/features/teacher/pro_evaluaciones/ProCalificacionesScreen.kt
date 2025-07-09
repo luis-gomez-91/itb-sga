@@ -47,7 +47,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import org.itb.sga.core.formatoText
-import org.itb.sga.data.network.Error
 import org.itb.sga.data.network.pro_evaluaciones.ProEvaluaciones
 import org.itb.sga.data.network.pro_evaluaciones.ProEvaluacionesCalificacion
 import org.itb.sga.data.network.pro_evaluaciones.ProEvaluacionesMateria
@@ -87,7 +86,7 @@ fun Screen(
     var showAll by remember { mutableStateOf(false) }
 
     LaunchedEffect(materiaSelect) {
-        homeViewModel.homeData.value!!.persona.idDocente?.let {
+        homeViewModel.homeData.value?.persona?.idDocente?.let {
             proEvaluacionesViewModel.onloadProEvaluaciones(
                 id = it,
                 homeViewModel = homeViewModel,
@@ -137,8 +136,10 @@ fun Screen(
                         enabled = true,
                         icon = Icons.Filled.PictureAsPdf,
                         onClickAction = {
-                            proEvaluacionesViewModel.downloadActa("acta_notas", materiaSelect!!.idMateria, homeViewModel)
-                            proEvaluacionesViewModel.downloadActa("informe_acta_calificaciones", materiaSelect!!.idMateria, homeViewModel)
+                            materiaSelect?.idMateria?.let {
+                                proEvaluacionesViewModel.downloadActa("acta_notas", it, homeViewModel)
+                                proEvaluacionesViewModel.downloadActa("informe_acta_calificaciones", it, homeViewModel)
+                            }
                         },
                         buttonColor = MaterialTheme.colorScheme.primaryContainer,
                         textColor = MaterialTheme.colorScheme.primary

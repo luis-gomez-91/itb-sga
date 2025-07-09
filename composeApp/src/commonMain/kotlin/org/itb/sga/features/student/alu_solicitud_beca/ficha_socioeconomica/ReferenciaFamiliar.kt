@@ -95,14 +95,16 @@ fun ReferenciaFamiliar(
                 modifier = Modifier.fillMaxSize()
             ) {
                 itemsIndexed(referencias) { index, referencia ->
-                    AddParentesco(
-                        referencia = referencia,
-                        dataParentesco = data!!.referenciaFamiliar.parentesco,
-                        enable = enable,
-                        aluSolicitudBecaViewModel = aluSolicitudBecaViewModel,
-                        onDelete = { aluSolicitudBecaViewModel.removeListParentesco(index) },
-                        index = index
-                    )
+                    data?.referenciaFamiliar?.parentesco?.let {
+                        AddParentesco(
+                            referencia = referencia,
+                            dataParentesco = it,
+                            enable = enable,
+                            aluSolicitudBecaViewModel = aluSolicitudBecaViewModel,
+                            onDelete = { aluSolicitudBecaViewModel.removeListParentesco(index) },
+                            index = index
+                        )
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }

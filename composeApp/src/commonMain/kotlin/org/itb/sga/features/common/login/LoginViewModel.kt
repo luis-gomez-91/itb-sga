@@ -19,16 +19,17 @@ import org.itb.sga.data.network.Response
 import org.itb.sga.data.network.form.RequestPasswordRecoveryForm
 import org.itb.sga.features.common.home.HomeViewModel
 
+
 class LoginViewModel(
     val biometryAuthenticator: BiometryAuthenticator
 ) : ViewModel(){
     val client = createHttpClient()
     val loginService = LoginService(client)
 
-    private val _username = MutableStateFlow("lagomez5")
+    private val _username = MutableStateFlow("")
     val username: StateFlow<String> = _username
 
-    private val _password = MutableStateFlow("Mariajose1994$")
+    private val _password = MutableStateFlow("")
     val password: StateFlow<String> = _password
 
     private val _isLoading = MutableStateFlow(false)

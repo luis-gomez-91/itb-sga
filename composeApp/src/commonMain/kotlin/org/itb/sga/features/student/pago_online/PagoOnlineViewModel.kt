@@ -42,7 +42,6 @@ class PagoOnlineViewModel : ViewModel() {
     val total: StateFlow<Double> = _total
 
     private val _idPagoPymentez = MutableStateFlow<Int?>(null)
-    val idPagoPymentez: StateFlow<Int?> = _idPagoPymentez
 
     private val _referencia = MutableStateFlow<String?>(null)
     val referencia: StateFlow<String?> = _referencia
@@ -51,13 +50,11 @@ class PagoOnlineViewModel : ViewModel() {
     val showModalNuvei: StateFlow<Boolean> = _showModalNuvei
 
     private val _selectedRubros = MutableStateFlow<List<RubroX>>(emptyList())
-    val selectedRubros: StateFlow<List<RubroX>> = _selectedRubros
 
     private val _switchStates = MutableStateFlow<Map<RubroX, Boolean>>(emptyMap())
     val switchStates: StateFlow<Map<RubroX, Boolean>> = _switchStates
 
     private val _diferido = MutableStateFlow(0)
-    val diferido: StateFlow<Int> = _diferido
 
     fun setDiferido(newValue: Int) {
         _diferido.value = newValue
@@ -67,14 +64,16 @@ class PagoOnlineViewModel : ViewModel() {
         if (isChecked) {
             val rubroFecha: LocalDate = LocalDate.parse(rubro.fecha)
 
-            val rubrosAnteriores = _data.value?.rubros!!.filter {
+            val rubrosAnteriores = _data.value?.rubros?.filter {
                 val rubroFechaAnterior: LocalDate = LocalDate.parse(it.fecha)
 
                 rubroFechaAnterior < rubroFecha
             }
 
-            if (rubrosAnteriores.any { !_switchStates.value[it]!! }) {
-                return
+            rubrosAnteriores?.let {
+                if (it.any { !_switchStates.value[it]!! }) {
+                    return
+                }
             }
 
             _switchStates.value = _switchStates.value.toMutableMap().apply {
@@ -194,13 +193,6 @@ class PagoOnlineViewModel : ViewModel() {
 
     fun updateTerminosCondiciones(value: Boolean) {
         _terminosCondiciones.value = value
-    }
-
-    private val _showPayAlert = MutableStateFlow<Boolean>(false)
-    val showPayAlert: StateFlow<Boolean> = _showPayAlert
-
-    fun updateShowPayAlert(value: Boolean) {
-        _showPayAlert.value = value
     }
 
     private val _payData = MutableStateFlow<PayData>(

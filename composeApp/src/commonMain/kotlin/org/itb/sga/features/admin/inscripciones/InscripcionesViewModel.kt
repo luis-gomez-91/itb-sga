@@ -31,11 +31,10 @@ class InscripcionesViewModel: ViewModel() {
                 when (result) {
                     is InscripcionResult.Success -> {
                         _data.value = result.inscripciones
-//                        _data.value!!.paging.next = _data.value!!.paging.next.from + _pagingRange.value
                         _error.value = ""
                     }
                     is InscripcionResult.Failure -> {
-                        _error.value = result.error.error ?: "An unknown error occurred"
+                        _error.value = result.error.error
                     }
                 }
             } catch (e: Exception) {

@@ -74,7 +74,6 @@ class AluSolicitudesViewModel: ViewModel() {
     val fileName: StateFlow<String> = _fileName
 
     private val _byteArray = MutableStateFlow<ByteArray?>(null)
-    val byteArray: StateFlow<ByteArray?> = _byteArray
 
     fun changeFileName(name: String) {
         _fileName.value = name
@@ -147,19 +146,21 @@ class AluSolicitudesViewModel: ViewModel() {
                 val fileAsIntList = _byteArray.value!!.map { it.toUByte().toInt() }
                 fileForm = FileForm(file = fileAsIntList, name = _fileName.value)
             }
-            val form = SolicitudEspecieForm(
-                action = "addSolicitud",
-                idEspecie = _selectedTipoSolicitud.value!!.id,
-                observacion = _observacion.value,
-                idInscripcion = idInscripcion,
-                file = fileForm,
-                idAsignatura = _selectedMateria.value?.id,
-                idDocente = _selectedDocente.value?.id
-            )
+            val form = _selectedTipoSolicitud.value?.let {
+                SolicitudEspecieForm(
+                    action = "addSolicitud",
+                    idEspecie = it.id,
+                    observacion = _observacion.value,
+                    idInscripcion = idInscripcion,
+                    file = fileForm,
+                    idAsignatura = _selectedMateria.value?.id,
+                    idDocente = _selectedDocente.value?.id
+                )
+            }
             try {
-                val result = service.addSolicitud(form)
+                val result = form?.let { service.addSolicitud(it) }
                 _response.value = result
-                logInfo("solicitudes", result.message)
+                result?.let { logInfo("solicitudes", it.message) }
 
             } catch (e: Exception) {
                 homeViewModel.addError(Error(title = "Error", error = "${e.message}"))

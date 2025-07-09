@@ -64,7 +64,7 @@ fun Screen(
     val periodo by homeViewModel.periodoSelect.collectAsState(null)
 
     LaunchedEffect(periodo) {
-        homeViewModel.homeData.value!!.persona.idDocente?.let {
+        homeViewModel.homeData.value?.persona?.idDocente?.let {
             proEvaluacionesViewModel.onloadProEvaluaciones(
                 id = it,
                 homeViewModel = homeViewModel,

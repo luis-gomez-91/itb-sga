@@ -111,7 +111,7 @@ fun FormScreen(
                         enabled = true,
                         icon = Icons.Filled.Save,
                         onClickAction = {
-                            homeViewModel.homeData.value!!.persona.idInscripcion?.let {
+                            homeViewModel.homeData.value?.persona?.idInscripcion?.let {
                                 aluSolicitudesViewModel.sendSolicitud(
                                     idInscripcion = it,
                                     homeViewModel = homeViewModel
@@ -184,16 +184,13 @@ fun Especies(
     }
 
 
-    if (if (!solicitudes?.asignaturas.isNullOrEmpty() && selectedTipoSolicitud?.relacionaDocente ?: false) {
-            true
-        } else {
-            false
+    if (!solicitudes?.asignaturas.isNullOrEmpty() && selectedTipoSolicitud?.relacionaDocente == true) {
+        solicitudes?.asignaturas?.let {
+            Materias(
+                aluSolicitudesViewModel = aluSolicitudesViewModel,
+                materias = it
+            )
         }
-    ) {
-        Materias(
-            aluSolicitudesViewModel = aluSolicitudesViewModel,
-            materias = solicitudes?.asignaturas
-        )
     }
 
     val coroutineScope = rememberCoroutineScope1()
@@ -257,7 +254,7 @@ fun Observaciones(
 @Composable
 fun Materias(
     aluSolicitudesViewModel: AluSolicitudesViewModel,
-    materias: List<TipoEspecieAsignatura>?
+    materias: List<TipoEspecieAsignatura>
 ) {
     var expanded by remember { mutableStateOf(false) }
     val selectedMateria by aluSolicitudesViewModel.selectedMateria.collectAsState(null)
@@ -268,7 +265,7 @@ fun Materias(
         onExpandedChange = { expanded = it },
         label = "Asignatura",
         selectedOption = selectedMateria,
-        options = materias!!,
+        options = materias,
         onOptionSelected = { selectedOption ->
             aluSolicitudesViewModel.changeSelectedMateria(selectedOption)
             aluSolicitudesViewModel.changeSelectedDocente(null)

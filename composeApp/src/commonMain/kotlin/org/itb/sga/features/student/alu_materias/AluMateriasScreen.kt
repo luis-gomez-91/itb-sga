@@ -116,7 +116,7 @@ fun Screen(
     LaunchedEffect(Unit) {
         homeViewModel.clearError()
         homeViewModel.clearSearchQuery()
-        homeViewModel.homeData.value!!.persona.idInscripcion?.let {
+        homeViewModel.homeData.value?.persona?.idInscripcion?.let {
             aluMateriasViewModel.onloadAluMaterias(
                 it, homeViewModel
             )
@@ -164,10 +164,10 @@ fun Screen(
             }
         }
 
-        if (error != null) {
+        error?.let {
             MyErrorAlert(
-                titulo = error!!.title,
-                mensaje = error!!.error,
+                titulo = it.title,
+                mensaje = it.error,
                 onDismiss = {
                     homeViewModel.clearError()
                     navController.popBackStack()
@@ -561,13 +561,21 @@ fun LeccionItem(
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
-        MyAssistChip(
-            label = "${leccion.horaEntrada} - ${leccion.horaSalida}",
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            labelColor = MaterialTheme.colorScheme.secondary,
-            icon = Icons.Filled.Timer
-        )
-        Spacer(modifier = Modifier.width(4.dp))
+        val horaDisplay = if (leccion.horaSalida != null) {
+            "${leccion.horaEntrada} - ${leccion.horaSalida}"
+        } else {
+            "${leccion.horaEntrada} - Cursando"
+        }
+        leccion.horaSalida.let {
+            MyAssistChip(
+                label = horaDisplay,
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                labelColor = MaterialTheme.colorScheme.secondary,
+                icon = Icons.Filled.Timer
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+        }
+
         MyAssistChip(
             label = "Asistencia",
             containerColor = if (leccion.asistio) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.errorContainer,

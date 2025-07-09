@@ -54,7 +54,7 @@ fun FichaSocioeconomicaScreen(
     )
 
     LaunchedEffect(Unit) {
-        homeViewModel.homeData.value!!.persona.idInscripcion?.let {
+        homeViewModel.homeData.value?.persona?.idInscripcion?.let {
             aluSolicitudBecaViewModel.onloadFichaSocioeconomica(
                 it
             )
@@ -68,7 +68,7 @@ fun FichaSocioeconomicaScreen(
                 .fillMaxWidth()
                 .background(color = MaterialTheme.colorScheme.surfaceContainer),
             indicator = { tabPositions ->
-                TabRowDefaults.Indicator(
+                TabRowDefaults.SecondaryIndicator(
                     Modifier
                         .tabIndicatorOffset(tabPositions[selectedTabIndex])
                         .height(3.dp),

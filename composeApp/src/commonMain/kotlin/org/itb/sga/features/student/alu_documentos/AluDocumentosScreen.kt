@@ -77,7 +77,7 @@ fun Screen(
 
     LaunchedEffect(response) {
         homeViewModel.clearSearchQuery()
-        homeViewModel.homeData.value!!.persona.idInscripcion?.let {
+        homeViewModel.homeData.value?.persona?.idInscripcion?.let {
             aluDocumentosViewModel.onloadAluDcoumentos(
                 it, homeViewModel)
         }
@@ -206,9 +206,11 @@ fun DocumentoItem(
             },
             onConfirm = {
                 scope.launch {
-                    when (action) {
-                        "removeDocument" -> aluDocumentosViewModel.removeDocument(homeViewModel.homeData.value!!.persona.idPersona)
-                        "sendDocument" -> aluDocumentosViewModel.sendDocument(homeViewModel.homeData.value!!.persona.idPersona)
+                    homeViewModel.homeData.value?.persona?.idPersona?.let {
+                        when (action) {
+                            "removeDocument" -> aluDocumentosViewModel.removeDocument(it)
+                            "sendDocument" -> aluDocumentosViewModel.sendDocument(it)
+                        }
                     }
                 }
             },

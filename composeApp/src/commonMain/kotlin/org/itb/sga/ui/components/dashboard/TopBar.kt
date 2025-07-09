@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import kotlinx.coroutines.launch
 import org.itb.sga.features.common.home.HomeViewModel
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyTopBar(
@@ -63,13 +64,11 @@ fun MyTopBar(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
-//                    .height(68.dp)
             ) {
                 Crossfade(targetState = onSearch) { isSearch ->
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(),
-//                            .padding(8.dp),
                         contentAlignment = Alignment.CenterStart
                     ) {
                         if (!isSearch) {

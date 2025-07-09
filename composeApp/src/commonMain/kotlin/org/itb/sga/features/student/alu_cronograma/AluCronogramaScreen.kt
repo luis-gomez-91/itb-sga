@@ -50,6 +50,7 @@ import org.itb.sga.ui.components.MyCard
 import org.itb.sga.ui.components.MyCircularProgressIndicator
 import org.itb.sga.ui.components.dashboard.DashBoardScreen
 
+
 @Composable
 fun AluCronogramaScreen(
     navController: NavHostController,
@@ -92,7 +93,9 @@ fun Screen(
     LaunchedEffect(Unit) {
         homeViewModel.clearError()
         homeViewModel.clearSearchQuery()
-        aluCronogramaViewModel.onloadAluCronograma(homeViewModel.homeData.value!!.persona.idInscripcion!!, homeViewModel)
+        homeViewModel.homeData.value?.persona?.idInscripcion?.let {
+            aluCronogramaViewModel.onloadAluCronograma(it, homeViewModel)
+        }
     }
 
     if (isLoading) {
@@ -110,10 +113,10 @@ fun Screen(
         }
     }
 
-    if (error != null) {
+    error?.let {
         MyErrorAlert(
-            titulo = error!!.title,
-            mensaje = error!!.error,
+            titulo = it.title,
+            mensaje = it.error,
             onDismiss = {
                 homeViewModel.clearError()
                 navController.popBackStack()
@@ -186,7 +189,6 @@ fun AluCronogramaItem(
                     Horarios(data.horarios)
                 }
             }
-
         }
     }
 }

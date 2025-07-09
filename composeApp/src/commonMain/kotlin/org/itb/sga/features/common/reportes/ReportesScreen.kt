@@ -95,7 +95,7 @@ fun Screen(
     val error by reportesViewModel.error.collectAsState(null)
 
     LaunchedEffect(Unit) {
-        homeViewModel.homeData.value!!.persona.idPersona.let {
+        homeViewModel.homeData.value?.persona?.idPersona?.let {
             reportesViewModel.onloadReportes(
                 idPersona = it,
                 homeViewModel = homeViewModel,
@@ -371,7 +371,7 @@ fun ReportForm(
                             getOptionDescription = { it.name },
                             enabled = true,
                             onSearchTextChange = { query ->
-                                reportesViewModel.fetchDjangoModel(parametro.modelo!!, query)
+                                parametro.modelo?.let { reportesViewModel.fetchDjangoModel(it, query) }
                             }
                         )
                     }

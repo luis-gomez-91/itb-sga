@@ -94,7 +94,9 @@ fun Screen(
 
     LaunchedEffect(Unit) {
         homeViewModel.clearSearchQuery()
-        aluNotasViewModel.onloadAluNotaAsignatura(homeViewModel.homeData.value!!.persona.idInscripcion!!)
+        homeViewModel.homeData.value?.persona?.idInscripcion?.let {
+            aluNotasViewModel.onloadAluNotaAsignatura(it)
+        }
     }
 
     TipoItem(asignaturaFiltrada, otraNotaFiltrada)

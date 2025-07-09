@@ -104,7 +104,7 @@ fun Screen(
 
     LaunchedEffect(periodoSelect) {
         selectedTabIndex = 0
-        homeViewModel.homeData.value!!.persona.idDocente?.let {
+        homeViewModel.homeData.value?.persona?.idDocente?.let {
             periodoSelect?.let { it1 ->
                 proHorariosViewModel.onloadProHorarios(
                     id = it,

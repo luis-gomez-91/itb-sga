@@ -28,7 +28,6 @@ import org.itb.sga.data.network.notificaciones.Notificacion
 import org.itb.sga.data.network.Response
 import org.itb.sga.data.network.form.RequestPasswordChangeForm
 import org.itb.sga.features.common.login.LoginViewModel
-import kotlin.math.log
 
 class HomeViewModel(
     private val pdfOpener: URLOpener,
@@ -49,6 +48,7 @@ class HomeViewModel(
             _isLoading.value = true
             try {
                 val result = service.fetchHome(id)
+                logInfo("homeViewModel", "RESULT: $result")
 
                 when (result) {
                     is HomeResult.Success -> {
@@ -59,11 +59,12 @@ class HomeViewModel(
                     }
                     is HomeResult.Failure -> {
                         _error.value = result.error
-                        _error.value!!.title = "Error al cargar datos"
+                        _error.value?.title = "Error al cargar datos"
                     }
                 }
 
             } catch (e: Exception) {
+                logInfo("homeViewModel", "ERROR: $e")
                 addError(error = Error(title = "Error", error = "${e.message}"))
             } finally {
                 _isLoading.value = false
@@ -130,7 +131,7 @@ class HomeViewModel(
                     }
                     is ReportResult.Failure -> {
                         _error.value = result.error
-                        _error.value!!.title = "Error al generar reporte"
+                        _error.value?.title = "Error al generar reporte"
                     }
 
                 }
@@ -212,7 +213,7 @@ class HomeViewModel(
             }
             val result = form?.let { requestPostDispatcher(client, it) }
 
-            _homeData.value!!.persona.foto = result?.message ?: _homeData.value!!.persona.foto
+            _homeData.value?.persona?.foto = result?.message ?: _homeData.value?.persona?.foto?:""
             _photoUploaded.value = true
 
         } catch (e: Exception) {
@@ -304,10 +305,6 @@ class HomeViewModel(
     private val _screenSelect = MutableStateFlow<String>("screen")
     val screenSelect: StateFlow<String> = _screenSelect
 
-    fun changeScreenSelect(value: String) {
-        _screenSelect.value = value
-    }
-
 //    Biometric credentials
     private val _hasShownAlert = MutableStateFlow(false)
 
@@ -330,9 +327,9 @@ class HomeViewModel(
             val user = aokDatabase.userDao().getLastUser()
             val result = user?.let {
                 it.username == loginViewModel.username.value && it.password == loginViewModel.password.value
-            } ?: false
+            } == true
             !result
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             true
         }
         _showSaveCredentials.value = value
@@ -340,13 +337,15 @@ class HomeViewModel(
 
     fun saveCredentialsLogin(loginViewModel: LoginViewModel) {
         viewModelScope.launch {
-            val user = User(
-                username = loginViewModel.username.value,
-                password = loginViewModel.password.value,
-                userId = loginViewModel.userData.value!!.idUsuario,
-                hashedPassword = null
-            )
-            aokDatabase.userDao().upsert(user)
+            val user = loginViewModel.userData.value?.let {
+                User(
+                    username = loginViewModel.username.value,
+                    password = loginViewModel.password.value,
+                    userId = it.idUsuario,
+                    hashedPassword = null
+                )
+            }
+            user?.let { aokDatabase.userDao().upsert(it) }
         }
     }
 

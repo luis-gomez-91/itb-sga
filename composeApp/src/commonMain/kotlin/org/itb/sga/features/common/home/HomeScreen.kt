@@ -51,6 +51,7 @@ import org.itb.sga.ui.components.alerts.MySuccessAlert
 import org.itb.sga.ui.components.dashboard.DashBoardScreen
 import org.itb.sga.ui.components.shimmer.ShimmerFormLoadingAnimation
 
+
 @Composable
 fun HomeScreen(
     navController: NavHostController,
@@ -63,19 +64,19 @@ fun HomeScreen(
             homeViewModel.onloadHome(id)
         }
     }
-    DashBoardScreen(
-        title = loginViewModel.userData.value!!.nombre,
-        navController = navController,
-        content = {
-            Screen(
-                navController,
-                homeViewModel,
-                loginViewModel
-            )
-        },
-        homeViewModel = homeViewModel,
-        loginViewModel = loginViewModel
-    )
+    userData?.let { user ->
+        DashBoardScreen(
+            title = user.nombre,
+            navController = navController,
+            content = {
+                Screen(navController, homeViewModel, loginViewModel)
+            },
+            homeViewModel = homeViewModel,
+            loginViewModel = loginViewModel
+        )
+    } ?: run {
+        MyCircularProgressIndicator()
+    }
 }
 
 @Composable
@@ -109,11 +110,11 @@ fun Screen(
         }
     }
 
-    if (response != null) {
-        if (response!!.status == "success") {
+    response?.let {
+        if (it.status == "success") {
             MySuccessAlert(
                 titulo = "Realizado",
-                mensaje = response!!.message,
+                mensaje = it.message,
                 onDismiss = {
                     homeViewModel.clearResponse()
                 },
@@ -122,7 +123,7 @@ fun Screen(
         } else {
             MyErrorAlert(
                 titulo = "Error",
-                mensaje = response!!.message,
+                mensaje = it.message,
                 onDismiss = {
                     homeViewModel.clearResponse()
                 },
@@ -266,7 +267,7 @@ fun cardModulo(
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
-                model = "https://sga.itb.edu.ec${modulo.img}",
+                model = modulo.img.let { "https://sga.itb.edu.ec$it" },
                 contentDescription = modulo.nombre,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

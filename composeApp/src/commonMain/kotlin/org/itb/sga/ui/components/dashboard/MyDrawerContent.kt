@@ -23,7 +23,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.LockPerson
 import androidx.compose.material.icons.filled.Logout
@@ -120,31 +119,45 @@ fun MyDrawerContent(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     text = "Sistema de Gestión Académica",
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
 
-                Spacer(Modifier.height(8.dp))
-                PhotoProfile(homeViewModel, scope, homeData)
+                homeData?.let { data ->
+                    Spacer(Modifier.height(8.dp))
+                    PhotoProfile(homeViewModel, scope, data)
 
-                Text(
-                    text = homeData?.persona?.nombre ?: "",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-                Text(
-                    text = "(${homeData?.persona?.emailinst})",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.secondary
-                )
+                    data.persona.nacionalidadEmoticon?.let {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                    Text(
+                        text = data.persona.nombre,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    Text(
+                        text = data.persona.emailinst,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    Text(
+                        text = data.persona.usuario,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
                 HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
-//                Spacer(modifier = Modifier.height(8.dp))
 
                 items.forEach { item ->
                     Column {

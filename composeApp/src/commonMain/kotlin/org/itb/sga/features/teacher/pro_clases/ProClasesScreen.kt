@@ -145,10 +145,10 @@ fun Screen(
             }
         }
     }
-    if (error != null) {
+    error?.let {
         MyErrorAlert(
-            titulo = error!!.title,
-            mensaje = error!!.error,
+            titulo = it.title,
+            mensaje = it.error,
             onDismiss = {
                 homeViewModel.clearError()
                 navController.popBackStack()

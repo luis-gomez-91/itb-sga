@@ -155,17 +155,17 @@ fun Screen(
                 }
             }
         }
-        if (error != null) {
-            MyErrorAlert(
-                titulo = error!!.title,
-                mensaje = error!!.error,
-                onDismiss = {
-                    homeViewModel.clearError()
-                    navController.popBackStack()
-                },
-                showAlert = true
-            )
-        }
+    }
+    error?.let {
+        MyErrorAlert(
+            titulo = it.title,
+            mensaje = it.error,
+            onDismiss = {
+                homeViewModel.clearError()
+                navController.popBackStack()
+            },
+            showAlert = true
+        )
     }
 }
 

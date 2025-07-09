@@ -73,7 +73,7 @@ fun Screen(
 
     LaunchedEffect(Unit) {
         homeViewModel.clearSearchQuery()
-        homeViewModel.homeData.value!!.persona.idInscripcion?.let {
+        homeViewModel.homeData.value?.persona?.idInscripcion?.let {
             aluFinanzasViewModel.onloadAluFinanzas(
                 it, homeViewModel)
         }
