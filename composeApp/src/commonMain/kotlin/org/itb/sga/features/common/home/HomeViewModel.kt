@@ -2,6 +2,7 @@ package org.itb.sga.features.common.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.plusmobileapps.konnectivity.Konnectivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +32,8 @@ import org.itb.sga.features.common.login.LoginViewModel
 
 class HomeViewModel(
     private val pdfOpener: URLOpener,
-    val aokDatabase: AokDatabase
+    val aokDatabase: AokDatabase,
+    val konnectivity: Konnectivity
 ) : ViewModel() {
     val client = createHttpClient()
     val service = HomeService(client)

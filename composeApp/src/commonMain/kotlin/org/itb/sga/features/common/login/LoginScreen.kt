@@ -4,21 +4,18 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Fingerprint
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Login
-import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import org.jetbrains.compose.resources.painterResource
@@ -42,7 +38,6 @@ import aok.composeapp.generated.resources.logo
 import aok.composeapp.generated.resources.logo_dark
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.ui.components.alerts.MyErrorAlert
-import org.itb.sga.ui.components.MyCircularProgressIndicator
 import org.itb.sga.ui.components.MyFilledTonalButton
 import org.itb.sga.ui.components.MyOutlinedTextField
 import org.itb.sga.ui.components.alerts.MySuccessAlert
@@ -51,7 +46,24 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
+import compose.icons.TablerIcons
+import compose.icons.tablericons.Eye
+import compose.icons.tablericons.EyeOff
+import compose.icons.tablericons.FaceId
+import compose.icons.tablericons.Fingerprint
+import compose.icons.tablericons.LockOpen
+import compose.icons.tablericons.Login
+import compose.icons.tablericons.Send
+import org.itb.sga.core.appIsLastVersion
+import org.itb.sga.core.getPlatform
+import org.itb.sga.data.domain.BiometryType
+import org.itb.sga.ui.components.ConnectivityWrapper
+import org.itb.sga.ui.components.FullScreenLoading
+import org.itb.sga.ui.components.NewVersionScreen
 import org.itb.sga.ui.components.SocialMedia
+
 
 @Composable
 fun LoginScreen(
@@ -59,16 +71,11 @@ fun LoginScreen(
     loginViewModel: LoginViewModel,
     homeViewModel: HomeViewModel
 ) {
-    val username by loginViewModel.username.collectAsState()
-    val password by loginViewModel.password.collectAsState()
-    val isLoading by loginViewModel.isLoading.collectAsState()
-    val verPassword: Boolean by loginViewModel.verPassword.collectAsState(false)
-    val error by loginViewModel.error.collectAsState(null)
-    val showBottomSheet by homeViewModel.showBottomSheet.collectAsState(false)
-    val showResponse by loginViewModel.showResponse.collectAsState()
-    val selectedTheme by homeViewModel.selectedTheme.collectAsState(null)
-    val response by loginViewModel.response.collectAsState()
+    val internetConnected by homeViewModel.konnectivity.isConnectedState.collectAsState()
+    val appLastVersion by loginViewModel.appLastVersion.collectAsState(null)
 
+
+    val selectedTheme by homeViewModel.selectedTheme.collectAsState(null)
     var imageLogo by remember { mutableStateOf(Res.drawable.logo) }
 
     LaunchedEffect(selectedTheme) {
@@ -79,130 +86,94 @@ fun LoginScreen(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 36.dp),
-        contentAlignment = Alignment.Center
+    ConnectivityWrapper(
+        internetConnected,
+        homeViewModel
     ) {
-        if (isLoading) {
-            MyCircularProgressIndicator()
+        LaunchedEffect(Unit) {
+            loginViewModel.fetchLastVersionApp()
+        }
+
+        appLastVersion?.let {
+            if (appIsLastVersion(it)) {
+                Screen(loginViewModel, navController, homeViewModel)
+            } else {
+                NewVersionScreen(imageLogo)
+            }
+        }
+    }
+}
+
+@Composable
+fun Screen(
+    loginViewModel: LoginViewModel,
+    navController: NavHostController,
+    homeViewModel: HomeViewModel
+) {
+    val isLoading by loginViewModel.isLoading.collectAsState()
+    val error by loginViewModel.error.collectAsState(null)
+    val showBottomSheet by homeViewModel.showBottomSheet.collectAsState(false)
+    val showResponse by loginViewModel.showResponse.collectAsState()
+    val selectedTheme by homeViewModel.selectedTheme.collectAsState(null)
+    val response by loginViewModel.response.collectAsState()
+    var imageLogo by remember { mutableStateOf(Res.drawable.logo) }
+
+    LaunchedEffect(selectedTheme) {
+        imageLogo = if (selectedTheme?.dark == true) {
+            Res.drawable.logo_dark
         } else {
+            Res.drawable.logo
+        }
+    }
+
+    Box {
+        FullScreenLoading(isLoading = (isLoading))
+        Column (
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             Column (
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceAround
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+                    .safeContentPadding()
+                    .imePadding()
+                ,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Image(
+                    painter = painterResource(imageLogo),
+                    contentDescription = "logo",
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal =  32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Image(
-                        painter = painterResource(imageLogo),
-                        contentDescription = "logo",
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    MyOutlinedTextField(
-                        value = username,
-                        onValueChange = { loginViewModel.onLoginChanged(it, password) },
-                        placeholder = "Usuario",
-                        label = "Usuario",
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    MyOutlinedTextField(
-                        value = password,
-                        onValueChange = { loginViewModel.onLoginChanged(username, it) },
-                        placeholder = "Contraseña",
-                        label = "Contraseña",
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        modifier = Modifier.fillMaxWidth(),
-                        visualTransformation = if(!verPassword) PasswordVisualTransformation() else VisualTransformation.None,
-                        trailingIcon = {
-                            if (password.isNotBlank()) {
-                                PasswordIcon(
-                                    isPasswordVisible = verPassword,
-                                    onIconClick = { loginViewModel.togglePasswordVisibility() }
-                                )
-                            }
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        TextButton(
-                            onClick = {
-                                homeViewModel.changeBottomSheet()
-                            }
-                        ) {
-                            Text(
-                                text = "Recuperar contraseña",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(Modifier.width(4.dp))
-                            Icon(
-                                imageVector = Icons.Filled.Lock,
-                                contentDescription = "More Information",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-
-                        TextButton(
-                            onClick = {
-                                loginViewModel.tryToAuth(navController, homeViewModel.aokDatabase)
-                            }
-                        ) {
-                            Text(
-                                text = "Ingresar con huella o Face ID",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(Modifier.width(4.dp))
-                            Icon(
-                                imageVector = Icons.Filled.Fingerprint,
-                                contentDescription = "More Information",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
+                    item {
+                        FormLogin(loginViewModel, navController, homeViewModel)
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    MyFilledTonalButton(
-                        text = "Ingresar",
-                        enabled = loginViewModel.habilitaBoton(),
-                        icon = Icons.Filled.Login,
-                        iconSize = 24.dp,
-                        buttonColor = MaterialTheme.colorScheme.primaryContainer,
-                        textColor = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        textStyle = MaterialTheme.typography.titleMedium,
-                        onClickAction = {
-                            loginViewModel.onLoginSelector(navController)
-                        }
-                    )
                 }
+            }
 
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.BottomCenter
-                ) {
-                    SocialMedia(
-                        modifier = Modifier,
-                        homeViewModel = homeViewModel,
-                        size = 40.dp
-                    )
-                }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 32.dp, end = 32.dp, bottom = 32.dp)
+            ) {
+                SocialMedia(
+                    modifier = Modifier,
+                    homeViewModel = homeViewModel,
+                    size = 32.dp
+                )
             }
         }
 
@@ -248,11 +219,129 @@ fun LoginScreen(
 }
 
 @Composable
+fun FormLogin(
+    loginViewModel: LoginViewModel,
+    navController: NavHostController,
+    homeViewModel: HomeViewModel
+) {
+    val username by loginViewModel.username.collectAsState()
+    val password by loginViewModel.password.collectAsState()
+    val verPassword: Boolean by loginViewModel.verPassword.collectAsState(false)
+    val focusManager = LocalFocusManager.current
+    val biometryType = when(getPlatform().name) {
+        "Android" -> BiometryType("Ingresar con huella dactilar", TablerIcons.Fingerprint)
+        "iOS" -> BiometryType("Ingresar con Face ID", TablerIcons.FaceId)
+        else -> BiometryType("Ingresar con credenciales biométricas", TablerIcons.Fingerprint)
+    }
+
+    MyOutlinedTextField(
+        value = username,
+        onValueChange = { loginViewModel.onLoginChanged(it, password) },
+        placeholder = "Usuario",
+        label = "Usuario",
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Next
+        ),
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    MyOutlinedTextField(
+        value = password,
+        onValueChange = { loginViewModel.onLoginChanged(username, it) },
+        placeholder = "Contraseña",
+        label = "Contraseña",
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction = ImeAction.Done
+        ),
+        modifier = Modifier.fillMaxWidth(),
+        visualTransformation = if(!verPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        trailingIcon = {
+            if (password.isNotBlank()) {
+                PasswordIcon(
+                    isPasswordVisible = verPassword,
+                    onIconClick = { loginViewModel.togglePasswordVisibility() }
+                )
+            }
+        },
+        keyboardActions = KeyboardActions(
+            onDone = {
+                focusManager.clearFocus()
+                loginViewModel.onLoginSelector(navController)
+            }
+        ),
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.End
+    ) {
+        TextButton(
+            onClick = {
+                homeViewModel.changeBottomSheet()
+            }
+        ) {
+            Text(
+                text = "Recuperar contraseña",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(Modifier.width(4.dp))
+            Icon(
+                imageVector = TablerIcons.LockOpen,
+                contentDescription = "Recuperar contraseña",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+
+        TextButton(
+            onClick = {
+                loginViewModel.tryToAuth(navController, homeViewModel.aokDatabase)
+            }
+        ) {
+            Text(
+                text = biometryType.message,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(Modifier.width(4.dp))
+            Icon(
+                imageVector = biometryType.icon,
+                contentDescription = "Login biométrico",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    MyFilledTonalButton(
+        text = "Ingresar",
+        enabled = loginViewModel.habilitaBoton(),
+        icon = TablerIcons.Login,
+        iconSize = 24.dp,
+        buttonColor = MaterialTheme.colorScheme.primaryContainer,
+        textColor = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.fillMaxWidth().height(48.dp),
+        textStyle = MaterialTheme.typography.titleMedium,
+        onClickAction = {
+            loginViewModel.onLoginSelector(navController)
+        }
+    )
+
+}
+
+@Composable
 fun PasswordIcon(
     isPasswordVisible: Boolean,
     onIconClick: () -> Unit
 ) {
-    val image = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility
+    val image = if (isPasswordVisible) TablerIcons.EyeOff else TablerIcons.Eye
     val description = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
 
     IconButton(onClick = { onIconClick() }) {
@@ -276,13 +365,14 @@ fun PasswordRecoveryForm(
         }
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                modifier = Modifier.fillMaxWidth(),
                 text = "Recuperar contraseña",
                 style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -298,7 +388,6 @@ fun PasswordRecoveryForm(
             MyOutlinedTextField(
                 value = phoneInput,
                 onValueChange = { newPhoneInput ->
-                    // Filtra solo los dígitos y limita la longitud a 10
                     val sanitizedInput = newPhoneInput.filter { it.isDigit() }.take(10)
                     loginViewModel.onPasswordRecoveryChange(userInput, sanitizedInput)
                 },
@@ -308,21 +397,18 @@ fun PasswordRecoveryForm(
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(8.dp))
-            Row (
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                MyFilledTonalButton(
-                    text = "Enviar",
-                    enabled = true,
-                    icon = Icons.Filled.Save,
-                    iconSize = 20.dp,
-                    onClickAction = {
-                        homeViewModel.changeBottomSheet()
-                        loginViewModel.requestPasswordRecovery()
-                    }
-                )
-            }
+
+            MyFilledTonalButton(
+                text = "Enviar",
+                enabled = true,
+                icon = TablerIcons.Send,
+                iconSize = 24.dp,
+                onClickAction = {
+                    homeViewModel.changeBottomSheet()
+                    loginViewModel.requestPasswordRecovery()
+                },
+                textStyle = MaterialTheme.typography.titleMedium
+            )
         }
     }
 }

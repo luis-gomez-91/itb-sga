@@ -9,7 +9,7 @@ import org.itb.sga.data.entity.ThemePreference
 import org.itb.sga.data.entity.User
 
 @Database(
-    version = 3,
+    version = 4,
     exportSchema = true,
     entities = [
         User::class,

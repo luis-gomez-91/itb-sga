@@ -30,6 +30,7 @@ import androidx.navigation.NavHostController
 import org.itb.sga.data.network.Periodo
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
+import org.itb.sga.ui.components.ConnectivityWrapper
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,69 +41,78 @@ fun DashBoardScreen(
     homeViewModel: HomeViewModel,
     loginViewModel: LoginViewModel
 ) {
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val showBottomSheet by homeViewModel.showBottomSheet.collectAsState(false)
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            MyDrawerContent(
-                drawerState,
-                navController,
-                homeViewModel,
-                loginViewModel
-            )
-        },
-        content = {
-            Scaffold(
-                topBar = { MyTopBar(title = title, drawerState = drawerState, homeViewModel = homeViewModel) },
-                bottomBar = { MyBottomBar(navController = navController, homeViewModel = homeViewModel) }
-            ) { innerPadding ->
-                Surface(
-                    Modifier
-                        .padding(innerPadding)
-                        .background(color = MaterialTheme.colorScheme.tertiaryContainer)
-                ) {
-                    Column (
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(bottom = 4.dp)
-                    ) {
-                        content()
-                    }
-                }
-            }
+    val internetConnected by homeViewModel.konnectivity.isConnectedState.collectAsState()
+    ConnectivityWrapper(
+        internetConnected,
+        homeViewModel
+    ) {
+        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+        val showBottomSheet by homeViewModel.showBottomSheet.collectAsState(false)
 
-            if (showBottomSheet) {
-                ModalBottomSheet(
-                    onDismissRequest = {
-                        homeViewModel.changeBottomSheet()
-                    }
-                ) {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = "Períodos Académicos",
-                        style = MaterialTheme.typography.titleMedium,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize()
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                MyDrawerContent(
+                    drawerState,
+                    navController,
+                    homeViewModel,
+                    loginViewModel
+                )
+            },
+            content = {
+                Scaffold(
+                    topBar = { MyTopBar(title = title, drawerState = drawerState, homeViewModel = homeViewModel) },
+                    bottomBar = { MyBottomBar(navController = navController, homeViewModel = homeViewModel) }
+                ) { innerPadding ->
+                    Surface(
+                        Modifier
+                            .padding(innerPadding)
+                            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
                     ) {
-                        items(homeViewModel.homeData.value?.periodos ?: emptyList()) { periodo ->
-                            PeriodoItem(
-                                periodo = periodo,
-                                homeViewModel = homeViewModel
-                            )
+                        Column (
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(bottom = 4.dp)
+                        ) {
+                            content()
                         }
                     }
-                    Spacer(Modifier.height(16.dp))
                 }
+
+                if (showBottomSheet) {
+                    ModalBottomSheet(
+                        onDismissRequest = {
+                            homeViewModel.changeBottomSheet()
+                        }
+                    ) {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "Períodos Académicos",
+                            style = MaterialTheme.typography.titleMedium,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(homeViewModel.homeData.value?.periodos ?: emptyList()) { periodo ->
+                                PeriodoItem(
+                                    periodo = periodo,
+                                    homeViewModel = homeViewModel
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(16.dp))
+                    }
+                }
+                Notificacion(homeViewModel, navController)
             }
-            Notificacion(homeViewModel, navController)
-       }
-    )
+        )
+    }
+
+
 }
 
 @Composable

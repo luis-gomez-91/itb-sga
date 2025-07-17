@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
+import com.plusmobileapps.konnectivity.Konnectivity
 import dev.icerock.moko.biometry.compose.BindBiometryAuthenticatorEffect
 import dev.icerock.moko.biometry.compose.BiometryAuthenticatorFactory
 import dev.icerock.moko.biometry.compose.rememberBiometryAuthenticatorFactory
@@ -29,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
         val builder = getDatabaseBuilder(this)
         aokDatabase = getRoomDatabase(builder)
@@ -43,7 +44,8 @@ class MainActivity : AppCompatActivity() {
             Surface(color = Color.Transparent) {
 
                 val urlOpener = URLOpenerAndroid(this)
-                val homeViewModel = HomeViewModel(urlOpener, aokDatabase)
+                val konnectivity = Konnectivity()
+                val homeViewModel = HomeViewModel(urlOpener, aokDatabase, konnectivity)
                 val biometryFactory: BiometryAuthenticatorFactory = rememberBiometryAuthenticatorFactory()
 
 
@@ -62,8 +64,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         // ATTENTION: This was auto-generated to handle app links.
-        val appLinkIntent: Intent = intent
-        val appLinkAction: String? = appLinkIntent.action
-        val appLinkData: Uri? = appLinkIntent.data
+//        val appLinkIntent: Intent = intent
+//        val appLinkAction: String? = appLinkIntent.action
+//        val appLinkData: Uri? = appLinkIntent.data
     }
 }

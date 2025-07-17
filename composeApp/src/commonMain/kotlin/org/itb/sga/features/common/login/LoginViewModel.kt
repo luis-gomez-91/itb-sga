@@ -102,9 +102,13 @@ class LoginViewModel(
             _isLoading.value = false
             _verPassword.value = false
 
+            while (navController.popBackStack()) {
+                // Esto hace pop de todas las pantallas hasta vaciar el back stack
+            }
+
+            // Navega a login y asegúrate de no duplicarlo
             navController.navigate("login") {
-                popUpTo(navController.graph.startDestinationRoute ?: "login") { inclusive = true }
-                launchSingleTop = true // Evita múltiples instancias de login
+                launchSingleTop = true
             }
         }
     }

@@ -1,5 +1,6 @@
 package org.itb.sga.ui.components
 
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -27,6 +28,7 @@ fun MyOutlinedTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onFocusLost: () -> Unit = {},
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     textStyle: TextStyle = TextStyle(
         color = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.outlineVariant,
         fontSize = MaterialTheme.typography.bodyMedium.fontSize,
@@ -54,6 +56,7 @@ fun MyOutlinedTextField(
             }
         },
         keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
         textStyle = textStyle,
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = MaterialTheme.colorScheme.secondary.copy(alpha = 1f),
@@ -65,6 +68,7 @@ fun MyOutlinedTextField(
         ),
         enabled = enabled,
         trailingIcon = trailingIcon,
-        visualTransformation = visualTransformation
+        visualTransformation = visualTransformation,
+        singleLine = true
     )
 }

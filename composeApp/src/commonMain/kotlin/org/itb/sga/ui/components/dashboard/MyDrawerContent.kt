@@ -2,11 +2,11 @@ package org.itb.sga.ui.components.dashboard
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -15,19 +15,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.LockPerson
-import androidx.compose.material.icons.filled.Logout
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Preview
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
@@ -39,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -61,6 +55,18 @@ import coil3.compose.AsyncImage
 import com.mohamedrejeb.calf.picker.toImageBitmap
 import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
+import compose.icons.TablerIcons
+import compose.icons.tablericons.Archive
+import compose.icons.tablericons.Check
+import compose.icons.tablericons.ChevronRight
+import compose.icons.tablericons.DeviceMobile
+import compose.icons.tablericons.Lock
+import compose.icons.tablericons.Logout
+import compose.icons.tablericons.Moon
+import compose.icons.tablericons.Photo
+import compose.icons.tablericons.Sun
+import compose.icons.tablericons.User
+import compose.icons.tablericons.X
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.itb.sga.core.SERVER_URL
@@ -71,9 +77,8 @@ import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
 import org.itb.sga.ui.components.MyFilledTonalButton
 import org.itb.sga.ui.components.MyOutlinedTextField
-import org.itb.sga.ui.components.MySwitch
 import org.itb.sga.ui.components.SocialMedia
-import org.itb.sga.ui.components.alerts.MyAlert
+
 
 @Composable
 fun MyDrawerContent(
@@ -87,23 +92,23 @@ fun MyDrawerContent(
     val homeData by homeViewModel.homeData.collectAsState(null)
     val selectedTheme by homeViewModel.selectedTheme.collectAsState(null)
 
-    var themeIcon by remember { mutableStateOf(Icons.Filled.LightMode) }
+    var themeIcon by remember { mutableStateOf(TablerIcons.Sun) }
 
     LaunchedEffect(selectedTheme) {
-        themeIcon = if (selectedTheme?.dark == true) Icons.Filled.DarkMode else Icons.Filled.LightMode
+        themeIcon = if (selectedTheme?.dark == true) TablerIcons.Moon else TablerIcons.Sun
     }
 
     val items = buildList {
-        add(DrawerItem("Perfil", Icons.Filled.Person) { navHostController.navigate("account") })
-        add(DrawerItem("Cambiar contraseña", Icons.Filled.LockPerson) {
+        add(DrawerItem("Perfil", TablerIcons.User) { navHostController.navigate("account") })
+        add(DrawerItem("Cambiar contraseña", TablerIcons.Lock) {
             homeViewModel.changeShowPasswordForm(true)
         })
         if (homeData?.persona?.idInscripcion != null) {
-            add(DrawerItem("Consulta general", Icons.Filled.Preview) { navHostController.navigate("consultaalumno") })
+            add(DrawerItem("Consulta general", TablerIcons.Archive) { navHostController.navigate("consultaalumno") })
         }
-        add(DrawerItem("Cambiar tema", themeIcon) { homeViewModel.changeshowThemeSetting(true) })
+        add(DrawerItem("Tema", themeIcon) { homeViewModel.changeshowThemeSetting(true) })
 //        add(DrawerItem("Opciones de biométrico", Icons.Filled.Fingerprint) { homeViewModel.changeshowThemeSetting(true) })
-        add(DrawerItem("Cerrar sesión", Icons.Filled.Logout) { loginViewModel.onLogout(navHostController, homeViewModel) })
+        add(DrawerItem("Cerrar sesión", TablerIcons.Logout) { loginViewModel.onLogout(navHostController, homeViewModel) })
     }
 
 
@@ -149,11 +154,11 @@ fun MyDrawerContent(
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.secondary
                     )
-                    Text(
-                        text = data.persona.usuario,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
+//                    Text(
+//                        text = data.persona.usuario,
+//                        style = MaterialTheme.typography.labelMedium,
+//                        color = MaterialTheme.colorScheme.secondary
+//                    )
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -170,15 +175,27 @@ fun MyDrawerContent(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        text = item.label,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+                                    Row (
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = item.icon,
+                                            contentDescription = item.label,
+                                            modifier = Modifier.size(24.dp),
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(
+                                            text = item.label,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    Spacer(Modifier.width(16.dp))
                                     Icon(
-                                        imageVector = item.icon,
+                                        imageVector = TablerIcons.ChevronRight,
                                         contentDescription = item.label,
-                                        modifier = Modifier.size(24.dp),
+                                        modifier = Modifier.size(20.dp),
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
@@ -288,7 +305,7 @@ fun PhotoProfile(
                     ) {
                         Icon(
                             modifier = Modifier.size(40.dp).padding(4.dp),
-                            imageVector = Icons.Filled.Save,
+                            imageVector = TablerIcons.Check,
                             contentDescription = "Guardar foto",
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
@@ -306,7 +323,7 @@ fun PhotoProfile(
                     ) {
                         Icon(
                             modifier = Modifier.size(40.dp).padding(4.dp),
-                            imageVector = Icons.Filled.Cancel,
+                            imageVector = TablerIcons.X,
                             contentDescription = "Guardar foto",
                             tint = MaterialTheme.colorScheme.error
                         )
@@ -329,14 +346,14 @@ fun PhotoProfile(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .size(48.dp)
-                            .background(color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f), shape = CircleShape)
+                            .background(color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f), shape = CircleShape)
                             .clip(CircleShape)
                     ) {
                         Icon(
                             modifier = Modifier.size(40.dp).padding(4.dp),
-                            imageVector = Icons.Filled.Camera,
+                            imageVector = TablerIcons.Photo,
                             contentDescription = "Actualizar foto",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }
@@ -416,6 +433,7 @@ fun ChangePasswordForm(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ThemeSettings(
     homeViewModel: HomeViewModel
@@ -424,42 +442,77 @@ fun ThemeSettings(
     val showThemeSetting by homeViewModel.showThemeSetting.collectAsState(false)
     val selectedTheme by homeViewModel.selectedTheme.collectAsState()
     var currentSelectedTheme by remember { mutableStateOf(selectedTheme?.id ?: 1) }
-
     val isDarkSystem = isSystemInDarkTheme()
 
     if (showThemeSetting) {
-        MyAlert(
-            title = "Configurar tema",
-            onDismiss = { homeViewModel.changeshowThemeSetting(false) },
-            showAlert = showThemeSetting,
-            text = {
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(16.dp)
-                ) {
-                    items(themeOptions) { theme ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
+        ModalBottomSheet(
+            onDismissRequest = { homeViewModel.changeshowThemeSetting(false) }
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                item {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "Seleccionar Tema",
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    HorizontalDivider()
+                }
+
+                items(themeOptions) { theme ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .clickable {
+                                currentSelectedTheme = theme.id
+                                homeViewModel.updateThemePreference(theme, isDarkSystem)
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row (
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
+                            var icon = TablerIcons.Sun
+                            if (theme.dark) {
+                                icon = TablerIcons.Moon
+                            } else if (theme.system) {
+                                icon = TablerIcons.DeviceMobile
+                            }
+
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = theme.theme,
+                                tint = MaterialTheme.colorScheme.secondary
+                            )
+                            Spacer(Modifier.width(8.dp))
                             Text(
                                 text = theme.theme,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.weight(1f)
-                            )
-                            MySwitch(
-                                checked = theme.active,
-                                onCheckedChange = {
-                                    currentSelectedTheme = theme.id
-                                    homeViewModel.updateThemePreference(theme, isDarkSystem)
-                                }
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.secondary
                             )
                         }
+
+                        RadioButton(
+                            selected = currentSelectedTheme == theme.id,
+                            onClick = {
+                                currentSelectedTheme = theme.id
+                                homeViewModel.updateThemePreference(theme, isDarkSystem)
+                            }
+                        )
                     }
+                    HorizontalDivider()
                 }
             }
-        )
-
+        }
     }
 }

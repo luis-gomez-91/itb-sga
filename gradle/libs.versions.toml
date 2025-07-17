@@ -45,6 +45,8 @@ sqlite = "2.5.0-rc03"
 webView = "1.9.40"
 mokoMVVM = "0.16.1"
 mokoBiometry = "0.4.0"
+composeIcons = "1.1.1"
+konnectivity = "0.1-alpha01"
 
 [libraries]
 calf-file-picker = { module = "com.mohamedrejeb.calf:calf-file-picker", version.ref = "calfFilePicker" }
@@ -102,6 +104,9 @@ kevinnzou-webview = { module = "io.github.kevinnzou:compose-webview-multiplatfor
 moko-mvvm = { module = "dev.icerock.moko:mvvm-core", version.ref = "mokoMVVM" }
 moko-biometry = { module = "dev.icerock.moko:biometry", version.ref = "mokoBiometry" }
 moko-biometry-compose = { module = "dev.icerock.moko:biometry-compose", version.ref = "mokoBiometry" }
+composeIcons-tablerIcons = { module = "br.com.devsrsouza.compose.icons:tabler-icons", version.ref = "composeIcons" }
+composeIcons-evaIcons = { module = "br.com.devsrsouza.compose.icons:eva-icons", version.ref = "composeIcons" }
+konnectivity = { module = "com.plusmobileapps:konnectivity", version.ref = "konnectivity"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

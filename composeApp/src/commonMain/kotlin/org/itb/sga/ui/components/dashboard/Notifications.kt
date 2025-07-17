@@ -26,8 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -47,6 +45,7 @@ import org.itb.sga.ui.components.MyFilledTonalButton
 import org.itb.sga.ui.components.alerts.MyAlert
 import org.itb.sga.ui.components.shimmer.ShimmerFormLoadingAnimation
 
+
 @Composable
 fun Notificacion(
     homeViewModel: HomeViewModel,
@@ -55,7 +54,7 @@ fun Notificacion(
     val notificaciones by homeViewModel.notificaciones.collectAsState(emptyList())
     val showNotifications by homeViewModel.showNotifications.collectAsState(false)
 
-    if (notificaciones.isNotEmpty() && showNotifications) {
+    if (showNotifications) {
         MyAlert(
             title = "Notificaciones ITB",
             onDismiss = {
@@ -64,14 +63,18 @@ fun Notificacion(
             showAlert = showNotifications,
             containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
             text = {
-                LazyColumn {
-                    items(notificaciones) { notificacion ->
-                        NotificationItem(
-                            notificacion = notificacion,
-                            navController = navController,
-                            homeViewModel = homeViewModel
-                        )
+                if (notificaciones.isNotEmpty()) {
+                    LazyColumn {
+                        items(notificaciones) { notificacion ->
+                            NotificationItem(
+                                notificacion = notificacion,
+                                navController = navController,
+                                homeViewModel = homeViewModel
+                            )
+                        }
                     }
+                } else {
+                    "Sin notificaciones"
                 }
             }
         )

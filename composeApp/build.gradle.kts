@@ -68,6 +68,9 @@ kotlin {
             implementation(libs.kevinnzou.webview)
             implementation(libs.moko.biometry)
             implementation(libs.moko.biometry.compose)
+            implementation(libs.composeIcons.tablerIcons)
+            implementation(libs.composeIcons.evaIcons)
+            implementation(libs.konnectivity)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
