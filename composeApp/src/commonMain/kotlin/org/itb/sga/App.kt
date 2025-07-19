@@ -98,40 +98,5 @@ fun App(
                 proEntregaActasViewModel = proEntregaActasViewModel
             )
         }
-//                Column (
-//                    modifier = Modifier
-//                        .fillMaxSize()
-//                        .padding(top = 0.dp, start = 32.dp, end = 32.dp, bottom = 64.dp),
-//                    verticalArrangement = Arrangement.Center,
-//                    horizontalAlignment = Alignment.CenterHorizontally
-//                ) {
-//                    Image(
-//                        painter = painterResource(imageLogo),
-//                        contentDescription = "logo",
-//                        modifier = Modifier.fillMaxWidth()
-//                    )
-//                    Spacer(Modifier.height(8.dp))
-//                    Text(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        text = "¡Una nueva versión está disponible! Actualiza la app para seguir disfrutando de las mejores funciones.",
-//                        style = MaterialTheme.typography.bodyLarge,
-//                        color = MaterialTheme.colorScheme.secondary,
-//                        textAlign = TextAlign.Center
-//                    )
-//                    Spacer(Modifier.height(16.dp))
-//                    MyFilledTonalButton(
-//                        text = "Actualizar",
-//                        buttonColor = MaterialTheme.colorScheme.primaryContainer,
-//                        textColor = MaterialTheme.colorScheme.primary,
-//                        icon = Icons.Filled.Update,
-//                        onClickAction = { openPlayStoreOrAppStore() },
-//                        iconSize = 32.dp,
-//                        textStyle = MaterialTheme.typography.bodyLarge
-//                    )
-//                }
-//            }
-//        }
-
-
     }
 }

@@ -10,12 +10,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import org.itb.sga.data.network.Error
 import kotlinx.coroutines.launch
+import org.itb.sga.core.Platform
 import org.itb.sga.data.network.Login
 import org.itb.sga.data.network.LoginResult
 import org.itb.sga.core.createHttpClient
 import org.itb.sga.core.logInfo
 import org.itb.sga.data.database.AokDatabase
 import org.itb.sga.data.network.Response
+import org.itb.sga.data.network.form.AppUpdateForm
 import org.itb.sga.data.network.form.RequestPasswordRecoveryForm
 import org.itb.sga.features.common.home.HomeViewModel
 
@@ -200,17 +202,17 @@ class LoginViewModel(
     private val _appLastVersion = MutableStateFlow<Int?>(null)
     val appLastVersion: StateFlow<Int?> = _appLastVersion
 
-    fun fetchLastVersionApp() {
+    fun fetchLastVersionApp(platform: Platform) {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
 
-                val result = loginService.fetchLastVersionApp()
+                val result = loginService.fetchLastVersionApp(AppUpdateForm(platform = platform.name))
                 _appLastVersion.value = result.message.toInt()
-                logInfo("prueba", "$result")
+                logInfo("LoginViewModel", "$result")
 
             } catch (e: Exception) {
-                logInfo("prueba", "Exception: ${e.message}")
+                logInfo("LoginViewModel", "Exception: ${e.message}")
                 _error.value = Error(title = "Error", error = "${e.message}")
             } finally {
                 _isLoading.value = false

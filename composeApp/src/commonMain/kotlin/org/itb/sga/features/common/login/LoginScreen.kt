@@ -56,6 +56,7 @@ import compose.icons.tablericons.Fingerprint
 import compose.icons.tablericons.LockOpen
 import compose.icons.tablericons.Login
 import compose.icons.tablericons.Send
+import org.itb.sga.core.Platform
 import org.itb.sga.core.appIsLastVersion
 import org.itb.sga.core.getPlatform
 import org.itb.sga.data.domain.BiometryType
@@ -73,8 +74,6 @@ fun LoginScreen(
 ) {
     val internetConnected by homeViewModel.konnectivity.isConnectedState.collectAsState()
     val appLastVersion by loginViewModel.appLastVersion.collectAsState(null)
-
-
     val selectedTheme by homeViewModel.selectedTheme.collectAsState(null)
     var imageLogo by remember { mutableStateOf(Res.drawable.logo) }
 
@@ -91,7 +90,7 @@ fun LoginScreen(
         homeViewModel
     ) {
         LaunchedEffect(Unit) {
-            loginViewModel.fetchLastVersionApp()
+            loginViewModel.fetchLastVersionApp(getPlatform())
         }
 
         appLastVersion?.let {
