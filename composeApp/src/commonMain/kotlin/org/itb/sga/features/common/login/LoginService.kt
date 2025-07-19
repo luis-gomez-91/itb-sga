@@ -15,7 +15,6 @@ import org.itb.sga.data.network.Error
 import org.itb.sga.data.network.Login
 import org.itb.sga.data.network.LoginResult
 import org.itb.sga.data.network.Response
-import org.itb.sga.data.network.form.AppUpdateForm
 import org.itb.sga.data.network.form.RequestPasswordRecoveryForm
 
 class LoginService(
@@ -57,9 +56,9 @@ private val client: HttpClient
         }
     }
 
-    suspend fun fetchLastVersionApp(form: AppUpdateForm): Response {
+    suspend fun fetchLastVersionApp(platform: String): Response {
         return try {
-            val response = client.get("${SERVER_URL}api_rest?action=fetchLastVersionApp&platform=${form}")
+            val response = client.get("${SERVER_URL}api_rest?action=fetchLastVersionApp&platform=$platform")
             response.body<Response>()
 
         } catch (e: Exception) {

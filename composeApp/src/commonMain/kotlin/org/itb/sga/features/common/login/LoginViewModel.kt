@@ -17,7 +17,6 @@ import org.itb.sga.core.createHttpClient
 import org.itb.sga.core.logInfo
 import org.itb.sga.data.database.AokDatabase
 import org.itb.sga.data.network.Response
-import org.itb.sga.data.network.form.AppUpdateForm
 import org.itb.sga.data.network.form.RequestPasswordRecoveryForm
 import org.itb.sga.features.common.home.HomeViewModel
 
@@ -207,7 +206,7 @@ class LoginViewModel(
             try {
                 _isLoading.value = true
 
-                val result = loginService.fetchLastVersionApp(AppUpdateForm(platform = platform.name))
+                val result = loginService.fetchLastVersionApp(platform.name)
                 _appLastVersion.value = result.message.toInt()
                 logInfo("LoginViewModel", "$result")
 
