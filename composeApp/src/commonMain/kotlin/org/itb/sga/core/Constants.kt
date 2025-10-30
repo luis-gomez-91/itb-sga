@@ -5,8 +5,8 @@ import org.itb.sga.data.network.reportes.DjangoModelItem
 
 const val DATABASE_NAME = "aok.db"
 
-//const val SERVER_URL = "https://sga.itb.edu.ec/"
-const val SERVER_URL = "http://10.0.2.2:8000/"
+const val SERVER_URL = "https://sga.itb.edu.ec/"
+//const val SERVER_URL = "http://10.0.2.2:8000/"
 
 val ROUTES = setOf(
     "login", "home", "inscripciones", "account", "alu_finanzas",
@@ -27,7 +27,7 @@ val resizeOptions = ResizeOptions(
 
 val LIST_SEXO = listOf(
     DjangoModelItem(1, "FEMENINO"),
-    DjangoModelItem(2, "MASCULINO")
+    DjangoModelItem(2, "MASCULINO") 
 )
 
 val LIST_SANGRE = listOf(
