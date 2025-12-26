@@ -50,8 +50,10 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.toLocalDateTime
 import org.itb.sga.core.formatoText
+import org.itb.sga.core.logInfo
 import org.itb.sga.data.network.ProHorario
 import org.itb.sga.data.network.ProHorarioClase
 import org.itb.sga.features.common.home.HomeViewModel
@@ -246,12 +248,20 @@ fun Clases(
     navController: NavHostController,
     proClasesViewModel: ProClasesViewModel
 ) {
+    logInfo("prueba_ok", "proHorario: $proHorario")
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
     ) {
         items(proHorario.clases) { clase ->
-            ClaseItem(clase, proHorariosViewModel, homeViewModel, navController, proClasesViewModel)
+            ClaseItem(
+                clase,
+                proHorario.diaId,
+                proHorariosViewModel,
+                homeViewModel,
+                navController,
+                proClasesViewModel
+            )
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
@@ -260,6 +270,7 @@ fun Clases(
 @Composable
 fun ClaseItem(
     clase: ProHorarioClase,
+    diaId: Int,
     proHorariosViewModel: ProHorariosViewModel,
     homeViewModel: HomeViewModel,
     navController: NavHostController,
@@ -333,7 +344,8 @@ fun ClaseItem(
                     )
                 }
             } else {
-                if (isShowButton(clase) && clase.habilitaAbrirClase) {
+                logInfo("prueba_ok", "${clase.habilitaAbrirClase}")
+                if (isShowButton(clase, diaId) && clase.habilitaAbrirClase) {
                     Spacer(Modifier.height(8.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -391,26 +403,26 @@ fun ClaseMoreInfo(
     }
 }
 
-fun isShowButton(clase: ProHorarioClase): Boolean {
-    val timeZone = TimeZone.currentSystemDefault()
-    val currentDateTime = Clock.System.now().toLocalDateTime(timeZone)
+fun isShowButton(clase: ProHorarioClase, diaClase: Int): Boolean {
+    val timeZone = TimeZone.of("America/Guayaquil")
+    val now = Clock.System.now().toLocalDateTime(timeZone)
 
-    val classDateTime = parseDateTime(clase.turnoComienza, currentDateTime.date)
+    // 1️⃣ Día correcto (ISO)
+    if (now.date.dayOfWeek.isoDayNumber != diaClase) return false
 
-    if (classDateTime.date != currentDateTime.date) return false
+    // 2️⃣ Dentro del período de la materia
+    val desde = LocalDate.parse(clase.materiaDesde)
+    val hasta = LocalDate.parse(clase.materiaHasta)
+    if (now.date !in desde..hasta) return false
 
-    val classTimeInMinutes = classDateTime.time.hour * 60 + classDateTime.time.minute
-    val currentTimeInMinutes = currentDateTime.time.hour * 60 + currentDateTime.time.minute
+    // 3️⃣ Hora válida
+    val classMinutes = parseMinutes(clase.turnoComienza)
+    val nowMinutes = now.time.hour * 60 + now.time.minute
 
-    return currentTimeInMinutes in (classTimeInMinutes - clase.tiempoAperturaAntes)..(classTimeInMinutes + clase.tiempoAperturaDespues)
+    return nowMinutes in (classMinutes - clase.tiempoAperturaAntes)..(classMinutes + clase.tiempoAperturaDespues)
 }
 
-fun parseDateTime(timeString: String, currentDate: LocalDate): LocalDateTime {
-    val parts = timeString.split(":")
-    if (parts.size != 2) throw IllegalArgumentException("Formato inválido, se espera HH:mm")
-
-    val hour = parts[0].toInt()
-    val minute = parts[1].toInt()
-
-    return LocalDateTime(currentDate, LocalTime(hour, minute))
+fun parseMinutes(time: String): Int {
+    val (h, m) = time.split(":").map { it.toInt() }
+    return h * 60 + m
 }
