@@ -57,11 +57,9 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.calf.file.picker)
             implementation(libs.calf.file.picker.coil)
-            implementation(libs.coil.compose.v300alpha8)
-            implementation(libs.peekaboo.ui)
-            implementation(libs.peekaboo.image.picker)
             implementation(libs.filekit.core)
-            implementation(libs.filekit.compose)
+            implementation(libs.filekit.dialogs)
+            implementation(libs.filekit.dialogs.compose)
             implementation(libs.moko.mvvm)
             implementation(libs.androidx.room.runtime)
             implementation(libs.sqlite.bundled)
@@ -86,7 +84,7 @@ android {
         applicationId = "org.itb.sga"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 19
+        versionCode = 21
         versionName = "1.0.5"
     }
     packaging {

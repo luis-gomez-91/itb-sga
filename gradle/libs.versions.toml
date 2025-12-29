@@ -1,5 +1,5 @@
 [versions]
-agp = "8.9.1"
+agp = "8.9.3"
 android-compileSdk = "36"
 android-minSdk = "28"
 android-targetSdk = "36"
@@ -13,10 +13,9 @@ androidx-material = "1.13.0"
 androidx-test-junit = "1.3.0"
 calfFilePicker = "0.5.3"
 calfFilePickerCoil = "0.5.1"
-coilCompose = "3.0.0-alpha8"
 compose-multiplatform = "1.7.3"
 coreVersion = "1.11.0"
-filekitCore = "0.8.7"
+fileKit = "0.12.0"
 junit = "4.13.2"
 kotlin = "2.1.0"
 foundationAndroid = "1.9.4"
@@ -31,14 +30,13 @@ lifecycleViewmodelAndroid = "2.9.4"
 uiAndroid = "1.9.4"
 constraintlayoutCompose = "1.1.1"
 coil = "3.0.0-alpha08"
-ktor = "2.3.12"
+ktor = "2.3.2"
 uiTextGoogleFonts = "1.9.4"
 navigation-compose = "2.8.0-alpha02"
 core = "1.17.0"
 places = "5.0.0"
 protoliteWellKnownTypes = "18.0.1"
 coreI18n = "1.0.0"
-peekaboo = "0.5.2"
 ksp = "2.1.0-1.0.29"
 androidx-room = "2.7.0-alpha11"
 sqlite = "2.5.0-alpha11"
@@ -51,10 +49,17 @@ konnectivity = "0.1-alpha01"
 [libraries]
 calf-file-picker = { module = "com.mohamedrejeb.calf:calf-file-picker", version.ref = "calfFilePicker" }
 calf-file-picker-coil = { module = "com.mohamedrejeb.calf:calf-file-picker-coil", version.ref = "calfFilePickerCoil" }
-coil-compose-v300alpha8 = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-network-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor", version.ref = "coil" }
+
 core = { module = "com.google.android.play:core", version.ref = "coreVersion" }
-filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref = "filekitCore" }
-filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekitCore" }
+#filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref = "fileKit" }
+#filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "fileKit" }
+filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "fileKit" }
+filekit-dialogs = { module = "io.github.vinceglb:filekit-dialogs", version.ref = "fileKit" }
+filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "fileKit" }
+
+
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -75,8 +80,6 @@ androidx-lifecycle-viewmodel-android = { group = "androidx.lifecycle", name = "l
 androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
 androidx-constraintlayout-compose = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 
-coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
-coil-network-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor", version.ref = "coil" }
 
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-metadata-jvm = { module = "org.jetbrains.kotlinx:kotlinx-metadata-jvm", version.ref = "kotlinxMetadataJvm" }
@@ -93,9 +96,6 @@ material-icons-extended = { module = "org.jetbrains.compose.material:material-ic
 places = { group = "com.google.android.libraries.places", name = "places", version.ref = "places" }
 protolite-well-known-types = { group = "com.google.firebase", name = "protolite-well-known-types", version.ref = "protoliteWellKnownTypes" }
 androidx-core-i18n = { group = "androidx.core", name = "core-i18n", version.ref = "coreI18n" }
-
-peekaboo-ui = { module = "io.github.onseok:peekaboo-ui", version.ref = "peekaboo" }
-peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", version.ref = "peekaboo" }
 
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "androidx-room" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "androidx-room" }

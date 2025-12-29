@@ -30,8 +30,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import io.github.vinceglb.filekit.core.FileKit
-import io.github.vinceglb.filekit.core.pickFile
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.dialogs.openFilePicker
+import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.readBytes
 import kotlinx.coroutines.launch
 import org.itb.sga.core.SERVER_URL
 import org.itb.sga.core.getChipState
@@ -223,30 +225,32 @@ fun DocumentoItem(
 fun UploadFile(
     aluDocumentosViewModel: AluDocumentosViewModel,
     documento: AluDocumento
-) :String {
+): String {
+
     val scope = rememberCoroutineScope()
-    var errorMessage by remember { mutableStateOf<String?>(null) }
     val fileName by aluDocumentosViewModel.fileName.collectAsState(null)
+
     IconButton(
         onClick = {
             aluDocumentosViewModel.changeDocumentSelect(documento)
             aluDocumentosViewModel.changeAction("sendDocument")
+
             scope.launch {
-                try {
-                    val file = FileKit.pickFile()
-                    if (file != null) {
-                        aluDocumentosViewModel.changeFile(file.readBytes())
-                        aluDocumentosViewModel.changeFileName(file.name)
-                    } else {
-                        errorMessage = "No se seleccionó ningún archivo."
-                    }
-                } catch (e: Exception) {
-                    errorMessage = "Error al seleccionar archivo: ${e.message}"
+                val file = FileKit.openFilePicker()
+
+                if (file != null) {
+                    aluDocumentosViewModel.changeFile(file.readBytes())
+                    aluDocumentosViewModel.changeFileName(file.name)
                 }
             }
         }
     ) {
-        Icon(imageVector = Icons.Filled.UploadFile, contentDescription = "Subir archivo", tint = MaterialTheme.colorScheme.onPrimary)
+        Icon(
+            imageVector = Icons.Filled.UploadFile,
+            contentDescription = "Subir archivo",
+            tint = MaterialTheme.colorScheme.onPrimary
+        )
     }
-    return "Archivo seleccionado: ${fileName}"
+
+    return fileName?.let { "Archivo seleccionado: $it" } ?: "Seleccionar archivo"
 }

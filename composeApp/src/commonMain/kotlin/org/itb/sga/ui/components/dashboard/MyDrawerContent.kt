@@ -53,8 +53,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.mohamedrejeb.calf.picker.toImageBitmap
-import com.preat.peekaboo.image.picker.SelectionMode
-import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Archive
 import compose.icons.tablericons.Check
@@ -67,10 +65,14 @@ import compose.icons.tablericons.Photo
 import compose.icons.tablericons.Sun
 import compose.icons.tablericons.User
 import compose.icons.tablericons.X
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.compressImage
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.openFilePicker
+import io.github.vinceglb.filekit.readBytes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.itb.sga.core.SERVER_URL
-import org.itb.sga.core.resizeOptions
 import org.itb.sga.data.domain.DrawerItem
 import org.itb.sga.data.network.Home
 import org.itb.sga.features.common.home.HomeViewModel
@@ -243,22 +245,10 @@ fun PhotoProfile(
 
     LaunchedEffect(photoUploaded) {
         if (photoUploaded) {
-            imageBitmap = null // Limpia la imagen al completarse la subida
-            homeViewModel.resetPhotoUploadedFlag() // Restablece el estado en el ViewModel
+            imageBitmap = null
+            homeViewModel.resetPhotoUploadedFlag()
         }
     }
-
-    val singleImagePicker = rememberImagePickerLauncher(
-        selectionMode = SelectionMode.Single,
-        scope = scope,
-        resizeOptions = resizeOptions,
-        onResult = { byteArrays ->
-            byteArrays.firstOrNull()?.let {
-                imageBitmap = it.toImageBitmap()
-                imageByteArray = it
-            }
-        }
-    )
 
     Row(
         modifier = Modifier
@@ -293,18 +283,21 @@ fun PhotoProfile(
                     IconButton(
                         onClick = {
                             scope.launch {
-                                imageByteArray?.let { homeViewModel.uploadPhoto(it) }
-
+                                imageByteArray?.let {
+                                    homeViewModel.uploadPhoto(it)
+                                }
                             }
                         },
                         modifier = Modifier
                             .align(Alignment.BottomStart)
                             .size(48.dp)
-                            .background(color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f), shape = CircleShape)
+                            .background(
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                                shape = CircleShape
+                            )
                             .clip(CircleShape)
                     ) {
                         Icon(
-                            modifier = Modifier.size(40.dp).padding(4.dp),
                             imageVector = TablerIcons.Check,
                             contentDescription = "Guardar foto",
                             tint = MaterialTheme.colorScheme.onPrimary
@@ -312,19 +305,19 @@ fun PhotoProfile(
                     }
 
                     IconButton(
-                        onClick = {
-                            imageBitmap = null
-                        },
+                        onClick = { imageBitmap = null },
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .size(48.dp)
-                            .background(color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.8f), shape = CircleShape)
+                            .background(
+                                color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.8f),
+                                shape = CircleShape
+                            )
                             .clip(CircleShape)
                     ) {
                         Icon(
-                            modifier = Modifier.size(40.dp).padding(4.dp),
                             imageVector = TablerIcons.X,
-                            contentDescription = "Guardar foto",
+                            contentDescription = "Cancelar",
                             tint = MaterialTheme.colorScheme.error
                         )
                     }
@@ -341,16 +334,34 @@ fun PhotoProfile(
 
                     IconButton(
                         onClick = {
-                            singleImagePicker.launch()
+                            scope.launch {
+                                val file = FileKit.openFilePicker(type = FileKitType.Image)
+
+                                if (file != null) {
+                                    val originalBytes = file.readBytes()
+
+                                    val resizedBytes = FileKit.compressImage(
+                                        bytes = originalBytes,
+                                        quality = 80,
+                                        maxWidth = 800,
+                                        maxHeight = 800
+                                    )
+
+                                    imageByteArray = resizedBytes
+                                    imageBitmap = resizedBytes.toImageBitmap()
+                                }
+                            }
                         },
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .size(48.dp)
-                            .background(color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f), shape = CircleShape)
+                            .background(
+                                color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                                shape = CircleShape
+                            )
                             .clip(CircleShape)
                     ) {
                         Icon(
-                            modifier = Modifier.size(40.dp).padding(4.dp),
                             imageVector = TablerIcons.Photo,
                             contentDescription = "Actualizar foto",
                             tint = MaterialTheme.colorScheme.secondary
@@ -361,6 +372,7 @@ fun PhotoProfile(
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

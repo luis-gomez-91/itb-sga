@@ -31,13 +31,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import io.github.vinceglb.filekit.FileKit
 import kotlinx.coroutines.launch
 import org.itb.sga.data.network.AluSolicitudDepartamentos
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.ui.components.MyFilledTonalButton
 import androidx.compose.runtime.rememberCoroutineScope as rememberCoroutineScope1
-import io.github.vinceglb.filekit.core.FileKit
-import io.github.vinceglb.filekit.core.pickFile
+import io.github.vinceglb.filekit.dialogs.openFilePicker
+import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.readBytes
 import org.itb.sga.data.network.TipoEspecieAsignatura
 import org.itb.sga.data.network.TipoEspecieDocente
 import org.itb.sga.ui.components.MyCircularProgressIndicator
@@ -45,6 +47,7 @@ import org.itb.sga.ui.components.MyExposedDropdownMenuBox
 import org.itb.sga.ui.components.MyOutlinedTextFieldArea
 import org.itb.sga.ui.components.form.FormContainer
 import org.itb.sga.ui.components.shimmer.ShimmerFormLoadingAnimation
+
 
 @Composable
 fun AddSolicitudForm(
@@ -216,10 +219,15 @@ fun Especies(
                 shape = RoundedCornerShape(4.dp),
                 modifier = Modifier.padding(start = 4.dp),
                 onClickAction = {
-                    coroutineScope.launch() {
-                        val file = FileKit.pickFile()
-                        aluSolicitudesViewModel.changeFileName(file?.name ?: "Archivo no seleccionado")
-                        file?.readBytes()?.let { aluSolicitudesViewModel.changeByteArray(it) }
+                    coroutineScope.launch {
+                        val file = FileKit.openFilePicker()
+
+                        if (file != null) {
+                            aluSolicitudesViewModel.changeFileName(file.name)
+                            aluSolicitudesViewModel.changeByteArray(file.readBytes())
+                        } else {
+                            aluSolicitudesViewModel.changeFileName("Archivo no seleccionado")
+                        }
                     }
                 }
             )
@@ -231,7 +239,6 @@ fun Especies(
                 )
             }
         }
-
         Spacer(Modifier.height(8.dp))
     }
 

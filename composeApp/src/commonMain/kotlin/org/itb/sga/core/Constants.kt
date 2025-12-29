@@ -1,6 +1,5 @@
 package org.itb.sga.core
 
-import com.preat.peekaboo.image.picker.ResizeOptions
 import org.itb.sga.data.network.reportes.DjangoModelItem
 
 const val DATABASE_NAME = "aok.db"
@@ -16,13 +15,6 @@ val ROUTES = setOf(
     "admin_ayudafinanciera", "documentos_alu", "documentos", "beca_solicitud",
     "alumnos_cab", "consultaalumno", "alu_matricula", "pro_cronograma",
     "reportes", "pro_evaluaciones", "pro_entrega_acta"
-)
-
-val resizeOptions = ResizeOptions(
-    width = 1200, // Custom width
-    height = 1200, // Custom height
-    resizeThresholdBytes = 2 * 1024 * 1024L, // Custom threshold for 2MB,
-    compressionQuality = 0.5 // Adjust compression quality (0.0 to 1.0)
 )
 
 val LIST_SEXO = listOf(

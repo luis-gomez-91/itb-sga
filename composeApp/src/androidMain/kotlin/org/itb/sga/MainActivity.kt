@@ -1,8 +1,6 @@
 package org.itb.sga
 
-import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -14,13 +12,15 @@ import dev.icerock.moko.biometry.compose.BindBiometryAuthenticatorEffect
 import dev.icerock.moko.biometry.compose.BiometryAuthenticatorFactory
 import dev.icerock.moko.biometry.compose.rememberBiometryAuthenticatorFactory
 import dev.icerock.moko.mvvm.getViewModel
-import io.github.vinceglb.filekit.core.FileKit
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.dialogs.init
 import org.itb.sga.core.URLOpenerAndroid
 import org.itb.sga.data.database.AokDatabase
 import org.itb.sga.data.database.getDatabaseBuilder
 import org.itb.sga.data.database.getRoomDatabase
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
+
 
 class MainActivity : AppCompatActivity() {
 

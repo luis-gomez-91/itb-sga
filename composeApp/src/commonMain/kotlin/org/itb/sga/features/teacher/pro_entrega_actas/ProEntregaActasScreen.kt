@@ -58,8 +58,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavHostController
-import io.github.vinceglb.filekit.core.FileKit
-import io.github.vinceglb.filekit.core.pickFile
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.dialogs.openFilePicker
+import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.readBytes
 import kotlinx.coroutines.launch
 import org.itb.sga.core.SERVER_URL
 import org.itb.sga.core.formatoText
@@ -75,6 +77,7 @@ import org.itb.sga.ui.components.MyOutlinedTextFieldArea
 import org.itb.sga.ui.components.alerts.MyErrorAlert
 import org.itb.sga.ui.components.alerts.MyInfoAlert
 import org.itb.sga.ui.components.dashboard.DashBoardScreen
+
 
 @Composable
 fun ProEntregaActasScreen(
@@ -383,9 +386,13 @@ fun FilePickerRow(
                 icon = Icons.Filled.PictureAsPdf,
                 onClickAction = {
                     coroutineScope.launch {
-                        val file = FileKit.pickFile()
-                        file?.let {
-                            onFileSelected(it.readBytes(), it.name)
+                        val file = FileKit.openFilePicker()
+
+                        if (file != null) {
+                            onFileSelected(
+                                file.readBytes(),
+                                file.name
+                            )
                         }
                     }
                 },
