@@ -84,8 +84,8 @@ android {
         applicationId = "org.itb.sga"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 21
-        versionName = "1.0.5"
+        versionCode = 23
+        versionName = "1.0.6"
     }
     packaging {
         resources {

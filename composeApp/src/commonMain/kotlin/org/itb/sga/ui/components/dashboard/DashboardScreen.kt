@@ -27,10 +27,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import org.itb.sga.data.network.InscripcionCarrera
 import org.itb.sga.data.network.Periodo
 import org.itb.sga.features.common.home.HomeViewModel
 import org.itb.sga.features.common.login.LoginViewModel
 import org.itb.sga.ui.components.ConnectivityWrapper
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +51,7 @@ fun DashBoardScreen(
     ) {
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val showBottomSheet by homeViewModel.showBottomSheet.collectAsState(false)
+        val showBottomCarreras by homeViewModel.showBottomCarreras.collectAsState(false)
 
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -107,6 +110,35 @@ fun DashBoardScreen(
                         Spacer(Modifier.height(16.dp))
                     }
                 }
+
+                if (showBottomCarreras) {
+                    ModalBottomSheet(
+                        onDismissRequest = {
+                            homeViewModel.changeShowBottomCarreras()
+                        }
+                    ) {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "Mis Carreras",
+                            style = MaterialTheme.typography.titleMedium,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(homeViewModel.homeData.value?.persona?.inscripciones ?: emptyList()) { inscripcionCarrera ->
+                                CarreraItem(
+                                    inscripcionCarrera = inscripcionCarrera,
+                                    homeViewModel = homeViewModel
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(16.dp))
+                    }
+                }
+
                 Notificacion(homeViewModel, navController)
             }
         )
@@ -143,6 +175,42 @@ fun PeriodoItem(
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = if (select.id == periodo.id)
+                    MaterialTheme.colorScheme.secondary
+                else MaterialTheme.colorScheme.outline
+            )
+        }
+    }
+}
+
+@Composable
+fun CarreraItem(
+    inscripcionCarrera: InscripcionCarrera,
+    homeViewModel: HomeViewModel
+) {
+    val inscripcionCarreraSelect by homeViewModel.inscripcionCarreraSelect.collectAsState(null)
+
+    inscripcionCarreraSelect?.let { select ->
+        TextButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+                .background(
+                    color = if (select.id == inscripcionCarrera.id)
+                        MaterialTheme.colorScheme.secondaryContainer
+                    else Color.Transparent
+                ),
+            onClick = {
+                homeViewModel.changeInscripcionCarreraSelect(inscripcionCarrera)
+            }
+        ) {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                text = inscripcionCarrera.carrera,
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                color = if (select.id == inscripcionCarrera.id)
                     MaterialTheme.colorScheme.secondary
                 else MaterialTheme.colorScheme.outline
             )

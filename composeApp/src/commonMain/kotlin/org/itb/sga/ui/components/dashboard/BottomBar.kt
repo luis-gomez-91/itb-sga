@@ -28,11 +28,13 @@ import compose.icons.evaicons.Outline
 import compose.icons.evaicons.fill.Home
 import compose.icons.evaicons.fill.Person
 import compose.icons.evaicons.outline.Bell
+import compose.icons.evaicons.outline.BookOpen
 import compose.icons.evaicons.outline.Home
 import compose.icons.evaicons.outline.Menu
 import compose.icons.evaicons.outline.Person
 import org.itb.sga.data.domain.BottomBarItem
 import org.itb.sga.features.common.home.HomeViewModel
+
 
 @Composable
 fun MyBottomBar(
@@ -79,6 +81,17 @@ fun MyBottomBar(
                     onclick = { homeViewModel.changeBottomSheet() },
                     label = "Períodos",
                     icon = EvaIcons.Outline.Menu,
+                    color = MaterialTheme.colorScheme.secondary,
+                    style = MaterialTheme.typography.labelSmall,
+                    isSelected = false
+                )
+            )
+        } else {
+            add(
+                BottomBarItem(
+                    onclick = { homeViewModel.changeShowBottomCarreras() },
+                    label = "Carreras",
+                    icon = EvaIcons.Outline.BookOpen,
                     color = MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.labelSmall,
                     isSelected = false

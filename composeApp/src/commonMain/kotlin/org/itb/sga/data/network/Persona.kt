@@ -11,7 +11,7 @@ data class Persona(
     val esInscripcion: Boolean,
     val esDocente: Boolean,
     var foto: String,
-    val idInscripcion: Int?,
+    var idInscripcion: Int?,
     val idDocente: Int?,
     val idPersona: Int,
     val identificacion: String,
@@ -19,5 +19,6 @@ data class Persona(
     val nombre: String,
     val sexo: String?,
     val tipoIdentificacion: String,
-    val usuario: String
+    val usuario: String,
+    val inscripciones: List<InscripcionCarrera>?
 )

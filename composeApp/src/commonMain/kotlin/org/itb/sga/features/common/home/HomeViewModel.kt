@@ -25,6 +25,7 @@ import org.itb.sga.data.network.ReportForm
 import org.itb.sga.data.network.ReportResult
 import org.itb.sga.data.network.form.UploadPhotoForm
 import org.itb.sga.data.network.Error
+import org.itb.sga.data.network.InscripcionCarrera
 import org.itb.sga.data.network.notificaciones.Notificacion
 import org.itb.sga.data.network.Response
 import org.itb.sga.data.network.form.RequestPasswordChangeForm
@@ -55,6 +56,7 @@ class HomeViewModel(
                 when (result) {
                     is HomeResult.Success -> {
                         _homeData.value = result.home
+                        _inscripcionCarreraSelect.value = result.home.persona.inscripciones?.firstOrNull()
                         _notificaciones.value = result.home.notificaciones
                         clearError()
                         _periodoSelect.value = _periodoSelect.value ?: result.home.periodos.getOrNull(0)
@@ -185,6 +187,22 @@ class HomeViewModel(
 
     fun changePeriodoSelect(periodo: Periodo) {
         _periodoSelect.value = periodo
+    }
+
+    //  --------------------------------------------------- BOTTOM CARRERAS ---------------------------------------------------
+    private val _showBottomCarreras = MutableStateFlow(false)
+    val showBottomCarreras: StateFlow<Boolean> = _showBottomCarreras
+
+    private val _inscripcionCarreraSelect = MutableStateFlow<InscripcionCarrera?>(null)
+    val inscripcionCarreraSelect: StateFlow<InscripcionCarrera?> = _inscripcionCarreraSelect
+
+    fun changeShowBottomCarreras() {
+        _showBottomCarreras.value = !_showBottomCarreras.value
+    }
+
+    fun changeInscripcionCarreraSelect(newValue: InscripcionCarrera) {
+        _inscripcionCarreraSelect.value = newValue
+        _homeData.value!!.persona.idInscripcion = newValue.id
     }
 
     //  --------------------------------------------------- IMAGENES ---------------------------------------------------
