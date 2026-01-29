@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FormField(
     val action: String,
-    val value: String?,
+    val value: String? = null,
     val id: Int?
 )

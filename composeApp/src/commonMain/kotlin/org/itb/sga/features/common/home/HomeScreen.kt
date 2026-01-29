@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,6 +33,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +41,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import kotlinx.coroutines.launch
 import org.itb.sga.core.ROUTES
 import org.itb.sga.core.capitalizeWords
 import org.itb.sga.data.network.GrupoModulo
@@ -88,6 +91,8 @@ fun Screen(
     val homeData by homeViewModel.homeData.collectAsState(null)
     val isLoading by homeViewModel.isLoading.collectAsState(false)
     val response by homeViewModel.response.collectAsState(null)
+    val showMaterialApoyo by homeViewModel.showMaterialApoyo.collectAsState(false)
+    val scope = rememberCoroutineScope()
 
     homeViewModel.actualPageRestart()
 
@@ -99,6 +104,11 @@ fun Screen(
         if (isLoading) {
             ShimmerFormLoadingAnimation(20)
         } else {
+            homeData?.persona?.let {
+                if (it.material_apoyo_adicional) {
+                    MaterialApoyo(onclick = {homeViewModel.changeShowMaterialApoyo(true)})
+                }
+            }
             homeData?.grupoModulos?.let { grupoModulos ->
                 grupoModulos.forEach { item ->
                     GrupoItem(item, navController, homeViewModel)
@@ -132,6 +142,23 @@ fun Screen(
         }
     }
 
+    if (showMaterialApoyo) {
+        MyConfirmAlert(
+            titulo = "¿Desea continuar?",
+            mensaje = "Se procederá a generar un rubro por \$35 en sus finanzas. Una vez efectuado el pago, podrá retirar el material de apoyo correspondiente en su facultad.",
+            onCancel = {
+                homeViewModel.changeShowMaterialApoyo(false)
+            },
+            onConfirm = {
+                scope.launch {
+                    homeViewModel.changeShowMaterialApoyo(false)
+                    homeViewModel.generarMaterialApoyo()
+                }
+            },
+            showAlert = true
+        )
+    }
+
     val showSaveCredentials by homeViewModel.showSaveCredentials.collectAsState(initial = false)
 
     LaunchedEffect(loginViewModel) {
@@ -152,6 +179,49 @@ fun Screen(
             showAlert = true
         )
     }
+}
+
+@Composable
+fun MaterialApoyo(
+    onclick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.End
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.medium,
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 4.dp
+            ),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.background
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 14.dp)
+            ) {
+                Text(
+                    text = "📘 ¿Desea adquirir Material de Apoyo Adicional?",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Haga clic aquí",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable {
+                        onclick()
+                    }
+                )
+            }
+        }
+    }
+    Spacer(modifier = Modifier.height(4.dp))
 }
 
 @Composable

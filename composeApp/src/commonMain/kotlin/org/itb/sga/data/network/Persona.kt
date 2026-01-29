@@ -20,5 +20,6 @@ data class Persona(
     val sexo: String?,
     val tipoIdentificacion: String,
     val usuario: String,
-    val inscripciones: List<InscripcionCarrera>?
+    val inscripciones: List<InscripcionCarrera>?,
+    val material_apoyo_adicional: Boolean
 )

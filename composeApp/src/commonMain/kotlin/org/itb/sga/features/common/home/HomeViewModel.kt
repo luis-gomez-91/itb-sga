@@ -28,6 +28,7 @@ import org.itb.sga.data.network.Error
 import org.itb.sga.data.network.InscripcionCarrera
 import org.itb.sga.data.network.notificaciones.Notificacion
 import org.itb.sga.data.network.Response
+import org.itb.sga.data.network.form.FormField
 import org.itb.sga.data.network.form.RequestPasswordChangeForm
 import org.itb.sga.features.common.login.LoginViewModel
 
@@ -455,6 +456,33 @@ class HomeViewModel(
         viewModelScope.launch {
             val result = homeData.value?.persona?.let { service.fetchNotificacionesDetalle(not.id, it.idPersona) }
             not.detail = result
+        }
+    }
+
+//    Material de apoyo
+    private val _showMaterialApoyo = MutableStateFlow<Boolean>(false)
+    val showMaterialApoyo: StateFlow<Boolean> = _showMaterialApoyo
+
+    fun changeShowMaterialApoyo(newValue: Boolean) {
+        _showMaterialApoyo.value = newValue
+    }
+
+    suspend fun generarMaterialApoyo() {
+        try {
+            val form = homeData.value?.persona?.idInscripcion?.let {
+                FormField(
+                    action = "generar_material_apoyo_adicional",
+                    id = it,
+                )
+            }
+            val result = form?.let { requestPostDispatcher(client, it) }
+            _response.value = result
+
+        } catch (e: Exception) {
+            val error = Error("Error", "Error inesperado: ${e.message}")
+            ReportResult.Failure(error)
+        } finally {
+
         }
     }
 
